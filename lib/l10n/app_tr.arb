@@ -1,0 +1,37 @@
+{
+    "game_name": "Fareler ve Patiler: Kedi Oyunu",
+    "start_button": "Başla!",
+    "settings_button": "Ayarlar",
+    "howtoplay_button": "Nasıl Oynanır?",
+    "credits_button": "Emeği Geçenler",
+    "exit_button": "Çıkış Yap",
+    "select_language": "Dil Seçiniz",
+    "select_difficulty": "Zorluk Seçiniz",
+    "select_time": "Süreyi Seçiniz",
+    "select_musicvolume": "Müziğin Ses Yüksekliği",
+    "select_charactervolume": "Karakterlerin Ses Yüksekliği",
+    "save_button": "Kaydet",
+    "countdown": "Kalan Süre",
+    "game_over": "Oyun Bitti",
+    "tryagain_button": "Tekrar Dene",
+    "return_mainmenu_button": "Ana Menü'ye Dön",
+    "howtoplay_label_forhuman": "Nasıl Oynanır? (İnsanlar İçin)",
+    "howtoplay_text_forhuman": "Oyun çok basit! Ayarlardan kedinizin oynaması için istediğiniz süreyi seçin, ardından oyunu başlatın! Kediniz yakaladığı her cisim başına puan kazanacak! Eğer bir süre olsun istemiyorsanız, direk oyunu kum havuzu modunda açabilirsiniz!",
+    "howtoplay_label_forcats": "Nasıl Oynanır? (Kediler İçin)",
+    "howtoplay_text_forcats": "Miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav",
+    "micetap_count": "Tıklanan Fareler:",
+    "bugtap_count": "Tıklanan Böcekler:",
+    "wrongtap_count": "Dışarı Tıklamalar:",
+    "save_complete_snackbar": "İşlem Başarıyla Tamamlandı!",
+    "error": "Hata",
+    "credits_creators": "Yapımcılar",
+    "credits_creators_text": "Buğra Kaan Sağlam",
+    "exit_validation": "Kim Çıkmak İstiyor? \nKedi mi İnsan mı?",
+    "this_will_close_automatically_in_seconds": "Bu Ekran 2 Saniye İçerisinde \nOtomatik Kapanacak...",
+    "i_am_cat": "Miyav??",
+    "i_am_human": "Ben İnsanım, Oyunu Kapat",
+    "loading": "Yükleniyor..."
+
+
+
+}
