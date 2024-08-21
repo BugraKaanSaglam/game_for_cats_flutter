@@ -55,10 +55,10 @@ android {
     }
     signingConfigs {
      release {
-       storeFile file('keystore.jks')
-       keyAlias 'key'
-       keyPassword '*****'
-       storePassword '*****'
+       storeFile file('my-release-key.jks')
+       keyAlias  System.getenv("KEY_ALIAS")
+       keyPassword System.getenv("KEY_PASSWORD")
+       storePassword System.getenv("KEYSTORE_PASSWORD")
      }
    }
    buildTypes {
