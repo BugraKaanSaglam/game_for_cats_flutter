@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_flutter/database/db_error.dart';
