@@ -30,4 +30,6 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34" />
+
 </manifest>

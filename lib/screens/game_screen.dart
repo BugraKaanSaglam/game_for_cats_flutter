@@ -158,7 +158,8 @@ class Game extends FlameGame with TapDetector, HasGameRef, HasCollisionDetection
   @override
   void render(Canvas canvas) {
     canvas.drawImageRect(globalBackgroundImage, const Rect.fromLTWH(0, 0, 1024, 1024), Rect.fromLTWH(0, 0, size.x, size.y), Paint());
-    canvas.drawRect(Vector2(gameRef.size.x, gameScreenTopBarHeight).toRect(), Paint()..color = MainAppState().gameTheme.colorScheme.surface); //TopBar
+    canvas.drawRect(
+        Vector2(gameRef.size.x, gameScreenTopBarHeight).toRect(), Paint()..color = MainAppState().gameTheme.appBarTheme.backgroundColor ?? Colors.deepOrange); //TopBar
     drawCountdown(canvas);
     super.render(canvas);
   }

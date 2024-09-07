@@ -1,12 +1,12 @@
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_flutter/enums/enum_functions.dart';
-import 'package:game_for_cats_flutter/enums/game_enums.dart';
-import 'package:game_for_cats_flutter/screens/credits_screen.dart';
-import 'package:game_for_cats_flutter/screens/game_screen.dart';
-import 'package:game_for_cats_flutter/screens/howtoplay_screen.dart';
-import 'package:game_for_cats_flutter/screens/main_screen.dart';
-import 'package:game_for_cats_flutter/screens/settings_screen.dart';
+import 'enums/enum_functions.dart';
+import 'enums/game_enums.dart';
+import 'screens/credits_screen.dart';
+import 'screens/game_screen.dart';
+import 'screens/howtoplay_screen.dart';
+import 'screens/main_screen.dart';
+import 'screens/settings_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() {
@@ -25,6 +25,7 @@ class MainApp extends StatefulWidget {
 
 //Language Controller
 Language languageCode = Language.english;
+Color barColor = const Color.fromRGBO(255, 112, 67, 1);
 
 class MainAppState extends State<MainApp> {
   void setLocale(int value) {
@@ -36,6 +37,7 @@ class MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      themeMode: ThemeMode.light,
       theme: gameTheme,
       debugShowCheckedModeBanner: false,
       home: const MainScreen(),
@@ -53,19 +55,11 @@ class MainAppState extends State<MainApp> {
   }
 
   ThemeData gameTheme = ThemeData(
-    primarySwatch: Colors.blueGrey,
-    canvasColor: Colors.green,
-    visualDensity: VisualDensity.adaptivePlatformDensity,
-    colorScheme: ColorScheme(
-      brightness: Brightness.light,
-      primary: Colors.white, //General Text Color
-      onPrimary: Colors.black, //X
-      secondary: Colors.black, //X
-      onSecondary: Colors.black, //X
-      error: Colors.red, //Validation Errors (Not Needed)
-      onError: Colors.white, //X
-      surface: Colors.deepOrange.shade700, //App Color
-      onSurface: Colors.black, //AppBar Text Color
-    ),
+    navigationBarTheme: NavigationBarThemeData(backgroundColor: barColor),
+    appBarTheme: AppBarTheme(backgroundColor: barColor),
+    canvasColor: Colors.grey.shade400,
+    visualDensity: VisualDensity.comfortable,
+    primaryColor: barColor,
+    elevatedButtonTheme: ElevatedButtonThemeData(style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(barColor))),
   );
 }

@@ -1,5 +1,5 @@
-import 'package:game_for_cats_flutter/enums/game_enums.dart';
-import 'package:game_for_cats_flutter/global/global_variables.dart';
+import 'game_enums.dart';
+import '../global/global_variables.dart';
 
 Language getLanguageFromValue(int? value) {
   switch (value) {

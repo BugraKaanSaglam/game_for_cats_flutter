@@ -24,4 +24,4 @@ AppBar mainAppBar(String title, BuildContext context, {bool hasBackButton = true
 }
 
 TextStyle labelTextStyle() => const TextStyle(fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold);
-TextStyle normalTextStyle() => const TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.w300);
+TextStyle normalTextStyle() => const TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w300);

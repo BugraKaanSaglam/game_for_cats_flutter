@@ -2,7 +2,7 @@
 
 import 'dart:developer';
 
-import 'package:game_for_cats_flutter/database/opc_database_list.dart';
+import 'opc_database_list.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:io' as io;
 import 'package:path/path.dart' show join;
