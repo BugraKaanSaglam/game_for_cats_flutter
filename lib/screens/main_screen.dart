@@ -1,4 +1,3 @@
-// ignore_for_file: must_be_immutable, use_build_context_synchronously
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_flutter/database/db_error.dart';
@@ -27,7 +26,14 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: mainAppBar(AppLocalizations.of(context)!.game_name, context, hasBackButton: false),
-      body: mainBody(context),
+      body: Stack(
+        children: [
+          // Background image
+          Positioned.fill(child: Image.asset('assets/images/mainscreenbg.png', fit: BoxFit.fill)),
+          // Main content
+          mainBody(context),
+        ],
+      ),
     );
   }
 
@@ -40,8 +46,7 @@ class _MainScreenState extends State<MainScreen> {
               return const Center(child: CircularProgressIndicator());
             case ConnectionState.done:
               if (snapshot.data == null) {
-                OPCDataBase initDataBase =
-                    OPCDataBase(ver: databaseVersion, languageCode: Language.english.value, musicVolume: 0.5, characterVolume: 1, time: Time.fifty.value);
+                OPCDataBase initDataBase = OPCDataBase(ver: databaseVersion, languageCode: Language.english.value, musicVolume: 0.5, characterVolume: 1, time: Time.fifty.value);
                 DBHelper().add(initDataBase);
                 _db = initDataBase;
               } else {
@@ -58,13 +63,24 @@ class _MainScreenState extends State<MainScreen> {
                 MainApp.of(context)!.setLocale(languageCode.value);
               });
               return Column(children: [
-                const Spacer(flex: 20),
-                mainMenuButtons(context, AppLocalizations.of(context)!.start_button, '/game_screen', const Icon(Icons.arrow_right_alt_sharp), dataBase: _db),
-                mainMenuButtons(context, AppLocalizations.of(context)!.settings_button, '/settings_screen', const Icon(Icons.settings)),
-                mainMenuButtons(context, AppLocalizations.of(context)!.howtoplay_button, '/howtoplay_screen', const Icon(Icons.menu_book)),
-                mainMenuButtons(context, AppLocalizations.of(context)!.credits_button, '/credits_screen', const Icon(Icons.pest_control_rodent_sharp)),
-                const Spacer(flex: 1),
+                const Spacer(flex: 80),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    mainMenuButtons(context, AppLocalizations.of(context)!.start_button, '/game_screen', const Icon(Icons.arrow_right_alt_sharp), dataBase: _db),
+                    mainMenuButtons(context, AppLocalizations.of(context)!.settings_button, '/settings_screen', const Icon(Icons.settings)),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    mainMenuButtons(context, AppLocalizations.of(context)!.howtoplay_button, '/howtoplay_screen', const Icon(Icons.menu_book)),
+                    mainMenuButtons(context, AppLocalizations.of(context)!.credits_button, '/credits_screen', const Icon(Icons.pest_control_rodent_sharp)),
+                  ],
+                ),
+                const Spacer(flex: 15),
                 exitButton(AppLocalizations.of(context)!.exit_button, context),
+                const Spacer(flex: 1),
               ]);
 
             default:
@@ -83,12 +99,23 @@ class _MainScreenState extends State<MainScreen> {
     argumentSender = ArgumentSender(title: buttonString, dataBase: dataBase);
 
     return ElevatedButton(
+      style: const ButtonStyle(
+        fixedSize: WidgetStatePropertyAll<Size>(Size(170, 40)),
+        padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 20, vertical: 5)),
+      ),
       onPressed: () => Navigator.pushNamedAndRemoveUntil(context, adressString, (route) => false, arguments: argumentSender),
-      child: Row(children: [Text(buttonString, style: const TextStyle(fontWeight: FontWeight.bold)), buttonIcon]),
+      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(buttonString, style: const TextStyle(fontWeight: FontWeight.bold)), buttonIcon]),
     );
   }
 
   ElevatedButton exitButton(String title, BuildContext context) {
-    return ElevatedButton(onPressed: () => exit(0), child: Row(children: [Text(title), const Icon(Icons.exit_to_app_outlined)]));
+    return ElevatedButton(
+      onPressed: () => exit(0),
+      style: const ButtonStyle(
+        fixedSize: WidgetStatePropertyAll<Size>(Size(270, 40)),
+        padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
+      ),
+      child: Row(children: [Text(title), const Icon(Icons.exit_to_app_outlined)]),
+    );
   }
 }

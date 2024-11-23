@@ -1,6 +1,6 @@
 {
     "game_name": "Mice and Paws: Cat Game",
-    "start_button": "Start!",
+    "start_button": "Start The Game!",
     "settings_button": "Settings",
     "howtoplay_button": "How To Play?",
     "credits_button": "Credits",
@@ -14,7 +14,7 @@
     "countdown": "Time Left",
     "game_over": "Game Over",
     "tryagain_button": "Try Again",
-    "return_mainmenu_button": "Return to MainMenu",  
+    "return_mainmenu_button": "Return to MainMenu",
     "howtoplay_label_forhuman": "How To Play? (For Humans)",
     "howtoplay_text_forhuman": "Game is soo simple!, Select time for play from settings, then press Start!, If you want no time limit, select sandbox from settings!",
     "howtoplay_label_forcats": "How To Play? (For Cats)",
@@ -31,5 +31,4 @@
     "i_am_cat": "Meow??",
     "i_am_human": "I am Human, Close the Game",
     "loading": "Loading..."
-
 }

@@ -1,6 +1,6 @@
 {
     "game_name": "Fareler ve Patiler: Kedi Oyunu",
-    "start_button": "Başla!",
+    "start_button": "Oyuna Başla!",
     "settings_button": "Ayarlar",
     "howtoplay_button": "Nasıl Oynanır?",
     "credits_button": "Emeği Geçenler",
@@ -31,7 +31,4 @@
     "i_am_cat": "Miyav??",
     "i_am_human": "Ben İnsanım, Oyunu Kapat",
     "loading": "Yükleniyor..."
-
-
-
 }
