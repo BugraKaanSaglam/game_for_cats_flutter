@@ -51,14 +51,30 @@ android {
         versionCode 7
         versionName "1.7"
     }
+    def keystoreProperties = new Properties()
+    def keystorePropertiesFile = rootProject.file("key.properties")
+    if (keystorePropertiesFile.exists()) {
+        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    }   
+
+android {
     signingConfigs {
-     release {
-       storeFile file('my-release-key.jks')
-       keyAlias  System.getenv("KEY_ALIAS")
-       keyPassword System.getenv("KEY_PASSWORD")
-       storePassword System.getenv("KEYSTORE_PASSWORD")
-     }
-   }
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
+}
+
    buildTypes {
        release {
          signingConfig signingConfigs.release
