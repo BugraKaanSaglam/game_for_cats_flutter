@@ -9,7 +9,7 @@ AppBar mainAppBar(String title, BuildContext context, {bool hasBackButton = true
       centerTitle: true,
       leading: leading,
       elevation: 20,
-      shadowColor: Colors.yellowAccent,
+      shadowColor: Colors.white,
       foregroundColor: Colors.white,
     );
   } else {

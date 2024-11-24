@@ -31,8 +31,9 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
+    final padding = MediaQuery.of(context).padding;
     final args = ModalRoute.of(context)?.settings.arguments as ArgumentSender;
-    return GameWidget(game: Game(args.dataBase, context), loadingBuilder: (p0) => loadingScreen(context));
+    return Padding(padding: EdgeInsets.only(top: padding.top), child: GameWidget(game: Game(args.dataBase, context), loadingBuilder: (p0) => loadingScreen(context)));
   }
 }
 
@@ -158,8 +159,7 @@ class Game extends FlameGame with TapDetector, HasGameRef, HasCollisionDetection
   @override
   void render(Canvas canvas) {
     canvas.drawImageRect(globalBackgroundImage, const Rect.fromLTWH(0, 0, 1024, 1024), Rect.fromLTWH(0, 0, size.x, size.y), Paint());
-    canvas.drawRect(
-        Vector2(gameRef.size.x, gameScreenTopBarHeight).toRect(), Paint()..color = MainAppState().gameTheme.appBarTheme.backgroundColor ?? Colors.deepOrange); //TopBar
+    canvas.drawRect(Vector2(gameRef.size.x, gameScreenTopBarHeight).toRect(), Paint()..color = MainAppState().gameTheme.appBarTheme.backgroundColor ?? Colors.deepOrange); //TopBar
     drawCountdown(canvas);
     super.render(canvas);
   }
