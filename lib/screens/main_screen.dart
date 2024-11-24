@@ -59,10 +59,8 @@ class _MainScreenState extends State<MainScreen> {
               checkGameTime(_db?.time);
               //Set Language
               languageCode = getLanguageFromValue(_db?.languageCode);
-              Future.delayed(const Duration(), () {
-                MainApp.of(context)!.setLocale(languageCode.value);
-              });
-              return Column(children: [
+              Future.delayed(const Duration(), () => MainApp.of(context)!.setLocale(languageCode.value));
+              return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
                 const Spacer(flex: 80),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -71,6 +69,7 @@ class _MainScreenState extends State<MainScreen> {
                     mainMenuButtons(context, AppLocalizations.of(context)!.settings_button, '/settings_screen', const Icon(Icons.settings)),
                   ],
                 ),
+                const Spacer(flex: 1),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -89,9 +88,7 @@ class _MainScreenState extends State<MainScreen> {
         });
   }
 
-  checkGameTime(int? time) {
-    getTimeFromValue(time); //This also set gameTimer!
-  }
+  checkGameTime(int? time) => getTimeFromValue(time); //This also set gameTimer!
 
 //* Buttons
   ElevatedButton mainMenuButtons(BuildContext context, String buttonString, String adressString, Icon buttonIcon, {OPCDataBase? dataBase}) {
@@ -100,7 +97,7 @@ class _MainScreenState extends State<MainScreen> {
 
     return ElevatedButton(
       style: const ButtonStyle(
-        fixedSize: WidgetStatePropertyAll<Size>(Size(170, 40)),
+        fixedSize: WidgetStatePropertyAll<Size>(Size(200, 40)),
         padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 20, vertical: 5)),
       ),
       onPressed: () => Navigator.pushNamedAndRemoveUntil(context, adressString, (route) => false, arguments: argumentSender),
