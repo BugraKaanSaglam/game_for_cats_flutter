@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:game_for_cats_flutter/classes/custom_text.dart';
 import 'package:game_for_cats_flutter/database/db_error.dart';
 import 'package:game_for_cats_flutter/database/db_helper.dart';
 import 'package:game_for_cats_flutter/database/opc_database_list.dart';
@@ -10,7 +11,7 @@ import 'package:game_for_cats_flutter/enums/game_enums.dart';
 import 'package:game_for_cats_flutter/global/argumentsender_class.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../functions/form_functions.dart';
+import '../classes/custom_button.dart';
 import '../global/global_functions.dart';
 import '../global/global_variables.dart';
 import '../main.dart';
@@ -94,22 +95,20 @@ class _MainScreenState extends State<MainScreen> {
   checkGameTime(int? time) => getTimeFromValue(time); //This also set gameTimer!
 
 //* Buttons
-  ElevatedButton mainMenuButtons(BuildContext context, String buttonString, String adressString, Icon buttonIcon, {OPCDataBase? dataBase}) {
+  CustomButton mainMenuButtons(BuildContext context, String buttonString, String adressString, Icon buttonIcon, {OPCDataBase? dataBase}) {
     ArgumentSender? argumentSender;
     argumentSender = ArgumentSender(title: buttonString, dataBase: dataBase);
 
-    return ElevatedButton(
-      style: gameButtonStyle(),
+    return CustomButton(
       onPressed: () => Navigator.pushNamedAndRemoveUntil(context, adressString, (route) => false, arguments: argumentSender),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(buttonString, style: const TextStyle(fontWeight: FontWeight.bold)), buttonIcon]),
+      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [CustomText(data: buttonString), buttonIcon]),
     );
   }
 
-  ElevatedButton exitButton(String title, BuildContext context) {
-    return ElevatedButton(
+  CustomButton exitButton(String title, BuildContext context) {
+    return CustomButton(
       onPressed: () => exit(0),
-      style: gameButtonStyle(fixedSize: const Size(270, 40)),
-      child: Row(children: [Text(title), const Icon(Icons.exit_to_app_outlined)]),
+      child: Row(children: [CustomText(data: title), const Icon(Icons.exit_to_app_outlined)]),
     );
   }
 }

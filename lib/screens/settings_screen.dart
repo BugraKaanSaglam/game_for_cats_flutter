@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
+import 'package:game_for_cats_flutter/classes/custom_button.dart';
 import 'package:game_for_cats_flutter/database/db_helper.dart';
 import 'package:game_for_cats_flutter/enums/game_enums.dart';
 import 'package:game_for_cats_flutter/main.dart';
@@ -19,6 +20,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   OPCDataBase? _db;
+  Color dropdownColor = const Color.fromARGB(255, 197, 196, 196);
   @override
   void initState() {
     super.initState();
@@ -64,7 +66,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       children: [
         Text(AppLocalizations.of(context)!.select_language),
         DropdownButtonFormField(
-          dropdownColor: Colors.white,
+          dropdownColor: dropdownColor,
           value: _db?.languageCode ?? 0,
           decoration: formDecoration(),
           items: items,
@@ -108,7 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       children: [
         Text(AppLocalizations.of(context)!.select_time),
         DropdownButtonFormField(
-          dropdownColor: Colors.white,
+          dropdownColor: dropdownColor,
           value: _db?.time ?? Time.fifty.value,
           decoration: formDecoration(),
           items: items,
@@ -159,8 +161,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   ElevatedButton saveButton() {
-    return ElevatedButton(
-      style: gameButtonStyle(),
+    return CustomButton(
       onPressed: () {
         setState(() {
           ScaffoldMessenger.of(context).showSnackBar(

@@ -1,16 +1,6 @@
 //* Decorations
 import 'package:flutter/material.dart';
 
-ButtonStyle gameButtonStyle({Size? fixedSize}) {
-  Size buttonFixedSize = const Size(200, 40);
-  if (fixedSize != null) buttonFixedSize = fixedSize;
-  return ButtonStyle(
-    fixedSize: WidgetStatePropertyAll<Size>(buttonFixedSize),
-    backgroundColor: const WidgetStatePropertyAll<Color>(Color.fromARGB(255, 255, 97, 62)),
-    padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 20, vertical: 5)),
-  );
-}
-
 InputDecoration formDecoration() {
   return InputDecoration(
     labelStyle: formTextStyle(),
