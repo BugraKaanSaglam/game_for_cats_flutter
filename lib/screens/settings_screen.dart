@@ -5,7 +5,7 @@ import 'package:game_for_cats_flutter/enums/game_enums.dart';
 import 'package:game_for_cats_flutter/main.dart';
 import '../database/db_error.dart';
 import '../database/opc_database_list.dart';
-import '../functions/settings_form_functions.dart';
+import '../functions/form_functions.dart';
 import '../global/global_functions.dart';
 import '../global/global_variables.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -160,14 +160,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   ElevatedButton saveButton() {
     return ElevatedButton(
+      style: gameButtonStyle(),
       onPressed: () {
         setState(() {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context)!.save_complete_snackbar),
-              elevation: 10,
-              duration: const Duration(seconds: 2),
-            ),
+            SnackBar(content: Text(AppLocalizations.of(context)!.save_complete_snackbar), elevation: 10, duration: const Duration(seconds: 2)),
           );
           DBHelper().update(_db!);
           MainApp.of(context)!.setLocale(_db!.languageCode);

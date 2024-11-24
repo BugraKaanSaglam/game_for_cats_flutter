@@ -25,13 +25,11 @@ class MainApp extends StatefulWidget {
 
 //Language Controller
 Language languageCode = Language.english;
-Color barColor = const Color.fromRGBO(255, 112, 67, 1);
+Color barColor = const Color.fromARGB(255, 32, 141, 244);
 
 class MainAppState extends State<MainApp> {
   void setLocale(int value) {
-    setState(() {
-      languageCode = getLanguageFromValue(value);
-    });
+    setState(() => languageCode = getLanguageFromValue(value));
   }
 
   @override
@@ -58,7 +56,7 @@ class MainAppState extends State<MainApp> {
     navigationBarTheme: NavigationBarThemeData(backgroundColor: barColor),
     appBarTheme: AppBarTheme(backgroundColor: barColor),
     canvasColor: Colors.grey.shade400,
-    visualDensity: VisualDensity.comfortable,
+    visualDensity: VisualDensity.adaptivePlatformDensity,
     primaryColor: barColor,
     elevatedButtonTheme: ElevatedButtonThemeData(style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(barColor))),
   );

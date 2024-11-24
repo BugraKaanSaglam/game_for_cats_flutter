@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_flutter/database/db_error.dart';
@@ -8,6 +10,7 @@ import 'package:game_for_cats_flutter/enums/game_enums.dart';
 import 'package:game_for_cats_flutter/global/argumentsender_class.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../functions/form_functions.dart';
 import '../global/global_functions.dart';
 import '../global/global_variables.dart';
 import '../main.dart';
@@ -96,10 +99,7 @@ class _MainScreenState extends State<MainScreen> {
     argumentSender = ArgumentSender(title: buttonString, dataBase: dataBase);
 
     return ElevatedButton(
-      style: const ButtonStyle(
-        fixedSize: WidgetStatePropertyAll<Size>(Size(200, 40)),
-        padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 20, vertical: 5)),
-      ),
+      style: gameButtonStyle(),
       onPressed: () => Navigator.pushNamedAndRemoveUntil(context, adressString, (route) => false, arguments: argumentSender),
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text(buttonString, style: const TextStyle(fontWeight: FontWeight.bold)), buttonIcon]),
     );
@@ -108,10 +108,7 @@ class _MainScreenState extends State<MainScreen> {
   ElevatedButton exitButton(String title, BuildContext context) {
     return ElevatedButton(
       onPressed: () => exit(0),
-      style: const ButtonStyle(
-        fixedSize: WidgetStatePropertyAll<Size>(Size(270, 40)),
-        padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 20, vertical: 10)),
-      ),
+      style: gameButtonStyle(fixedSize: const Size(270, 40)),
       child: Row(children: [Text(title), const Icon(Icons.exit_to_app_outlined)]),
     );
   }
