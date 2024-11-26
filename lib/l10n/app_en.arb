@@ -11,7 +11,7 @@
     "select_musicvolume": "Game Music Volume",
     "select_charactervolume": "Characters Volume",
     "save_button": "Save",
-    "countdown": "Time Left",
+    "countdown": "Time Left: ",
     "game_over": "Game Over",
     "tryagain_button": "Try Again",
     "return_mainmenu_button": "Return to MainMenu",

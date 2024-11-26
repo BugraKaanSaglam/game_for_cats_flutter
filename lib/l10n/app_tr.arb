@@ -11,7 +11,7 @@
     "select_musicvolume": "Müziğin Ses Yüksekliği",
     "select_charactervolume": "Karakterlerin Ses Yüksekliği",
     "save_button": "Kaydet",
-    "countdown": "Kalan Süre",
+    "countdown": "Kalan Süre: ",
     "game_over": "Oyun Bitti",
     "tryagain_button": "Tekrar Dene",
     "return_mainmenu_button": "Ana Menü'ye Dön",
