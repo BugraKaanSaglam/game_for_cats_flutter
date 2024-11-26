@@ -1,3 +1,3 @@
 # game_for_cats_flutter
 
-A new Flutter project.
+Flutter project, mini game designed with flame engine for cats
