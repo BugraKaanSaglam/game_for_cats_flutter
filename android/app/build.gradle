@@ -48,8 +48,8 @@ android {
         minSdkVersion flutter.minSdkVersion
         compileSdkVersion 34
         targetSdkVersion 34
-        versionCode 7
-        versionName "1.7"
+        versionCode project.hasProperty('FLUTTER_BUILD_NUMBER') ? project.FLUTTER_BUILD_NUMBER.toInteger() : 1
+        versionName project.hasProperty('FLUTTER_BUILD_NAME') ? project.FLUTTER_BUILD_NAME : "1.0"
     }
     def keystoreProperties = new Properties()
     def keystorePropertiesFile = rootProject.file("key.properties")

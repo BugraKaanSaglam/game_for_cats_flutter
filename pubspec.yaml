@@ -1,7 +1,7 @@
 name: game_for_cats_flutter
-description: A new Flutter project.
+description: Game For Cats
 publish_to: 'none'
-version: 0.1.1
+version: 1.1.0+10
 
 environment:
   sdk: '>=3.0.6 <4.0.0'

@@ -17,17 +17,16 @@ import 'package:game_for_cats_flutter/objects/mice.dart';
 import 'package:game_for_cats_flutter/global/global_images.dart';
 import 'package:game_for_cats_flutter/utils/utils.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 import '../functions/game_functions.dart';
 
 bool isBackButtonClicked = false;
-bool isGameClosing = false;
 int elapsedTicks = 0; // Seconds
 ValueNotifier<int> elapsedTicksNotifier = ValueNotifier<int>(0);
 bool isBackButtonDialogOpen = false;
 FlameGame<World>? _game;
 GameClicksCounter clicksCounter = GameClicksCounter();
 OPCDataBase? _gameDatabase;
+bool isPaused = false; // Is Game Stopped
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -55,10 +54,18 @@ AlertDialog endGameDialog(BuildContext context) {
         ),
       ),
       actions: [
+        //* Restart
         ElevatedButton(
-          onPressed: () async => await closeGame(_game!, context, adress: '/game_screen', arguments: ArgumentSender(title: "", dataBase: _gameDatabase)),
+          onPressed: () async {
+            await closeGame(_game!, context, adress: '/game_screen', arguments: ArgumentSender(title: "", dataBase: _gameDatabase));
+            //* Restarting Game Parameters
+            isPaused = false;
+            clicksCounter.reset();
+            elapsedTicks = 0;
+          },
           child: Text(AppLocalizations.of(context)!.tryagain_button),
         ),
+        //* Return to Main Menu
         ElevatedButton(
           onPressed: () async => await closeGame(_game!, context, adress: '/main_screen'),
           child: Text(AppLocalizations.of(context)!.return_mainmenu_button),
@@ -68,8 +75,8 @@ AlertDialog endGameDialog(BuildContext context) {
 
 //* Game Ended, After This Function Triggers
 Future<void> closeGame(FlameGame<World> game, BuildContext context, {String? adress, ArgumentSender? arguments}) async {
-  game.pauseEngine();
   await FlameAudio.bgm.stop();
+  game.pauseEngine();
 
   if (adress != null) {
     if (arguments == null) {
@@ -79,7 +86,7 @@ Future<void> closeGame(FlameGame<World> game, BuildContext context, {String? adr
       Navigator.pushNamedAndRemoveUntil(context, adress, (route) => false, arguments: arguments);
     }
   }
-  isGameClosing = true;
+  isPaused = true; // Oyunu durdur
   isBackButtonClicked = false;
 }
 
@@ -100,12 +107,14 @@ AlertDialog backButtonDialog(FlameGame<World> game, BuildContext context) {
       ),
     ),
     actions: [
+      //* I am Cat Option
       ElevatedButton(
           onPressed: () {
             isBackButtonDialogOpen = false;
             Navigator.pop(context);
           },
           child: Text(AppLocalizations.of(context)!.i_am_cat)),
+      //* I am Human Option
       ElevatedButton(
         onPressed: () async {
           isBackButtonDialogOpen = false;
@@ -121,23 +130,22 @@ AlertDialog backButtonDialog(FlameGame<World> game, BuildContext context) {
 
 //* Function to close the dialog
 void closeDialogAutomatically(BuildContext context) {
-  if (isBackButtonDialogOpen && context.mounted == true) {
-    Navigator.pop(context);
-  }
+  if (isBackButtonDialogOpen && context.mounted == true) Navigator.pop(context);
   isBackButtonDialogOpen = false;
 }
 
 AppBar gameAppBar(BuildContext context) {
   return AppBar(
     leading: BackButton(
-        onPressed: () => showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (context) {
-              isBackButtonClicked = true;
-              Future.delayed(const Duration(seconds: 2), () => closeDialogAutomatically(context));
-              return backButtonDialog(_game!, context);
-            })),
+      onPressed: () => showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) {
+            isBackButtonClicked = true;
+            Future.delayed(const Duration(seconds: 2), () => closeDialogAutomatically(context));
+            return backButtonDialog(_game!, context);
+          }),
+    ),
     title: ValueListenableBuilder<int>(
       valueListenable: elapsedTicksNotifier,
       builder: (context, elapsedTicks, _) {
@@ -186,13 +194,12 @@ class Game extends FlameGame with TapDetector, HasGameRef, HasCollisionDetection
     }
     //Add Collision
     add(ScreenHitbox());
-    if (!isGameClosing) {
-      FlameAudio.bgm.play('bird_background_sound.mp3', volume: gameDataBase?.musicVolume ?? 1);
-    }
+    if (!isPaused) FlameAudio.bgm.play('bird_background_sound.mp3', volume: gameDataBase?.musicVolume ?? 1);
 
     interval = Timer(
       1.0,
       onTick: () async {
+        if (isPaused) return; // Game Paused
         if (elapsedTicks % 4 == 0) {
           double startingSpeed = 50;
           //Adding Mice or Bug Every 4 Seconds
@@ -222,6 +229,7 @@ class Game extends FlameGame with TapDetector, HasGameRef, HasCollisionDetection
 
   @override
   void update(double dt) {
+    if (isPaused) return; // If Game Stopped, No More Updates!
     super.update(dt);
     interval.update(dt);
   }
