@@ -164,9 +164,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return CustomButton(
       onPressed: () {
         setState(() {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)!.save_complete_snackbar), elevation: 10, duration: const Duration(seconds: 2)),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.save_complete_snackbar), elevation: 10, duration: const Duration(seconds: 2)));
           DBHelper().update(_db!);
           MainApp.of(context)!.setLocale(_db!.languageCode);
         });
