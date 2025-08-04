@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_flutter/global/argumentsender_class.dart';
 import '../global/global_functions.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:game_for_cats_flutter/l10n/app_localizations.dart';
 
 class CreditsScreen extends StatelessWidget {
   const CreditsScreen({super.key});

@@ -7,11 +7,11 @@ import 'screens/game_screen.dart';
 import 'screens/howtoplay_screen.dart';
 import 'screens/main_screen.dart';
 import 'screens/settings_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:game_for_cats_flutter/l10n/app_localizations.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Flame.device.fullScreen();
+  await Flame.device.fullScreen();
   runApp(const MainApp());
 }
 

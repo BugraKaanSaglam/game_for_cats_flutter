@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:game_for_cats_flutter/l10n/app_localizations.dart';
 import '../main.dart';
 
 Widget loadingScreen(BuildContext context) {

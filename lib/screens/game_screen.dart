@@ -16,7 +16,7 @@ import 'package:game_for_cats_flutter/objects/bug.dart';
 import 'package:game_for_cats_flutter/objects/mice.dart';
 import 'package:game_for_cats_flutter/global/global_images.dart';
 import 'package:game_for_cats_flutter/utils/utils.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:game_for_cats_flutter/l10n/app_localizations.dart';
 import '../functions/game_functions.dart';
 
 bool isBackButtonClicked = false;

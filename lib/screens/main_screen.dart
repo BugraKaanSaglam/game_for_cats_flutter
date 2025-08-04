@@ -9,7 +9,7 @@ import 'package:game_for_cats_flutter/database/opc_database_list.dart';
 import 'package:game_for_cats_flutter/enums/enum_functions.dart';
 import 'package:game_for_cats_flutter/enums/game_enums.dart';
 import 'package:game_for_cats_flutter/global/argumentsender_class.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:game_for_cats_flutter/l10n/app_localizations.dart';
 
 import '../classes/custom_button.dart';
 import '../global/global_functions.dart';

@@ -9,7 +9,7 @@ import '../database/opc_database_list.dart';
 import '../functions/form_functions.dart';
 import '../global/global_functions.dart';
 import '../global/global_variables.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:game_for_cats_flutter/l10n/app_localizations.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
