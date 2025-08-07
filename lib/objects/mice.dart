@@ -1,9 +1,11 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:game_for_cats_flutter/functions/animation_handler.dart';
-import 'package:game_for_cats_flutter/global/global_images.dart';
-import 'package:game_for_cats_flutter/global/global_variables.dart';
+import 'package:game_for_cats_2025/functions/animation_handler.dart';
+import 'package:game_for_cats_2025/global/global_images.dart';
+import 'package:game_for_cats_2025/global/global_variables.dart';
 
 import '../utils/utils.dart';
 
@@ -19,10 +21,7 @@ class Mice extends SpriteAnimationComponent with HasGameRef<FlameGame>, Collisio
   double steeringFactor = 0.01;
   Vector2 target = Vector2.zero();
 
-  Mice(Vector2 position, Vector2 velocity, double speed)
-      : _velocity = velocity,
-        _speed = speed,
-        super(animation: animationHandler(globalMiceImage, 5, 1), position: position, size: Vector2(64, 64), anchor: Anchor.center) {
+  Mice(Vector2 position, Vector2 velocity, double speed) : _velocity = velocity, _speed = speed, super(animation: animationHandler(globalMiceImage, 5, 1), position: position, size: Vector2(64, 64), anchor: Anchor.center) {
     add(RectangleHitbox());
   }
 
@@ -39,13 +38,13 @@ class Mice extends SpriteAnimationComponent with HasGameRef<FlameGame>, Collisio
     super.onCollision(intersectionPoints, other);
 
     final currentTime = DateTime.now();
-    if (!_isColliding || _lastCollisionTime == null || currentTime.difference(_lastCollisionTime!) >=  Duration(milliseconds: waitTimeForCollisions)) {
+    if (!_isColliding || _lastCollisionTime == null || currentTime.difference(_lastCollisionTime!) >= Duration(milliseconds: waitTimeForCollisions)) {
       _isColliding = true;
       _lastCollisionTime = currentTime;
       target = Utils.generateRandomPosition(gameRef.size, Vector2(0, 10));
 
       // Reset _isColliding after a certain delay
-      Future.delayed( Duration(milliseconds: waitTimeForCollisions), () {
+      Future.delayed(Duration(milliseconds: waitTimeForCollisions), () {
         _isColliding = false;
       });
     }

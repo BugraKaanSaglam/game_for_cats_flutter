@@ -1,9 +1,11 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:game_for_cats_flutter/functions/animation_handler.dart';
-import 'package:game_for_cats_flutter/global/global_images.dart';
-import 'package:game_for_cats_flutter/global/global_variables.dart';
+import 'package:game_for_cats_2025/functions/animation_handler.dart';
+import 'package:game_for_cats_2025/global/global_images.dart';
+import 'package:game_for_cats_2025/global/global_variables.dart';
 
 import '../utils/utils.dart';
 
@@ -19,10 +21,7 @@ class Bug extends SpriteAnimationComponent with HasGameRef<FlameGame>, Collision
   double steeringFactor = 0.01;
   Vector2 target = Vector2.zero();
 
-  Bug(Vector2 position, Vector2 velocity, double speed)
-      : _velocity = velocity,
-        _speed = speed,
-        super(animation: animationHandler(globalBugImage, 3, 1, stepTime: 0.08), position: position, size: Vector2(60, 60), anchor: Anchor.center) {
+  Bug(Vector2 position, Vector2 velocity, double speed) : _velocity = velocity, _speed = speed, super(animation: animationHandler(globalBugImage, 3, 1, stepTime: 0.08), position: position, size: Vector2(60, 60), anchor: Anchor.center) {
     add(RectangleHitbox());
   }
 

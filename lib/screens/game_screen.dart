@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable, use_build_context_synchronously
+// ignore_for_file: must_be_immutable, use_build_context_synchronously, deprecated_member_use
 import 'dart:async';
 import 'dart:math';
 import 'package:flame/components.dart';
@@ -7,16 +7,16 @@ import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_flutter/classes/game_classes.dart';
-import 'package:game_for_cats_flutter/database/opc_database_list.dart';
-import 'package:game_for_cats_flutter/functions/loading_screen_function.dart';
-import 'package:game_for_cats_flutter/global/argumentsender_class.dart';
-import 'package:game_for_cats_flutter/global/global_variables.dart';
-import 'package:game_for_cats_flutter/objects/bug.dart';
-import 'package:game_for_cats_flutter/objects/mice.dart';
-import 'package:game_for_cats_flutter/global/global_images.dart';
-import 'package:game_for_cats_flutter/utils/utils.dart';
-import 'package:game_for_cats_flutter/l10n/app_localizations.dart';
+import 'package:game_for_cats_2025/classes/game_classes.dart';
+import 'package:game_for_cats_2025/database/opc_database_list.dart';
+import 'package:game_for_cats_2025/functions/loading_screen_function.dart';
+import 'package:game_for_cats_2025/global/argumentsender_class.dart';
+import 'package:game_for_cats_2025/global/global_variables.dart';
+import 'package:game_for_cats_2025/objects/bug.dart';
+import 'package:game_for_cats_2025/objects/mice.dart';
+import 'package:game_for_cats_2025/global/global_images.dart';
+import 'package:game_for_cats_2025/utils/utils.dart';
+import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import '../functions/game_functions.dart';
 
 bool isBackButtonClicked = false;
@@ -38,39 +38,36 @@ class GameScreen extends StatefulWidget {
 AlertDialog endGameDialog(BuildContext context) {
   int wrongTaps = clicksCounter.totalTaps - (clicksCounter.bugTaps + clicksCounter.miceTaps);
   return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.game_over),
-      content: Container(
-        height: 100,
-        decoration: BoxDecoration(border: Border.all(), color: const Color.fromARGB(179, 210, 210, 210), borderRadius: BorderRadius.circular(20)),
-        child: Column(
-          children: [
-            Text("${AppLocalizations.of(context)!.bugtap_count} ${clicksCounter.bugTaps}"),
-            const Spacer(flex: 1),
-            Text("${AppLocalizations.of(context)!.micetap_count} ${clicksCounter.miceTaps}"),
-            const Spacer(flex: 1),
-            Text("${AppLocalizations.of(context)!.wrongtap_count} $wrongTaps"),
-            const Spacer(flex: 3),
-          ],
-        ),
+    title: Text(AppLocalizations.of(context)!.game_over),
+    content: Container(
+      height: 100,
+      decoration: BoxDecoration(border: Border.all(), color: const Color.fromARGB(179, 210, 210, 210), borderRadius: BorderRadius.circular(20)),
+      child: Column(children: [Text("${AppLocalizations.of(context)!.bugtap_count} ${clicksCounter.bugTaps}"), const Spacer(flex: 1), Text("${AppLocalizations.of(context)!.micetap_count} ${clicksCounter.miceTaps}"), const Spacer(flex: 1), Text("${AppLocalizations.of(context)!.wrongtap_count} $wrongTaps"), const Spacer(flex: 3)]),
+    ),
+    actions: [
+      //* Restart
+      ElevatedButton(
+        onPressed: () async {
+          await closeGame(
+            _game!,
+            context,
+            adress: '/game_screen',
+            arguments: ArgumentSender(title: "", dataBase: _gameDatabase),
+          );
+          //* Restarting Game Parameters
+          isPaused = false;
+          clicksCounter.reset();
+          elapsedTicks = 0;
+        },
+        child: Text(AppLocalizations.of(context)!.tryagain_button),
       ),
-      actions: [
-        //* Restart
-        ElevatedButton(
-          onPressed: () async {
-            await closeGame(_game!, context, adress: '/game_screen', arguments: ArgumentSender(title: "", dataBase: _gameDatabase));
-            //* Restarting Game Parameters
-            isPaused = false;
-            clicksCounter.reset();
-            elapsedTicks = 0;
-          },
-          child: Text(AppLocalizations.of(context)!.tryagain_button),
-        ),
-        //* Return to Main Menu
-        ElevatedButton(
-          onPressed: () async => await closeGame(_game!, context, adress: '/main_screen'),
-          child: Text(AppLocalizations.of(context)!.return_mainmenu_button),
-        ),
-      ]);
+      //* Return to Main Menu
+      ElevatedButton(
+        onPressed: () async => await closeGame(_game!, context, adress: '/main_screen'),
+        child: Text(AppLocalizations.of(context)!.return_mainmenu_button),
+      ),
+    ],
+  );
 }
 
 //* Game Ended, After This Function Triggers
@@ -99,21 +96,17 @@ AlertDialog backButtonDialog(FlameGame<World> game, BuildContext context) {
     content: Container(
       height: 100,
       decoration: BoxDecoration(border: Border.all(), color: Colors.white, borderRadius: BorderRadius.circular(20)),
-      child: Column(
-        children: [
-          Text(AppLocalizations.of(context)!.this_will_close_automatically_in_seconds),
-          const Spacer(flex: 1),
-        ],
-      ),
+      child: Column(children: [Text(AppLocalizations.of(context)!.this_will_close_automatically_in_seconds), const Spacer(flex: 1)]),
     ),
     actions: [
       //* I am Cat Option
       ElevatedButton(
-          onPressed: () {
-            isBackButtonDialogOpen = false;
-            Navigator.pop(context);
-          },
-          child: Text(AppLocalizations.of(context)!.i_am_cat)),
+        onPressed: () {
+          isBackButtonDialogOpen = false;
+          Navigator.pop(context);
+        },
+        child: Text(AppLocalizations.of(context)!.i_am_cat),
+      ),
       //* I am Human Option
       ElevatedButton(
         onPressed: () async {
@@ -138,23 +131,21 @@ AppBar gameAppBar(BuildContext context) {
   return AppBar(
     leading: BackButton(
       onPressed: () => showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (context) {
-            isBackButtonClicked = true;
-            Future.delayed(const Duration(seconds: 2), () => closeDialogAutomatically(context));
-            return backButtonDialog(_game!, context);
-          }),
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          isBackButtonClicked = true;
+          Future.delayed(const Duration(seconds: 2), () => closeDialogAutomatically(context));
+          return backButtonDialog(_game!, context);
+        },
+      ),
     ),
     title: ValueListenableBuilder<int>(
       valueListenable: elapsedTicksNotifier,
       builder: (context, elapsedTicks, _) {
         int remainingTime = gameTimer - elapsedTicks;
         String remainingTimeString = AppLocalizations.of(context)!.countdown;
-        return Text(
-          remainingTime > 0 ? remainingTimeString + remainingTime.toString() : AppLocalizations.of(context)!.game_over,
-          style: const TextStyle(color: Colors.white),
-        );
+        return Text(remainingTime > 0 ? remainingTimeString + remainingTime.toString() : AppLocalizations.of(context)!.game_over, style: const TextStyle(color: Colors.white));
       },
     ),
   );
@@ -190,7 +181,10 @@ class Game extends FlameGame with TapDetector, HasGameRef, HasCollisionDetection
       _game = game;
       _gameDatabase = gameDataBase;
     } catch (e) {
-      showDialog(context: context, builder: (context) => AlertDialog(title: Text("${AppLocalizations.of(context)!.error} \n $e"), content: Text(e.toString())));
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(title: Text("${AppLocalizations.of(context)!.error} \n $e"), content: Text(e.toString())),
+      );
     }
     //Add Collision
     add(ScreenHitbox());

@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "game_for_cats_flutter",
+            "name": "game_for_cats_2025",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "game_for_cats_flutter (profile mode)",
+            "name": "game_for_cats_2025 (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "game_for_cats_flutter (release mode)",
+            "name": "game_for_cats_2025 (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

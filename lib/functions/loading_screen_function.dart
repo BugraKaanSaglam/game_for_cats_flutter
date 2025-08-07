@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_flutter/l10n/app_localizations.dart';
+import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import '../main.dart';
 
 Widget loadingScreen(BuildContext context) {
@@ -11,7 +11,10 @@ Widget loadingScreen(BuildContext context) {
         children: <Widget>[
           SizedBox(child: CircularProgressIndicator(strokeWidth: 6, valueColor: AlwaysStoppedAnimation<Color>(MainAppState().gameTheme.colorScheme.surface))),
           const SizedBox(height: 20),
-          Text(AppLocalizations.of(context)!.loading, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+          Text(
+            AppLocalizations.of(context)!.loading,
+            style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     ),

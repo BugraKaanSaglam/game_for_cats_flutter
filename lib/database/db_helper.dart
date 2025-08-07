@@ -20,7 +20,7 @@ class DBHelper {
     return _db;
   }
 
-  initDatabase() async {
+  Future<Database> initDatabase() async {
     try {
       String fileName = 'miceandpawsdatabase0.db';
       io.Directory documentDirectory = await getApplicationDocumentsDirectory();
@@ -29,15 +29,15 @@ class DBHelper {
       return db;
     } catch (e) {
       log("Database initialization error: $e");
+      throw Exception("Database initialization failed: $e");
     }
   }
 
-  _onCreate(Database db, int version) async {
-    await db.execute(
-        'CREATE TABLE OPCGameTable(Ver INTEGER not null PRIMARY KEY, LanguageCode INTEGER not null, MusicVolume DOUBLE not null, CharacterVolume DOUBLE not null, Time INTEGER not null)');
+  Future<void> _onCreate(Database db, int version) async {
+    await db.execute('CREATE TABLE OPCGameTable(Ver INTEGER not null PRIMARY KEY, LanguageCode INTEGER not null, MusicVolume DOUBLE not null, CharacterVolume DOUBLE not null, Time INTEGER not null)');
   }
 
-  add(OPCDataBase column) async {
+  Future<void> add(OPCDataBase column) async {
     try {
       var dbClient = await db;
       await dbClient!.insert('OPCGameTable', column.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
@@ -48,8 +48,7 @@ class DBHelper {
 
   Future<OPCDataBase?> getList(int ver) async {
     var dbClient = await db;
-    List<Map<String, dynamic>> maps =
-        await dbClient!.query('OPCGameTable', columns: ['Ver', 'LanguageCode', 'MusicVolume', 'CharacterVolume', 'Time'], where: 'Ver = ?', whereArgs: [ver]);
+    List<Map<String, dynamic>> maps = await dbClient!.query('OPCGameTable', columns: ['Ver', 'LanguageCode', 'MusicVolume', 'CharacterVolume', 'Time'], where: 'Ver = ?', whereArgs: [ver]);
     if (maps.isNotEmpty) {
       OPCDataBase retResult = OPCDataBase.fromMap(maps.first);
       return retResult;

@@ -1,8 +1,8 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_flutter/global/argumentsender_class.dart';
+import 'package:game_for_cats_2025/global/argumentsender_class.dart';
 import '../global/global_functions.dart';
-import 'package:game_for_cats_flutter/l10n/app_localizations.dart';
+import '../l10n/app_localizations.dart';
 
 class HowToPlayScreen extends StatelessWidget {
   const HowToPlayScreen({super.key});
@@ -17,26 +17,38 @@ class HowToPlayScreen extends StatelessWidget {
   Widget mainBody(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(5.0),
-      child: Column(children: [
-        Container(
+      child: Column(
+        children: [
+          Container(
             height: 200,
             decoration: BoxDecoration(border: Border.all(), color: Colors.white, borderRadius: BorderRadius.circular(20)),
-            child: Column(children: [
-              Text(AppLocalizations.of(context)!.howtoplay_label_forhuman, style: labelTextStyle()),
-              Padding(padding: const EdgeInsets.all(8.0), child: Text(AppLocalizations.of(context)!.howtoplay_text_forhuman, style: normalTextStyle())),
-            ])),
-        const Spacer(flex: 1),
-        Container(
+            child: Column(
+              children: [
+                Text(AppLocalizations.of(context)!.howtoplay_label_forhuman, style: labelTextStyle()),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(AppLocalizations.of(context)!.howtoplay_text_forhuman, style: normalTextStyle()),
+                ),
+              ],
+            ),
+          ),
+          const Spacer(flex: 1),
+          Container(
             height: 300,
             decoration: BoxDecoration(border: Border.all(), color: Colors.white, borderRadius: BorderRadius.circular(20)),
             child: Column(
               children: [
                 Text(AppLocalizations.of(context)!.howtoplay_label_forcats, style: labelTextStyle()),
-                Padding(padding: const EdgeInsets.all(8.0), child: Text(AppLocalizations.of(context)!.howtoplay_text_forcats, style: normalTextStyle())),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(AppLocalizations.of(context)!.howtoplay_text_forcats, style: normalTextStyle()),
+                ),
               ],
-            )),
-        const Spacer(flex: 1),
-      ]),
+            ),
+          ),
+          const Spacer(flex: 1),
+        ],
+      ),
     );
   }
 }

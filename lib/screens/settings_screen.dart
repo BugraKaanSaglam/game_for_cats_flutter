@@ -1,15 +1,15 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_flutter/classes/custom_button.dart';
-import 'package:game_for_cats_flutter/database/db_helper.dart';
-import 'package:game_for_cats_flutter/enums/game_enums.dart';
-import 'package:game_for_cats_flutter/main.dart';
+import 'package:game_for_cats_2025/classes/custom_button.dart';
+import 'package:game_for_cats_2025/database/db_helper.dart';
+import 'package:game_for_cats_2025/enums/game_enums.dart';
+import 'package:game_for_cats_2025/main.dart';
 import '../database/db_error.dart';
 import '../database/opc_database_list.dart';
 import '../functions/form_functions.dart';
 import '../global/global_functions.dart';
 import '../global/global_variables.dart';
-import 'package:game_for_cats_flutter/l10n/app_localizations.dart';
+import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -33,51 +33,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget mainBody(BuildContext context) {
     return FutureBuilder<OPCDataBase?>(
-        future: DBHelper().getList(databaseVersion),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return const Center(child: CircularProgressIndicator());
-            case ConnectionState.done:
-              if (snapshot.hasError) {
-                return dbError(context);
-              }
-              _db = snapshot.data;
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [languageDropDownFormField(), timeDropDownFormField(), musicField(), miceSoundField(), saveButton()],
-                ),
-              );
-            default:
+      future: DBHelper().getList(databaseVersion),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return const Center(child: CircularProgressIndicator());
+          case ConnectionState.done:
+            if (snapshot.hasError) {
               return dbError(context);
-          }
-        });
+            }
+            _db = snapshot.data;
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [languageDropDownFormField(), timeDropDownFormField(), musicField(), miceSoundField(), saveButton()]),
+            );
+          default:
+            return dbError(context);
+        }
+      },
+    );
   }
 
-//*FormFields
+  //*FormFields
   Column languageDropDownFormField() {
-    List<DropdownMenuItem> items = [
-      DropdownMenuItem(value: Language.turkish.value, child: Text(Language.turkish.name)),
-      DropdownMenuItem(value: Language.english.value, child: Text(Language.english.name)),
-    ];
+    List<DropdownMenuItem> items = [DropdownMenuItem(value: Language.turkish.value, child: Text(Language.turkish.name)), DropdownMenuItem(value: Language.english.value, child: Text(Language.english.name))];
     return Column(
       children: [
         Text(AppLocalizations.of(context)!.select_language),
-        DropdownButtonFormField(
-          dropdownColor: dropdownColor,
-          value: _db?.languageCode ?? 0,
-          decoration: formDecoration(),
-          items: items,
-          onChanged: (value) => _db?.languageCode = value,
-        ),
+        DropdownButtonFormField(dropdownColor: dropdownColor, value: _db?.languageCode ?? 0, decoration: formDecoration(), items: items, onChanged: (value) => _db?.languageCode = value),
       ],
     );
   }
 
-//! This is not Added TBA
-/*
+  //! This is not Added TBA
+  /*
   Column difficultyDropDownFormField() {
     List<DropdownMenuItem> items = [
       DropdownMenuItem(value: Difficulty.easy.value, child: Text(Difficulty.easy.name)),
@@ -100,22 +89,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 */
 
   Column timeDropDownFormField() {
-    List<DropdownMenuItem> items = [
-      DropdownMenuItem(value: Time.fifty.value, child: Text(Time.fifty.name)),
-      DropdownMenuItem(value: Time.hundered.value, child: Text(Time.hundered.name)),
-      DropdownMenuItem(value: Time.twohundered.value, child: Text(Time.twohundered.name)),
-      DropdownMenuItem(value: Time.sandbox.value, child: Text(Time.sandbox.name)),
-    ];
+    List<DropdownMenuItem> items = [DropdownMenuItem(value: Time.fifty.value, child: Text(Time.fifty.name)), DropdownMenuItem(value: Time.hundered.value, child: Text(Time.hundered.name)), DropdownMenuItem(value: Time.twohundered.value, child: Text(Time.twohundered.name)), DropdownMenuItem(value: Time.sandbox.value, child: Text(Time.sandbox.name))];
     return Column(
       children: [
         Text(AppLocalizations.of(context)!.select_time),
-        DropdownButtonFormField(
-          dropdownColor: dropdownColor,
-          value: _db?.time ?? Time.fifty.value,
-          decoration: formDecoration(),
-          items: items,
-          onChanged: (value) => _db?.time = value,
-        ),
+        DropdownButtonFormField(dropdownColor: dropdownColor, value: _db?.time ?? Time.fifty.value, decoration: formDecoration(), items: items, onChanged: (value) => _db?.time = value),
       ],
     );
   }

@@ -29,7 +29,6 @@ migrate_working_dir/
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
-.packages
 .pub-cache/
 .pub/
 /build/
@@ -44,10 +43,3 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-
-# Keystore files
-*.jks
-*.keystore
-
-# Ignore local.properties (contains sdk paths and keystore passwords)
-local.properties
