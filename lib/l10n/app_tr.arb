@@ -5,6 +5,7 @@
     "howtoplay_button": "Nasıl Oynanır?",
     "credits_button": "Emeği Geçenler",
     "exit_button": "Çıkış Yap",
+    "main_tagline": "Fareleri yakala, böceklerden kaç, kedini gururlandır!",
     "select_language": "Dil Seçiniz",
     "select_difficulty": "Zorluk Seçiniz",
     "select_time": "Süreyi Seçiniz",
@@ -30,5 +31,12 @@
     "this_will_close_automatically_in_seconds": "Bu Ekran 2 Saniye İçerisinde \nOtomatik Kapanacak...",
     "i_am_cat": "Miyav??",
     "i_am_human": "Ben İnsanım, Oyunu Kapat",
-    "loading": "Yükleniyor..."
+    "loading": "Yükleniyor...",
+    "settings_header_subtitle": "Mükemmel av için süreyi, dili ve sesleri ayarla.",
+    "settings_language_hint": "Menüler insan dostunun tercih ettiği dilde görünsün.",
+    "settings_time_hint": "Kısa bir koşu mu sınırsız kum havuzu mu? En uygun süreyi seç.",
+    "settings_music_hint": "Miyavları dans partisine çevir!",
+    "settings_character_hint": "Ciyaklama ve mırıldanma sesleri.",
+    "credits_subtitle": "Kedilere ve renklere aşık küçücük bir ekip.",
+    "credits_special_thanks": "Özel Teşekkürler"
 }

@@ -27,6 +27,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get exit_button => 'Çıkış Yap';
 
   @override
+  String get main_tagline =>
+      'Fareleri yakala, böceklerden kaç, kedini gururlandır!';
+
+  @override
   String get select_language => 'Dil Seçiniz';
 
   @override
@@ -106,4 +110,28 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get loading => 'Yükleniyor...';
+
+  @override
+  String get settings_header_subtitle =>
+      'Mükemmel av için süreyi, dili ve sesleri ayarla.';
+
+  @override
+  String get settings_language_hint =>
+      'Menüler insan dostunun tercih ettiği dilde görünsün.';
+
+  @override
+  String get settings_time_hint =>
+      'Kısa bir koşu mu sınırsız kum havuzu mu? En uygun süreyi seç.';
+
+  @override
+  String get settings_music_hint => 'Miyavları dans partisine çevir!';
+
+  @override
+  String get settings_character_hint => 'Ciyaklama ve mırıldanma sesleri.';
+
+  @override
+  String get credits_subtitle => 'Kedilere ve renklere aşık küçücük bir ekip.';
+
+  @override
+  String get credits_special_thanks => 'Özel Teşekkürler';
 }

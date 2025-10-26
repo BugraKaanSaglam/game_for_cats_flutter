@@ -27,6 +27,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exit_button => 'Exit';
 
   @override
+  String get main_tagline =>
+      'Catch the mice, dodge the bugs, make kitty proud!';
+
+  @override
   String get select_language => 'Select Language';
 
   @override
@@ -106,4 +110,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loading => 'Loading...';
+
+  @override
+  String get settings_header_subtitle =>
+      'Adjust timers, languages and volumes for the purr-fect hunt.';
+
+  @override
+  String get settings_language_hint =>
+      'Show menus in the language your human prefers.';
+
+  @override
+  String get settings_time_hint =>
+      'Short sprint or endless sandbox? Pick the purr-fect timer.';
+
+  @override
+  String get settings_music_hint => 'Turn the meows into a dance party!';
+
+  @override
+  String get settings_character_hint => 'Squeaks & squeals volume.';
+
+  @override
+  String get credits_subtitle =>
+      'A tiny team with giant love for cats and colors.';
+
+  @override
+  String get credits_special_thanks => 'Special Thanks';
 }

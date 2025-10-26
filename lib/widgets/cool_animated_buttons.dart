@@ -52,7 +52,9 @@ class CoolAnimatedButtonState extends State<CoolAnimatedButton> {
     // Basılma durumuna göre gölgeyi ve konumu ayarla
     final double elevation = _isPressed ? 2.0 : 8.0;
 
-    final Matrix4 transform = _isPressed ? (Matrix4.identity()..translate(0.0, 4.0, 0.0)) : Matrix4.identity();
+    final Matrix4 transform = _isPressed
+        ? (Matrix4.identity()..translate(0.0, 4.0, 0.0))
+        : Matrix4.identity();
 
     return GestureDetector(
       onTapDown: _onTapDown,
@@ -64,8 +66,18 @@ class CoolAnimatedButtonState extends State<CoolAnimatedButton> {
         transform: transform,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(colors: [widget.startColor, widget.endColor], begin: Alignment.topLeft, end: Alignment.bottomRight),
-          boxShadow: [BoxShadow(color: widget.startColor.withOpacity(0.4), blurRadius: elevation * 2, offset: Offset(0, elevation))],
+          gradient: LinearGradient(
+            colors: [widget.startColor, widget.endColor],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: widget.startColor.withValues(alpha: 0.4 * 255),
+              blurRadius: elevation * 2,
+              offset: Offset(0, elevation),
+            ),
+          ],
         ),
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
         child: Row(
@@ -73,7 +85,12 @@ class CoolAnimatedButtonState extends State<CoolAnimatedButton> {
           children: [
             Text(
               widget.text,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 1.2),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                letterSpacing: 1.2,
+              ),
             ),
             const SizedBox(width: 12),
             IconTheme(

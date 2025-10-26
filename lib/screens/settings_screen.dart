@@ -1,15 +1,17 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/classes/custom_button.dart';
+import 'package:game_for_cats_2025/database/db_error.dart';
 import 'package:game_for_cats_2025/database/db_helper.dart';
+import 'package:game_for_cats_2025/database/opc_database_list.dart';
 import 'package:game_for_cats_2025/enums/game_enums.dart';
-import 'package:game_for_cats_2025/main.dart';
-import '../database/db_error.dart';
-import '../database/opc_database_list.dart';
-import '../functions/form_functions.dart';
-import '../global/global_functions.dart';
-import '../global/global_variables.dart';
+import 'package:game_for_cats_2025/global/global_functions.dart';
+import 'package:game_for_cats_2025/global/global_variables.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
+import 'package:game_for_cats_2025/main.dart';
+import 'package:game_for_cats_2025/utils/paw_theme.dart';
+import 'package:game_for_cats_2025/widgets/animated_gradient_background.dart';
+import 'package:game_for_cats_2025/widgets/playful_card.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -20,134 +22,242 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   OPCDataBase? _db;
-  Color dropdownColor = const Color.fromARGB(255, 197, 196, 196);
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: mainAppBar(AppLocalizations.of(context)!.settings_button, context), body: mainBody(context));
+    return Scaffold(
+      appBar: mainAppBar(
+        AppLocalizations.of(context)!.settings_button,
+        context,
+      ),
+      body: AnimatedGradientBackground(child: _buildBody()),
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+        child: _db == null
+            ? const SizedBox.shrink()
+            : _buildSaveButton(context),
+      ),
+    );
   }
 
-  Widget mainBody(BuildContext context) {
+  Widget _buildBody() {
     return FutureBuilder<OPCDataBase?>(
       future: DBHelper().getList(databaseVersion),
       builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return const Center(child: CircularProgressIndicator());
-          case ConnectionState.done:
-            if (snapshot.hasError) {
-              return dbError(context);
-            }
-            _db = snapshot.data;
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [languageDropDownFormField(), timeDropDownFormField(), musicField(), miceSoundField(), saveButton()]),
-            );
-          default:
-            return dbError(context);
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          );
         }
+        if (snapshot.hasError) {
+          return dbError(context);
+        }
+        _db = snapshot.data;
+        if (_db == null) return dbError(context);
+
+        final l10n = AppLocalizations.of(context)!;
+        return SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            children: [
+              _buildHeader(context),
+              PlayfulCard(
+                emoji: '🌍',
+                title: l10n.select_language,
+                subtitle: l10n.settings_language_hint,
+                gradient: PawPalette.pinkToOrange(),
+                child: _buildLanguageDropdown(context),
+              ),
+              PlayfulCard(
+                emoji: '⏱️',
+                title: l10n.select_time,
+                subtitle: l10n.settings_time_hint,
+                gradient: PawPalette.tealToLemon(),
+                child: _buildTimeDropdown(context),
+              ),
+              PlayfulCard(
+                emoji: '🎵',
+                title: l10n.select_musicvolume,
+                subtitle: l10n.settings_music_hint,
+                child: _buildSlider(
+                  value: _db?.musicVolume ?? 0.5,
+                  onChanged: (value) =>
+                      setState(() => _db?.musicVolume = value),
+                  activeColor: PawPalette.grape,
+                ),
+              ),
+              PlayfulCard(
+                emoji: '🐁',
+                title: l10n.select_charactervolume,
+                subtitle: l10n.settings_character_hint,
+                child: _buildSlider(
+                  value: _db?.characterVolume ?? 1.0,
+                  onChanged: (value) =>
+                      setState(() => _db?.characterVolume = value),
+                  activeColor: PawPalette.teal,
+                ),
+              ),
+              const SizedBox(height: 80),
+            ],
+          ),
+        );
       },
     );
   }
 
-  //*FormFields
-  Column languageDropDownFormField() {
-    List<DropdownMenuItem> items = [DropdownMenuItem(value: Language.turkish.value, child: Text(Language.turkish.name)), DropdownMenuItem(value: Language.english.value, child: Text(Language.english.name))];
+  Widget _buildHeader(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(AppLocalizations.of(context)!.select_language),
-        DropdownButtonFormField(dropdownColor: dropdownColor, value: _db?.languageCode ?? 0, decoration: formDecoration(), items: items, onChanged: (value) => _db?.languageCode = value),
+        Text(
+          AppLocalizations.of(context)!.settings_button,
+          style: PawTextStyles.heading,
+        ),
+        const SizedBox(height: 6),
+        Text(
+          AppLocalizations.of(context)!.settings_header_subtitle,
+          style: PawTextStyles.subheading,
+        ),
+        const SizedBox(height: 20),
       ],
     );
   }
 
-  //! This is not Added TBA
-  /*
-  Column difficultyDropDownFormField() {
-    List<DropdownMenuItem> items = [
-      DropdownMenuItem(value: Difficulty.easy.value, child: Text(Difficulty.easy.name)),
-      DropdownMenuItem(value: Difficulty.medium.value, child: Text(Difficulty.medium.name)),
-      DropdownMenuItem(value: Difficulty.hard.value, child: Text(Difficulty.hard.name)),
+  Widget _buildLanguageDropdown(BuildContext context) {
+    final items = [
+      DropdownMenuItem(
+        value: Language.turkish.value,
+        child: Text(Language.turkish.name),
+      ),
+      DropdownMenuItem(
+        value: Language.english.value,
+        child: Text(Language.english.name),
+      ),
     ];
+
+    return _PillDropdown(
+      value: _db?.languageCode ?? Language.english.value,
+      items: items,
+      onChanged: (value) =>
+          setState(() => _db?.languageCode = value ?? Language.english.value),
+    );
+  }
+
+  Widget _buildTimeDropdown(BuildContext context) {
+    final items = [
+      DropdownMenuItem(value: Time.fifty.value, child: Text(Time.fifty.name)),
+      DropdownMenuItem(
+        value: Time.hundered.value,
+        child: Text(Time.hundered.name),
+      ),
+      DropdownMenuItem(
+        value: Time.twohundered.value,
+        child: Text(Time.twohundered.name),
+      ),
+      DropdownMenuItem(
+        value: Time.sandbox.value,
+        child: Text(Time.sandbox.name),
+      ),
+    ];
+
+    return _PillDropdown(
+      value: _db?.time ?? Time.fifty.value,
+      items: items,
+      onChanged: (value) =>
+          setState(() => _db?.time = value ?? Time.fifty.value),
+    );
+  }
+
+  Widget _buildSlider({
+    required double value,
+    required ValueChanged<double> onChanged,
+    required Color activeColor,
+  }) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(AppLocalizations.of(context)!.select_difficulty),
-        DropdownButtonFormField(
-          dropdownColor: Colors.white,
-          value: _db?.difficulty ?? 0,
-          decoration: formDecoration(),
-          items: items,
-          onChanged: (value) => _db?.difficulty = value,
+        SliderTheme(
+          data: SliderThemeData(
+            activeTrackColor: activeColor,
+            inactiveTrackColor: activeColor.withValues(alpha: 0.3 * 255),
+            thumbColor: Colors.white,
+            overlayColor: activeColor.withValues(alpha: 0.15 * 255),
+          ),
+          child: Slider(min: 0, max: 1, value: value, onChanged: onChanged),
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Text(
+            '${(value * 100).round()}%',
+            style: PawTextStyles.cardSubtitle,
+          ),
         ),
       ],
     );
   }
-*/
 
-  Column timeDropDownFormField() {
-    List<DropdownMenuItem> items = [DropdownMenuItem(value: Time.fifty.value, child: Text(Time.fifty.name)), DropdownMenuItem(value: Time.hundered.value, child: Text(Time.hundered.name)), DropdownMenuItem(value: Time.twohundered.value, child: Text(Time.twohundered.name)), DropdownMenuItem(value: Time.sandbox.value, child: Text(Time.sandbox.name))];
-    return Column(
-      children: [
-        Text(AppLocalizations.of(context)!.select_time),
-        DropdownButtonFormField(dropdownColor: dropdownColor, value: _db?.time ?? Time.fifty.value, decoration: formDecoration(), items: items, onChanged: (value) => _db?.time = value),
-      ],
-    );
-  }
+  Widget _buildSaveButton(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.85, end: 1),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutBack,
+      builder: (context, value, child) =>
+          Transform.scale(scale: value, child: child),
+      child: CustomButton(
+        onPressed: () async {
+          final messenger = ScaffoldMessenger.of(context);
+          final successText = AppLocalizations.of(
+            context,
+          )!.save_complete_snackbar;
+          final mainState = MainApp.of(context);
 
-  StatefulBuilder musicField() {
-    return StatefulBuilder(
-      builder: (context, musicState) {
-        return Column(
-          children: [
-            Text(AppLocalizations.of(context)!.select_musicvolume),
-            Slider(
-              min: 0,
-              max: 1,
-              value: _db!.musicVolume.toDouble(),
-              onChanged: (newValue) {
-                musicState(() => _db!.musicVolume = newValue);
-              },
+          await DBHelper().update(_db!);
+          mainState?.setLocale(_db!.languageCode);
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text(successText),
+              elevation: 10,
+              duration: const Duration(seconds: 2),
             ),
-          ],
-        );
-      },
+          );
+        },
+        child: Text(AppLocalizations.of(context)!.save_button),
+      ),
     );
   }
+}
 
-  StatefulBuilder miceSoundField() {
-    return StatefulBuilder(
-      builder: (context, miceSoundState) {
-        return Column(
-          children: [
-            Text(AppLocalizations.of(context)!.select_charactervolume),
-            Slider(
-              min: 0,
-              max: 1,
-              value: _db!.characterVolume.toDouble(),
-              onChanged: (newValue) {
-                miceSoundState(() => _db!.characterVolume = newValue);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+class _PillDropdown extends StatelessWidget {
+  const _PillDropdown({
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
 
-  ElevatedButton saveButton() {
-    return CustomButton(
-      onPressed: () {
-        setState(() {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.save_complete_snackbar), elevation: 10, duration: const Duration(seconds: 2)));
-          DBHelper().update(_db!);
-          MainApp.of(context)!.setLocale(_db!.languageCode);
-        });
-      },
-      child: Text(AppLocalizations.of(context)!.save_button),
+  final int value;
+  final List<DropdownMenuItem<int>> items;
+  final ValueChanged<int?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        color: Colors.white,
+        border: Border.all(
+          color: PawPalette.midnight.withValues(alpha: 0.08 * 255),
+        ),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int>(
+          value: value,
+          isExpanded: true,
+          icon: const Icon(Icons.expand_more),
+          items: items,
+          onChanged: onChanged,
+        ),
+      ),
     );
   }
 }

@@ -5,6 +5,7 @@
     "howtoplay_button": "How To Play?",
     "credits_button": "Credits",
     "exit_button": "Exit",
+    "main_tagline": "Catch the mice, dodge the bugs, make kitty proud!",
     "select_language": "Select Language",
     "select_difficulty": "Select Difficulty",
     "select_time": "Select Time",
@@ -30,5 +31,12 @@
     "this_will_close_automatically_in_seconds": "This Will Close Automatically \nin 2 Seconds...",
     "i_am_cat": "Meow??",
     "i_am_human": "I am Human, Close the Game",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "settings_header_subtitle": "Adjust timers, languages and volumes for the purr-fect hunt.",
+    "settings_language_hint": "Show menus in the language your human prefers.",
+    "settings_time_hint": "Short sprint or endless sandbox? Pick the purr-fect timer.",
+    "settings_music_hint": "Turn the meows into a dance party!",
+    "settings_character_hint": "Squeaks & squeals volume.",
+    "credits_subtitle": "A tiny team with giant love for cats and colors.",
+    "credits_special_thanks": "Special Thanks"
 }

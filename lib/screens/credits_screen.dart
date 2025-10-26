@@ -1,8 +1,12 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/global/argumentsender_class.dart';
+import 'package:game_for_cats_2025/widgets/animated_gradient_background.dart';
+import 'package:game_for_cats_2025/widgets/playful_card.dart';
+import 'package:game_for_cats_2025/utils/paw_theme.dart';
+
 import '../global/global_functions.dart';
-import 'package:game_for_cats_2025/l10n/app_localizations.dart';
+import '../l10n/app_localizations.dart';
 
 class CreditsScreen extends StatelessWidget {
   const CreditsScreen({super.key});
@@ -11,29 +15,24 @@ class CreditsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as ArgumentSender;
 
-    return Scaffold(appBar: mainAppBar(args.title!, context), body: mainBody(context));
+    return Scaffold(
+      appBar: mainAppBar(args.title!, context),
+      body: AnimatedGradientBackground(child: mainBody(context)),
+    );
   }
 
   Widget mainBody(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(5.0),
-      child: Column(
+    final l10n = AppLocalizations.of(context)!;
+
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         children: [
-          Container(
-            height: 200,
-            width: 600,
-            decoration: BoxDecoration(border: Border.all(), color: Colors.white, borderRadius: BorderRadius.circular(20)),
-            child: Column(
-              children: [
-                Text(AppLocalizations.of(context)!.credits_creators, style: labelTextStyle()),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(AppLocalizations.of(context)!.credits_creators_text, style: normalTextStyle()),
-                ),
-              ],
-            ),
-          ),
-          const Spacer(flex: 1),
+          Text(l10n.credits_creators, style: PawTextStyles.heading),
+          const SizedBox(height: 6),
+          Text(l10n.credits_subtitle, style: PawTextStyles.subheading),
+          const SizedBox(height: 20),
+          PlayfulCard(emoji: '✨', title: l10n.game_name, subtitle: l10n.credits_creators_text, gradient: PawPalette.pinkToOrange()),
         ],
       ),
     );

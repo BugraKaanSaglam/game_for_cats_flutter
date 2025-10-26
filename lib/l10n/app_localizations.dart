@@ -134,6 +134,12 @@ abstract class AppLocalizations {
   /// **'Exit'**
   String get exit_button;
 
+  /// No description provided for @main_tagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Catch the mice, dodge the bugs, make kitty proud!'**
+  String get main_tagline;
+
   /// No description provided for @select_language.
   ///
   /// In en, this message translates to:
@@ -289,6 +295,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loading...'**
   String get loading;
+
+  /// No description provided for @settings_header_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust timers, languages and volumes for the purr-fect hunt.'**
+  String get settings_header_subtitle;
+
+  /// No description provided for @settings_language_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Show menus in the language your human prefers.'**
+  String get settings_language_hint;
+
+  /// No description provided for @settings_time_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Short sprint or endless sandbox? Pick the purr-fect timer.'**
+  String get settings_time_hint;
+
+  /// No description provided for @settings_music_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn the meows into a dance party!'**
+  String get settings_music_hint;
+
+  /// No description provided for @settings_character_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Squeaks & squeals volume.'**
+  String get settings_character_hint;
+
+  /// No description provided for @credits_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A tiny team with giant love for cats and colors.'**
+  String get credits_subtitle;
+
+  /// No description provided for @credits_special_thanks.
+  ///
+  /// In en, this message translates to:
+  /// **'Special Thanks'**
+  String get credits_special_thanks;
 }
 
 class _AppLocalizationsDelegate
