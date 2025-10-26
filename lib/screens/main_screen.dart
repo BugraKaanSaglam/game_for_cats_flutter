@@ -203,18 +203,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildFeatureChip(IconData icon, String label) {
-    return Chip(
-      backgroundColor: Colors.white.withValues(alpha: 0.85 * 255),
-      labelPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-      avatar: Icon(icon, color: PawPalette.bubbleGum, size: 18),
-      label: Text(
-        label,
-        style: const TextStyle(color: PawPalette.midnight, fontWeight: FontWeight.w600),
-      ),
-    );
-  }
-
   Widget _buildAmbientOrbs() {
     return IgnorePointer(
       child: AnimatedBuilder(

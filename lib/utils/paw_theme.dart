@@ -15,6 +15,12 @@ class PawPalette {
   static const Color lemon = Color(0xFFFEE440);
   static const Color midnight = Color(0xFF2D1E2F);
 
+  static const LinearGradient lightBackground = LinearGradient(
+    colors: [Color(0xFFFFF8E8), Color(0xFFE3FDFD)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+
   static LinearGradient buttonGradient = const LinearGradient(
     colors: [Color(0xFF9B5DE5), Color(0xFF00BBF9)],
     begin: Alignment.topLeft,

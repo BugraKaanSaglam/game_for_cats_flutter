@@ -1,7 +1,6 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/global/argumentsender_class.dart';
-import 'package:game_for_cats_2025/widgets/animated_gradient_background.dart';
 import 'package:game_for_cats_2025/widgets/playful_card.dart';
 import 'package:game_for_cats_2025/utils/paw_theme.dart';
 
@@ -17,12 +16,28 @@ class HowToPlayScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: mainAppBar(args.title!, context),
-      body: AnimatedGradientBackground(child: mainBody(context, args)),
+      body: Container(
+        decoration: const BoxDecoration(gradient: PawPalette.lightBackground),
+        child: mainBody(context, args),
+      ),
     );
   }
 
   Widget mainBody(BuildContext context, ArgumentSender args) {
-    final sections = [_InstructionSection(emoji: '🧑‍🏫', title: AppLocalizations.of(context)!.howtoplay_label_forhuman, description: AppLocalizations.of(context)!.howtoplay_text_forhuman, gradient: PawPalette.pinkToOrange()), _InstructionSection(emoji: '🐱', title: AppLocalizations.of(context)!.howtoplay_label_forcats, description: AppLocalizations.of(context)!.howtoplay_text_forcats, gradient: PawPalette.tealToLemon())];
+    final sections = [
+      _InstructionSection(
+        emoji: '🧑‍🏫',
+        title: AppLocalizations.of(context)!.howtoplay_label_forhuman,
+        description: AppLocalizations.of(context)!.howtoplay_text_forhuman,
+        gradient: PawPalette.pinkToOrange(),
+      ),
+      _InstructionSection(
+        emoji: '🐱',
+        title: AppLocalizations.of(context)!.howtoplay_label_forcats,
+        description: AppLocalizations.of(context)!.howtoplay_text_forcats,
+        gradient: PawPalette.tealToLemon(),
+      ),
+    ];
 
     return SafeArea(
       child: ListView(
@@ -35,8 +50,14 @@ class HowToPlayScreen extends StatelessWidget {
               tween: Tween(begin: 0.9, end: 1),
               duration: Duration(milliseconds: 450 + (index * 120)),
               curve: Curves.easeOutBack,
-              builder: (context, value, child) => Transform.scale(scale: value, child: child),
-              child: PlayfulCard(emoji: sections[index].emoji, title: sections[index].title, subtitle: sections[index].description, gradient: sections[index].gradient),
+              builder: (context, value, child) =>
+                  Transform.scale(scale: value, child: child),
+              child: PlayfulCard(
+                emoji: sections[index].emoji,
+                title: sections[index].title,
+                subtitle: sections[index].description,
+                gradient: sections[index].gradient,
+              ),
             ),
           ),
         ],
@@ -46,7 +67,12 @@ class HowToPlayScreen extends StatelessWidget {
 }
 
 class _InstructionSection {
-  const _InstructionSection({required this.emoji, required this.title, required this.description, required this.gradient});
+  const _InstructionSection({
+    required this.emoji,
+    required this.title,
+    required this.description,
+    required this.gradient,
+  });
 
   final String emoji;
   final String title;

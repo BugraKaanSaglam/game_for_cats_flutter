@@ -25,7 +25,7 @@ class MainApp extends StatefulWidget {
 
 //Language Controller
 Language languageCode = Language.english;
-Color appThemeColor = const Color.fromARGB(255, 32, 141, 244);
+Color appThemeColor = const Color.fromARGB(255, 183, 202, 219);
 
 class MainAppState extends State<MainApp> {
   void setLocale(int value) {

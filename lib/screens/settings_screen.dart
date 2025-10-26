@@ -1,6 +1,5 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/classes/custom_button.dart';
 import 'package:game_for_cats_2025/database/db_error.dart';
 import 'package:game_for_cats_2025/database/db_helper.dart';
 import 'package:game_for_cats_2025/database/opc_database_list.dart';
@@ -10,7 +9,6 @@ import 'package:game_for_cats_2025/global/global_variables.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/main.dart';
 import 'package:game_for_cats_2025/utils/paw_theme.dart';
-import 'package:game_for_cats_2025/widgets/animated_gradient_background.dart';
 import 'package:game_for_cats_2025/widgets/playful_card.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -22,37 +20,36 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   OPCDataBase? _db;
+  late final Future<OPCDataBase?> _dbFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _dbFuture = DBHelper().getList(databaseVersion);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: mainAppBar(
-        AppLocalizations.of(context)!.settings_button,
-        context,
+      appBar: mainAppBar(AppLocalizations.of(context)!.settings_button, context),
+      body: Container(
+        decoration: const BoxDecoration(gradient: PawPalette.lightBackground),
+        child: _buildBody(),
       ),
-      body: AnimatedGradientBackground(child: _buildBody()),
-      bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-        child: _db == null
-            ? const SizedBox.shrink()
-            : _buildSaveButton(context),
-      ),
+      bottomNavigationBar: SafeArea(minimum: const EdgeInsets.fromLTRB(24, 0, 24, 16), child: _db == null ? const SizedBox.shrink() : _buildSaveButton(context)),
     );
   }
 
   Widget _buildBody() {
     return FutureBuilder<OPCDataBase?>(
-      future: DBHelper().getList(databaseVersion),
+      future: _dbFuture,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(color: Colors.white),
-          );
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator(color: Colors.white));
         }
-        if (snapshot.hasError) {
-          return dbError(context);
-        }
-        _db = snapshot.data;
+        if (snapshot.hasError) return dbError(context);
+
+        _db ??= snapshot.data;
         if (_db == null) return dbError(context);
 
         final l10n = AppLocalizations.of(context)!;
@@ -61,41 +58,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             children: [
               _buildHeader(context),
-              PlayfulCard(
-                emoji: '🌍',
-                title: l10n.select_language,
-                subtitle: l10n.settings_language_hint,
-                gradient: PawPalette.pinkToOrange(),
-                child: _buildLanguageDropdown(context),
-              ),
-              PlayfulCard(
-                emoji: '⏱️',
-                title: l10n.select_time,
-                subtitle: l10n.settings_time_hint,
-                gradient: PawPalette.tealToLemon(),
-                child: _buildTimeDropdown(context),
-              ),
+              PlayfulCard(emoji: '🌍', title: l10n.select_language, subtitle: l10n.settings_language_hint, gradient: PawPalette.pinkToOrange(), child: _buildLanguageDropdown(context)),
+              PlayfulCard(emoji: '⏱️', title: l10n.select_time, subtitle: l10n.settings_time_hint, gradient: PawPalette.tealToLemon(), child: _buildTimeDropdown(context)),
               PlayfulCard(
                 emoji: '🎵',
                 title: l10n.select_musicvolume,
                 subtitle: l10n.settings_music_hint,
-                child: _buildSlider(
-                  value: _db?.musicVolume ?? 0.5,
-                  onChanged: (value) =>
-                      setState(() => _db?.musicVolume = value),
-                  activeColor: PawPalette.grape,
-                ),
+                child: _buildSlider(value: _db?.musicVolume ?? 0.5, onChanged: (v) => setState(() => _db?.musicVolume = v), activeColor: PawPalette.grape),
               ),
               PlayfulCard(
                 emoji: '🐁',
                 title: l10n.select_charactervolume,
                 subtitle: l10n.settings_character_hint,
-                child: _buildSlider(
-                  value: _db?.characterVolume ?? 1.0,
-                  onChanged: (value) =>
-                      setState(() => _db?.characterVolume = value),
-                  activeColor: PawPalette.teal,
-                ),
+                child: _buildSlider(value: _db?.characterVolume ?? 1.0, onChanged: (v) => setState(() => _db?.characterVolume = v), activeColor: PawPalette.teal),
               ),
               const SizedBox(height: 80),
             ],
@@ -109,70 +84,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          AppLocalizations.of(context)!.settings_button,
-          style: PawTextStyles.heading,
-        ),
+        Text(AppLocalizations.of(context)!.settings_button, style: PawTextStyles.heading),
         const SizedBox(height: 6),
-        Text(
-          AppLocalizations.of(context)!.settings_header_subtitle,
-          style: PawTextStyles.subheading,
-        ),
+        Text(AppLocalizations.of(context)!.settings_header_subtitle, style: PawTextStyles.subheading),
         const SizedBox(height: 20),
       ],
     );
   }
 
   Widget _buildLanguageDropdown(BuildContext context) {
-    final items = [
-      DropdownMenuItem(
-        value: Language.turkish.value,
-        child: Text(Language.turkish.name),
-      ),
-      DropdownMenuItem(
-        value: Language.english.value,
-        child: Text(Language.english.name),
-      ),
-    ];
+    final items = [DropdownMenuItem(value: Language.turkish.value, child: Text(Language.turkish.name)), DropdownMenuItem(value: Language.english.value, child: Text(Language.english.name))];
 
-    return _PillDropdown(
-      value: _db?.languageCode ?? Language.english.value,
-      items: items,
-      onChanged: (value) =>
-          setState(() => _db?.languageCode = value ?? Language.english.value),
-    );
+    return _PillDropdown(value: _db?.languageCode ?? Language.english.value, items: items, onChanged: (v) => setState(() => _db?.languageCode = v ?? Language.english.value));
   }
 
   Widget _buildTimeDropdown(BuildContext context) {
-    final items = [
-      DropdownMenuItem(value: Time.fifty.value, child: Text(Time.fifty.name)),
-      DropdownMenuItem(
-        value: Time.hundered.value,
-        child: Text(Time.hundered.name),
-      ),
-      DropdownMenuItem(
-        value: Time.twohundered.value,
-        child: Text(Time.twohundered.name),
-      ),
-      DropdownMenuItem(
-        value: Time.sandbox.value,
-        child: Text(Time.sandbox.name),
-      ),
-    ];
+    final items = [DropdownMenuItem(value: Time.fifty.value, child: Text(Time.fifty.name)), DropdownMenuItem(value: Time.hundered.value, child: Text(Time.hundered.name)), DropdownMenuItem(value: Time.twohundered.value, child: Text(Time.twohundered.name)), DropdownMenuItem(value: Time.sandbox.value, child: Text(Time.sandbox.name))];
 
-    return _PillDropdown(
-      value: _db?.time ?? Time.fifty.value,
-      items: items,
-      onChanged: (value) =>
-          setState(() => _db?.time = value ?? Time.fifty.value),
-    );
+    return _PillDropdown(value: _db?.time ?? Time.fifty.value, items: items, onChanged: (v) => setState(() => _db?.time = v ?? Time.fifty.value));
   }
 
-  Widget _buildSlider({
-    required double value,
-    required ValueChanged<double> onChanged,
-    required Color activeColor,
-  }) {
+  Widget _buildSlider({required double value, required ValueChanged<double> onChanged, required Color activeColor}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -187,52 +119,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         Align(
           alignment: Alignment.centerRight,
-          child: Text(
-            '${(value * 100).round()}%',
-            style: PawTextStyles.cardSubtitle,
-          ),
+          child: Text('${(value * 100).round()}%', style: PawTextStyles.cardSubtitle),
         ),
       ],
     );
   }
 
   Widget _buildSaveButton(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.85, end: 1),
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeOutBack,
-      builder: (context, value, child) =>
-          Transform.scale(scale: value, child: child),
-      child: CustomButton(
-        onPressed: () async {
-          final messenger = ScaffoldMessenger.of(context);
-          final successText = AppLocalizations.of(
-            context,
-          )!.save_complete_snackbar;
-          final mainState = MainApp.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
-          await DBHelper().update(_db!);
-          mainState?.setLocale(_db!.languageCode);
-          messenger.showSnackBar(
-            SnackBar(
-              content: Text(successText),
-              elevation: 10,
-              duration: const Duration(seconds: 2),
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.9, end: 1),
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeOutBack,
+      builder: (context, value, child) => Transform.scale(scale: value, child: child),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () async {
+            final messenger = ScaffoldMessenger.of(context);
+            final mainState = MainApp.of(context);
+
+            await DBHelper().update(_db!);
+            mainState?.setLocale(_db!.languageCode);
+
+            messenger.showSnackBar(SnackBar(content: Text(l10n.save_complete_snackbar), elevation: 10, duration: const Duration(seconds: 2)));
+          },
+          borderRadius: BorderRadius.circular(28),
+          child: Ink(
+            height: 56,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: PawPalette.pinkToOrange()),
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.15 * 255),
+                  blurRadius: 14,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-          );
-        },
-        child: Text(AppLocalizations.of(context)!.save_button),
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.save_rounded, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Text(
+                    l10n.save_button,
+                    style: PawTextStyles.subheading.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
 class _PillDropdown extends StatelessWidget {
-  const _PillDropdown({
-    required this.value,
-    required this.items,
-    required this.onChanged,
-  });
+  const _PillDropdown({required this.value, required this.items, required this.onChanged});
 
   final int value;
   final List<DropdownMenuItem<int>> items;
@@ -245,18 +193,10 @@ class _PillDropdown extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22),
         color: Colors.white,
-        border: Border.all(
-          color: PawPalette.midnight.withValues(alpha: 0.08 * 255),
-        ),
+        border: Border.all(color: PawPalette.midnight.withValues(alpha: 0.08 * 255)),
       ),
       child: DropdownButtonHideUnderline(
-        child: DropdownButton<int>(
-          value: value,
-          isExpanded: true,
-          icon: const Icon(Icons.expand_more),
-          items: items,
-          onChanged: onChanged,
-        ),
+        child: DropdownButton<int>(value: value, isExpanded: true, icon: const Icon(Icons.expand_more), items: items, onChanged: onChanged),
       ),
     );
   }

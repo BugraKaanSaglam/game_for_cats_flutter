@@ -1,7 +1,6 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/global/argumentsender_class.dart';
-import 'package:game_for_cats_2025/widgets/animated_gradient_background.dart';
 import 'package:game_for_cats_2025/widgets/playful_card.dart';
 import 'package:game_for_cats_2025/utils/paw_theme.dart';
 
@@ -17,7 +16,10 @@ class CreditsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: mainAppBar(args.title!, context),
-      body: AnimatedGradientBackground(child: mainBody(context)),
+      body: Container(
+        decoration: const BoxDecoration(gradient: PawPalette.lightBackground),
+        child: mainBody(context),
+      ),
     );
   }
 
@@ -28,11 +30,14 @@ class CreditsScreen extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         children: [
-          Text(l10n.credits_creators, style: PawTextStyles.heading),
+          Text(l10n.credits_creators, style: PawTextStyles.heading.copyWith(color: Colors.black)),
           const SizedBox(height: 6),
-          Text(l10n.credits_subtitle, style: PawTextStyles.subheading),
+          Text(l10n.credits_subtitle, style: PawTextStyles.subheading.copyWith(color: Colors.black)),
           const SizedBox(height: 20),
-          PlayfulCard(emoji: '✨', title: l10n.game_name, subtitle: l10n.credits_creators_text, gradient: PawPalette.pinkToOrange()),
+          Theme(
+            data: ThemeData.light(),
+            child: PlayfulCard(emoji: '✨', title: l10n.game_name, subtitle: l10n.credits_creators_text, gradient: PawPalette.pinkToOrange()),
+          ),
         ],
       ),
     );
