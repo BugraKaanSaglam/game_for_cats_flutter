@@ -27,7 +27,7 @@ bool isBackButtonDialogOpen = false;
 FlameGame<World>? _game;
 GameClicksCounter clicksCounter = GameClicksCounter();
 OPCDataBase? _gameDatabase;
-bool isPaused = false; // Is Game Stopped
+bool isOverlayBlocking = false;
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -37,6 +37,8 @@ class GameScreen extends StatefulWidget {
 
 //* Alert for End Game
 Dialog endGameDialog(BuildContext context) {
+  isOverlayBlocking = true;
+  _game?.pauseEngine();
   int wrongTaps =
       clicksCounter.totalTaps -
       (clicksCounter.bugTaps + clicksCounter.miceTaps);
@@ -138,10 +140,10 @@ Future<void> closeGame(
 }) async {
   await FlameAudio.bgm.stop();
   game.pauseEngine();
-  isPaused = false;
   clicksCounter.reset();
   elapsedTicks = 0;
   elapsedTicksNotifier.value = 0;
+  isOverlayBlocking = false;
 
   if (adress != null) {
     if (arguments == null) {
@@ -156,13 +158,14 @@ Future<void> closeGame(
       );
     }
   }
-  isPaused = true; // Oyunu durdur
   isBackButtonClicked = false;
 }
 
 //* Alert for BackButtonClicked
 Dialog backButtonDialog(FlameGame<World> game, BuildContext context) {
   isBackButtonDialogOpen = true;
+  isOverlayBlocking = true;
+  _game?.pauseEngine();
   return Dialog(
     backgroundColor: Colors.transparent,
     child: Container(
@@ -209,6 +212,8 @@ Dialog backButtonDialog(FlameGame<World> game, BuildContext context) {
                   ),
                   onPressed: () {
                     isBackButtonDialogOpen = false;
+                    isOverlayBlocking = false;
+                    _game?.resumeEngine();
                     Navigator.pop(context);
                   },
                   child: Text(AppLocalizations.of(context)!.i_am_cat),
@@ -226,6 +231,7 @@ Dialog backButtonDialog(FlameGame<World> game, BuildContext context) {
                   ),
                   onPressed: () async {
                     isBackButtonDialogOpen = false;
+                    isOverlayBlocking = false;
                     Navigator.pop(context);
                     await closeGame(game, context);
                     showDialog(
@@ -248,6 +254,9 @@ Dialog backButtonDialog(FlameGame<World> game, BuildContext context) {
 void closeDialogAutomatically(BuildContext context) {
   if (isBackButtonDialogOpen && context.mounted == true) Navigator.pop(context);
   isBackButtonDialogOpen = false;
+  if (!isOverlayBlocking) return;
+  isOverlayBlocking = false;
+  _game?.resumeEngine();
 }
 
 PreferredSizeWidget gameAppBar(BuildContext context) {
@@ -319,6 +328,15 @@ class _GameScreenState extends State<GameScreen> {
             bottom: 24,
             child: _buildStatsBar(context),
           ),
+          if (isOverlayBlocking)
+            Positioned.fill(
+              child: IgnorePointer(
+                ignoring: true,
+                child: Container(
+                  color: Colors.black54,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -440,26 +458,32 @@ class Game extends FlameGame
     interval = Timer(
       1.0,
       onTick: () async {
+        if (isOverlayBlocking) return;
         if (elapsedTicks % 4 == 0) {
           double startingSpeed = 50;
-          //Adding Mice or Bug Every 4 Seconds
-          int randomValue = Random().nextInt(2); // 0 or 1
-          Vector2 startPosition = Vector2(
-            0,
-            gameScreenTopBarHeight +
-                Random().nextDouble() * (size.y - gameScreenTopBarHeight),
-          );
-          Vector2 startRndVelocity = Utils.generateRandomVelocity(
-            size,
-            10,
-            100,
-          );
-          if (randomValue == 0) {
-            Mice mice = Mice(startPosition, startRndVelocity, startingSpeed);
-            add(mice);
-          } else {
-            Bug bug = Bug(startPosition, startRndVelocity, startingSpeed);
-            add(bug);
+          final activeCreatures = children
+              .where((component) => component is Mice || component is Bug)
+              .length;
+          if (activeCreatures < 20) {
+            //Adding Mice or Bug Every 4 Seconds
+            int randomValue = Random().nextInt(2); // 0 or 1
+            Vector2 startPosition = Vector2(
+              0,
+              gameScreenTopBarHeight +
+                  Random().nextDouble() * (size.y - gameScreenTopBarHeight),
+            );
+            Vector2 startRndVelocity = Utils.generateRandomVelocity(
+              size,
+              10,
+              100,
+            );
+            if (randomValue == 0) {
+              Mice mice = Mice(startPosition, startRndVelocity, startingSpeed);
+              add(mice);
+            } else {
+              Bug bug = Bug(startPosition, startRndVelocity, startingSpeed);
+              add(bug);
+            }
           }
         }
         if (elapsedTicks == gameTimer) {
