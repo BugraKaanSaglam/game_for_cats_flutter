@@ -1,7 +1,7 @@
 name: game_for_cats_2025
 description: Game For Cats
 publish_to: 'none'
-version: 2.3.0+13
+version: 3.0.0+30
 
 environment:
   sdk: ^3.8.1
