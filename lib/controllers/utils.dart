@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flame/components.dart';
-import 'package:game_for_cats_2025/global/global_variables.dart';
+import 'package:game_for_cats_2025/models/global/global_variables.dart';
 
 class Utils {
   static Vector2 generateRandomPosition(Vector2 screenSize, Vector2 margins) {

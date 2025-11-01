@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/utils/paw_theme.dart';
+import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 
 /// Reusable animated gradient background with a subtle dark overlay so that
 /// foreground widgets stay readable regardless of the palette that is active.

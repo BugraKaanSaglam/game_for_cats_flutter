@@ -1,6 +1,6 @@
 import 'package:flame/cache.dart';
 import 'package:flame_audio/flame_audio.dart';
-import '../global/global_images.dart';
+import 'package:game_for_cats_2025/models/global/global_images.dart';
 
 Future<void> loadGameAudio() async {
   await FlameAudio.audioCache.load('mice_tap.mp3');

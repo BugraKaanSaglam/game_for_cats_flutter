@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/utils/paw_theme.dart';
+import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 
 /// Rounded gradient tile with optional emoji avatar used across settings & info screens.
 class PlayfulCard extends StatelessWidget {

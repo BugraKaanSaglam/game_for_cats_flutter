@@ -1,15 +1,14 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/database/db_error.dart';
-import 'package:game_for_cats_2025/database/db_helper.dart';
-import 'package:game_for_cats_2025/database/opc_database_list.dart';
-import 'package:game_for_cats_2025/enums/game_enums.dart';
-import 'package:game_for_cats_2025/global/global_functions.dart';
-import 'package:game_for_cats_2025/global/global_variables.dart';
-import 'package:game_for_cats_2025/l10n/app_localizations.dart';
+import 'package:game_for_cats_2025/controllers/settings_controller.dart';
+import 'package:game_for_cats_2025/models/database/db_error.dart';
+import 'package:game_for_cats_2025/models/database/opc_database_list.dart';
+import 'package:game_for_cats_2025/models/enums/game_enums.dart';
 import 'package:game_for_cats_2025/main.dart';
-import 'package:game_for_cats_2025/utils/paw_theme.dart';
-import 'package:game_for_cats_2025/widgets/playful_card.dart';
+import 'package:game_for_cats_2025/l10n/app_localizations.dart';
+import 'package:game_for_cats_2025/views/components/main_app_bar.dart';
+import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
+import 'package:game_for_cats_2025/views/widgets/playful_card.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -19,13 +18,15 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  late final SettingsController _controller;
   OPCDataBase? _db;
   late final Future<OPCDataBase?> _dbFuture;
 
   @override
   void initState() {
     super.initState();
-    _dbFuture = DBHelper().getList(databaseVersion);
+    _controller = SettingsController();
+    _dbFuture = _controller.loadConfiguration();
   }
 
   @override
@@ -138,10 +139,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: InkWell(
           onTap: () async {
             final messenger = ScaffoldMessenger.of(context);
-            final mainState = MainApp.of(context);
 
-            await DBHelper().update(_db!);
-            mainState?.setLocale(_db!.languageCode);
+            await _controller.saveConfiguration(_db!);
+            MainApp.of(context)?.setLocale(_controller.localeValue(_db!));
 
             messenger.showSnackBar(SnackBar(content: Text(l10n.save_complete_snackbar), elevation: 10, duration: const Duration(seconds: 2)));
           },

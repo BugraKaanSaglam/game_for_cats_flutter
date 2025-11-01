@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
-import '../main.dart';
+import 'package:game_for_cats_2025/main.dart';
 
 Widget loadingScreen(BuildContext context) {
   return Scaffold(

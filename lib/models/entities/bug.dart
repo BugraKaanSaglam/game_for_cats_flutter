@@ -3,11 +3,10 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:game_for_cats_2025/functions/animation_handler.dart';
-import 'package:game_for_cats_2025/global/global_images.dart';
-import 'package:game_for_cats_2025/global/global_variables.dart';
-
-import '../utils/utils.dart';
+import 'package:game_for_cats_2025/controllers/animation_handler.dart';
+import 'package:game_for_cats_2025/models/global/global_images.dart';
+import 'package:game_for_cats_2025/models/global/global_variables.dart';
+import 'package:game_for_cats_2025/controllers/utils.dart';
 
 // Bug class is a PositionComponent so we get the angle and position of the element.
 class Bug extends SpriteAnimationComponent with HasGameRef<FlameGame>, CollisionCallbacks {

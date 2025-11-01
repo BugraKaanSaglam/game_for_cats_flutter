@@ -1,12 +1,12 @@
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
-import 'enums/enum_functions.dart';
-import 'enums/game_enums.dart';
-import 'screens/credits_screen.dart';
-import 'screens/game_screen.dart';
-import 'screens/howtoplay_screen.dart';
-import 'screens/main_screen.dart';
-import 'screens/settings_screen.dart';
+import 'models/enums/enum_functions.dart';
+import 'models/enums/game_enums.dart';
+import 'views/screens/credits_screen.dart';
+import 'views/screens/game_screen.dart';
+import 'views/screens/howtoplay_screen.dart';
+import 'views/screens/main_screen.dart';
+import 'views/screens/settings_screen.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 
 void main() async {

@@ -1,11 +1,11 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/global/argumentsender_class.dart';
-import 'package:game_for_cats_2025/widgets/playful_card.dart';
-import 'package:game_for_cats_2025/utils/paw_theme.dart';
+import 'package:game_for_cats_2025/models/global/argument_sender.dart';
+import 'package:game_for_cats_2025/views/widgets/playful_card.dart';
+import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
+import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 
-import '../global/global_functions.dart';
-import '../l10n/app_localizations.dart';
+import '../components/main_app_bar.dart';
 
 class HowToPlayScreen extends StatelessWidget {
   const HowToPlayScreen({super.key});
