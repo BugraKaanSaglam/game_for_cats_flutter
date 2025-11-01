@@ -28,6 +28,7 @@ FlameGame<World>? _game;
 GameClicksCounter clicksCounter = GameClicksCounter();
 OPCDataBase? _gameDatabase;
 bool isOverlayBlocking = false;
+bool isGameOverTriggered = false;
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -144,6 +145,7 @@ Future<void> closeGame(
   elapsedTicks = 0;
   elapsedTicksNotifier.value = 0;
   isOverlayBlocking = false;
+  isGameOverTriggered = false;
 
   if (adress != null) {
     if (arguments == null) {
@@ -437,7 +439,7 @@ class Game extends FlameGame
     try {
       await loadGameAudio();
       await loadGameImagesAndAssets();
-      _game = game;
+      _game = this;
       _gameDatabase = gameDataBase;
     } catch (e) {
       showDialog(
@@ -458,7 +460,7 @@ class Game extends FlameGame
     interval = Timer(
       1.0,
       onTick: () async {
-        if (isOverlayBlocking) return;
+        if (isOverlayBlocking || isGameOverTriggered) return;
         if (elapsedTicks % 4 == 0) {
           double startingSpeed = 50;
           final activeCreatures = children
@@ -486,20 +488,27 @@ class Game extends FlameGame
             }
           }
         }
-        if (elapsedTicks == gameTimer) {
-          //End Game
-          await closeGame(game, context);
-          showDialog(
-            context: context,
-            builder: (context) => endGameDialog(context),
-          );
-        }
         elapsedTicks++;
         elapsedTicksNotifier.value = elapsedTicks; // Update the ValueNotifier
+        if (elapsedTicks >= gameTimer) {
+          await _handleGameOver();
+        }
       },
       repeat: true,
     );
     return super.onLoad();
+  }
+
+  Future<void> _handleGameOver() async {
+    if (isGameOverTriggered) return;
+    isGameOverTriggered = true;
+    isOverlayBlocking = true;
+    pauseEngine();
+    await FlameAudio.bgm.stop();
+    showDialog(
+      context: context,
+      builder: (context) => endGameDialog(context),
+    );
   }
 
   @override
