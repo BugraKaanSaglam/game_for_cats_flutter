@@ -29,6 +29,31 @@ GameClicksCounter clicksCounter = GameClicksCounter();
 OPCDataBase? _gameDatabase;
 bool isOverlayBlocking = false;
 bool isGameOverTriggered = false;
+GameResult? lastGameResult;
+
+class GameResult {
+  GameResult({
+    required this.totalTaps,
+    required this.miceTaps,
+    required this.bugTaps,
+    required this.wrongTaps,
+  });
+
+  final int totalTaps;
+  final int miceTaps;
+  final int bugTaps;
+  final int wrongTaps;
+
+  factory GameResult.fromCounter(GameClicksCounter counter) {
+    final wrong = counter.totalTaps - (counter.bugTaps + counter.miceTaps);
+    return GameResult(
+      totalTaps: counter.totalTaps,
+      miceTaps: counter.miceTaps,
+      bugTaps: counter.bugTaps,
+      wrongTaps: max(wrong, 0),
+    );
+  }
+}
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -40,9 +65,8 @@ class GameScreen extends StatefulWidget {
 Dialog endGameDialog(BuildContext context) {
   isOverlayBlocking = true;
   _game?.pauseEngine();
-  int wrongTaps =
-      clicksCounter.totalTaps -
-      (clicksCounter.bugTaps + clicksCounter.miceTaps);
+  final stats = lastGameResult ?? GameResult.fromCounter(clicksCounter);
+  final wrongTaps = stats.wrongTaps;
   return Dialog(
     backgroundColor: Colors.transparent,
     child: Container(
@@ -79,13 +103,13 @@ Dialog endGameDialog(BuildContext context) {
           _StatResultTile(
             icon: Icons.pest_control,
             label: AppLocalizations.of(context)!.bugtap_count,
-            value: clicksCounter.bugTaps,
+            value: stats.bugTaps,
             color: Colors.pinkAccent,
           ),
           _StatResultTile(
             icon: Icons.pets,
             label: AppLocalizations.of(context)!.micetap_count,
-            value: clicksCounter.miceTaps,
+            value: stats.miceTaps,
             color: Colors.lightBlueAccent,
           ),
           _StatResultTile(
@@ -139,6 +163,7 @@ Future<void> closeGame(
   String? adress,
   ArgumentSender? arguments,
 }) async {
+  lastGameResult ??= GameResult.fromCounter(clicksCounter);
   await FlameAudio.bgm.stop();
   game.pauseEngine();
   clicksCounter.reset();
@@ -318,12 +343,13 @@ class _GameScreenState extends State<GameScreen> {
     isGameOverTriggered = false;
     isBackButtonDialogOpen = false;
     isBackButtonClicked = false;
+    lastGameResult = null;
     elapsedTicks = 0;
     elapsedTicksNotifier.value = 0;
-    clicksCounter.totalTaps = 0;
-    clicksCounter.bugTaps = 0;
-    clicksCounter.miceTaps = 0;
     _game = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      clicksCounter.reset();
+    });
   }
 
   @override
@@ -518,6 +544,7 @@ class Game extends FlameGame
     if (isGameOverTriggered) return;
     isGameOverTriggered = true;
     isOverlayBlocking = true;
+    lastGameResult = GameResult.fromCounter(clicksCounter);
     pauseEngine();
     await FlameAudio.bgm.stop();
     showDialog(
