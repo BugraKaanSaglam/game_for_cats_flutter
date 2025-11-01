@@ -312,6 +312,21 @@ PreferredSizeWidget gameAppBar(BuildContext context) {
 
 class _GameScreenState extends State<GameScreen> {
   @override
+  void initState() {
+    super.initState();
+    isOverlayBlocking = false;
+    isGameOverTriggered = false;
+    isBackButtonDialogOpen = false;
+    isBackButtonClicked = false;
+    elapsedTicks = 0;
+    elapsedTicksNotifier.value = 0;
+    clicksCounter.totalTaps = 0;
+    clicksCounter.bugTaps = 0;
+    clicksCounter.miceTaps = 0;
+    _game = null;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)?.settings.arguments as ArgumentSender;
     return Scaffold(
