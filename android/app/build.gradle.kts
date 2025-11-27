@@ -61,3 +61,14 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // Force a version compatible with current AGP; newer 1.11.x requires AGP 8.9+
+    implementation("androidx.activity:activity:1.8.2")
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("androidx.activity:activity:1.8.2")
+    }
+}
