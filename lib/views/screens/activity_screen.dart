@@ -52,9 +52,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
               future: _historyFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState != ConnectionState.done) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: Colors.white),
-                  );
+                  return const Center(child: CircularProgressIndicator(color: Colors.white));
                 }
 
                 if (snapshot.hasError) {
@@ -99,11 +97,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
 
   Widget _buildLegend(AppLocalizations l10n) {
     return Row(
-      children: const [
-        _LegendDot(color: Color(0xFF4FACFE), labelKey: 'total'),
-        SizedBox(width: 12),
-        _LegendDot(color: Color(0xFFFF6B6B), labelKey: 'miss'),
-      ].map((w) => w).toList(),
+      children: const [_LegendDot(color: Color(0xFF4FACFE), labelKey: 'total'), SizedBox(width: 12), _LegendDot(color: Color(0xFFFF6B6B), labelKey: 'miss')].map((w) => w).toList(),
     );
   }
 
@@ -137,9 +131,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
     for (int i = _daysWindow - 1; i >= 0; i--) {
       final date = now.subtract(Duration(days: i));
       final key = _dateKey(date);
-      ordered.add(
-        aggregates[key] ?? _DailyAggregate(label: _labelFromDate(date)),
-      );
+      ordered.add(aggregates[key] ?? _DailyAggregate(label: _labelFromDate(date)));
     }
     return ordered;
   }
@@ -157,11 +149,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
               children: [
                 const Icon(Icons.pets, color: Colors.white, size: 36),
                 const SizedBox(height: 10),
-                Text(
-                  text,
-                  textAlign: TextAlign.center,
-                  style: PawTextStyles.cardSubtitle,
-                ),
+                Text(text, textAlign: TextAlign.center, style: PawTextStyles.cardSubtitle),
               ],
             ),
           ),
@@ -230,11 +218,7 @@ class _ActivityChart extends StatelessWidget {
           children: buckets
               .map(
                 (bucket) => Expanded(
-                  child: Text(
-                    bucket.label,
-                    textAlign: TextAlign.center,
-                    style: PawTextStyles.cardSubtitle.copyWith(fontSize: 12),
-                  ),
+                  child: Text(bucket.label, textAlign: TextAlign.center, style: PawTextStyles.cardSubtitle.copyWith(fontSize: 12)),
                 ),
               )
               .toList(),
@@ -245,13 +229,7 @@ class _ActivityChart extends StatelessWidget {
 }
 
 class _AnimatedBar extends StatefulWidget {
-  const _AnimatedBar({
-    required this.total,
-    required this.wrong,
-    required this.maxTotal,
-    required this.gradient,
-    required this.delay,
-  });
+  const _AnimatedBar({required this.total, required this.wrong, required this.maxTotal, required this.gradient, required this.delay});
 
   final int total;
   final int wrong;
@@ -293,9 +271,7 @@ class _AnimatedBarState extends State<_AnimatedBar> with SingleTickerProviderSta
 
   void _configureTween() {
     final targetHeight = _targetHeight();
-    _heightAnimation = Tween<double>(begin: 0, end: targetHeight).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-    );
+    _heightAnimation = Tween<double>(begin: 0, end: targetHeight).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
   }
 
   void _startWithDelay() {
@@ -356,10 +332,7 @@ class _AnimatedBarState extends State<_AnimatedBar> with SingleTickerProviderSta
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              '${widget.total}',
-              style: PawTextStyles.cardSubtitle.copyWith(fontWeight: FontWeight.bold),
-            ),
+            Text('${widget.total}', style: PawTextStyles.cardSubtitle.copyWith(fontWeight: FontWeight.bold)),
           ],
         );
       },
@@ -368,9 +341,7 @@ class _AnimatedBarState extends State<_AnimatedBar> with SingleTickerProviderSta
 }
 
 class _DailyAggregate {
-  _DailyAggregate({required this.label})
-      : total = 0,
-        wrong = 0;
+  _DailyAggregate({required this.label}) : total = 0, wrong = 0;
 
   final String label;
   int total;
@@ -422,10 +393,7 @@ class _StatPill extends StatelessWidget {
         children: [
           Text(label, style: PawTextStyles.cardSubtitle.copyWith(fontSize: 12)),
           const SizedBox(height: 4),
-          Text(
-            value,
-            style: PawTextStyles.cardTitle.copyWith(fontSize: 18, color: Colors.white),
-          ),
+          Text(value, style: PawTextStyles.cardTitle.copyWith(fontSize: 18, color: Colors.white)),
         ],
       ),
     );

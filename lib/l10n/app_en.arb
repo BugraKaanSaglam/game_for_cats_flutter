@@ -63,7 +63,7 @@
     "mute_title": "Mute",
     "mute_subtitle": "Silence all music and sound effects instantly.",
     "mute_toggle_label": "Tap to mute/unmute",
-    "lowpower_title": "Energy Saver",
+    "lowpower_title": "Low Performance Mode",
     "lowpower_subtitle": "Reduce creature count and speed for smoother play on older devices.",
     "lowpower_toggle_label": "Lower motion & power"
 }

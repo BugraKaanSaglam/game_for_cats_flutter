@@ -485,7 +485,7 @@ abstract class AppLocalizations {
   /// No description provided for @lowpower_title.
   ///
   /// In en, this message translates to:
-  /// **'Energy Saver'**
+  /// **'Low Performance Mode'**
   String get lowpower_title;
 
   /// No description provided for @lowpower_subtitle.

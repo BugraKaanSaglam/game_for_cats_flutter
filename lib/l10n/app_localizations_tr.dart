@@ -215,7 +215,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get mute_toggle_label => 'Aç/Kapat';
 
   @override
-  String get lowpower_title => 'Enerji Tasarrufu';
+  String get lowpower_title => 'Düşük Performans Modu';
 
   @override
   String get lowpower_subtitle =>
