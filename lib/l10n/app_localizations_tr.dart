@@ -183,4 +183,25 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get activity_accuracy_label => 'İsabet';
+
+  @override
+  String get background_title => 'Arka Plan';
+
+  @override
+  String get background_subtitle =>
+      'Oyun alanı için bir fotoğraf seç ya da varsayılanı kullan.';
+
+  @override
+  String get background_change_button => 'Arka Planı Değiştir';
+
+  @override
+  String get background_reset_button => 'Sıfırla';
+
+  @override
+  String get background_hint =>
+      'Parlak ve kontrastlı görseller kedinin ilgisini canlı tutar.';
+
+  @override
+  String get background_selected_snackbar =>
+      'Yeni arka plan seçildi. Uygulamak için Kaydet\'e bas.';
 }

@@ -28,7 +28,7 @@ class DBHelper {
       String path = join(documentDirectory.path, fileName);
       var db = await openDatabase(
         path,
-        version: 3,
+        version: 4,
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
         onOpen: (db) {},
@@ -42,7 +42,7 @@ class DBHelper {
 
   Future<void> _onCreate(Database db, int version) async {
     await db.execute(
-      'CREATE TABLE OPCGameTable(Ver INTEGER not null PRIMARY KEY, LanguageCode INTEGER not null, MusicVolume DOUBLE not null, CharacterVolume DOUBLE not null, Time INTEGER not null, Difficulty INTEGER not null)',
+      'CREATE TABLE OPCGameTable(Ver INTEGER not null PRIMARY KEY, LanguageCode INTEGER not null, MusicVolume DOUBLE not null, CharacterVolume DOUBLE not null, Time INTEGER not null, Difficulty INTEGER not null, BackgroundPath TEXT not null)',
     );
     await db.execute(
       'CREATE TABLE SessionHistory(Id INTEGER PRIMARY KEY AUTOINCREMENT, Date TEXT not null, TotalTaps INTEGER not null, WrongTaps INTEGER not null)',
@@ -60,6 +60,11 @@ class DBHelper {
         'CREATE TABLE IF NOT EXISTS SessionHistory(Id INTEGER PRIMARY KEY AUTOINCREMENT, Date TEXT not null, TotalTaps INTEGER not null, WrongTaps INTEGER not null)',
       );
     }
+    if (oldVersion < 4) {
+      await db.execute(
+        'ALTER TABLE OPCGameTable ADD COLUMN BackgroundPath TEXT not null DEFAULT ""',
+      );
+    }
   }
 
   Future<void> add(OPCDataBase column) async {
@@ -75,7 +80,7 @@ class DBHelper {
     var dbClient = await db;
     List<Map<String, dynamic>> maps = await dbClient!.query(
       'OPCGameTable',
-      columns: ['Ver', 'LanguageCode', 'MusicVolume', 'CharacterVolume', 'Time', 'Difficulty'],
+      columns: ['Ver', 'LanguageCode', 'MusicVolume', 'CharacterVolume', 'Time', 'Difficulty', 'BackgroundPath'],
       where: 'Ver = ?',
       whereArgs: [ver],
     );

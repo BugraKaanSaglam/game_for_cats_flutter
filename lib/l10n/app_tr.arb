@@ -53,5 +53,11 @@
     "activity_legend_miss": "Kaçırılan tıklama",
     "activity_total_label": "Toplam",
     "activity_miss_label": "Kaçırma",
-    "activity_accuracy_label": "İsabet"
+    "activity_accuracy_label": "İsabet",
+    "background_title": "Arka Plan",
+    "background_subtitle": "Oyun alanı için bir fotoğraf seç ya da varsayılanı kullan.",
+    "background_change_button": "Arka Planı Değiştir",
+    "background_reset_button": "Sıfırla",
+    "background_hint": "Parlak ve kontrastlı görseller kedinin ilgisini canlı tutar.",
+    "background_selected_snackbar": "Yeni arka plan seçildi. Uygulamak için Kaydet'e bas."
 }

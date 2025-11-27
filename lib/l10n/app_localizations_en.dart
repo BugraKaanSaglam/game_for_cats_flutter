@@ -183,4 +183,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get activity_accuracy_label => 'Accuracy';
+
+  @override
+  String get background_title => 'Background Image';
+
+  @override
+  String get background_subtitle =>
+      'Pick a photo for the playfield or reset to default.';
+
+  @override
+  String get background_change_button => 'Change Background';
+
+  @override
+  String get background_reset_button => 'Reset';
+
+  @override
+  String get background_hint =>
+      'Choosing a bright, high-contrast image keeps kitty engaged.';
+
+  @override
+  String get background_selected_snackbar =>
+      'New background selected. Tap Save to apply.';
 }

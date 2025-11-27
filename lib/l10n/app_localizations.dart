@@ -427,6 +427,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Accuracy'**
   String get activity_accuracy_label;
+
+  /// No description provided for @background_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Background Image'**
+  String get background_title;
+
+  /// No description provided for @background_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a photo for the playfield or reset to default.'**
+  String get background_subtitle;
+
+  /// No description provided for @background_change_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Background'**
+  String get background_change_button;
+
+  /// No description provided for @background_reset_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get background_reset_button;
+
+  /// No description provided for @background_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choosing a bright, high-contrast image keeps kitty engaged.'**
+  String get background_hint;
+
+  /// No description provided for @background_selected_snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'New background selected. Tap Save to apply.'**
+  String get background_selected_snackbar;
 }
 
 class _AppLocalizationsDelegate

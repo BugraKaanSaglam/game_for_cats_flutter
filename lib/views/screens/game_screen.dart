@@ -539,7 +539,7 @@ class Game extends FlameGame
     _difficultyProfile = _resolveDifficultyProfile();
     try {
       await loadGameAudio();
-      await loadGameImagesAndAssets();
+      await loadGameImagesAndAssets(backgroundPath: gameDataBase?.backgroundPath);
       _game = this;
       _gameDatabase = gameDataBase;
     } catch (e) {

@@ -1,5 +1,7 @@
 // ignore_for_file: must_be_immutable, use_build_context_synchronously
 import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'package:game_for_cats_2025/controllers/settings_controller.dart';
 import 'package:game_for_cats_2025/models/database/db_error.dart';
 import 'package:game_for_cats_2025/models/database/opc_database_list.dart';
@@ -9,6 +11,8 @@ import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/views/components/main_app_bar.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:game_for_cats_2025/views/widgets/playful_card.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -62,6 +66,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               PlayfulCard(emoji: '🌍', title: l10n.select_language, subtitle: l10n.settings_language_hint, gradient: PawPalette.pinkToOrange(), child: _buildLanguageDropdown(context)),
               PlayfulCard(emoji: '⏱️', title: l10n.select_time, subtitle: l10n.settings_time_hint, gradient: PawPalette.tealToLemon(), child: _buildTimeDropdown(context)),
               PlayfulCard(emoji: '🎯', title: l10n.select_difficulty, subtitle: l10n.settings_difficulty_hint, child: _buildDifficultyDropdown(context)),
+              PlayfulCard(
+                emoji: '🖼️',
+                title: l10n.background_title,
+                subtitle: l10n.background_subtitle,
+                gradient: PawPalette.pinkToOrange(),
+                child: _buildBackgroundPicker(context),
+              ),
               PlayfulCard(
                 emoji: '🎵',
                 title: l10n.select_musicvolume,
@@ -120,6 +131,93 @@ class _SettingsScreenState extends State<SettingsScreen> {
       items: items,
       onChanged: (v) => setState(() => _db?.difficulty = v ?? Difficulty.easy.value),
     );
+  }
+
+  Widget _buildBackgroundPicker(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final path = _db?.backgroundPath ?? '';
+    final hasCustom = path.isNotEmpty;
+    final image = hasCustom ? FileImage(File(path)) : const AssetImage('assets/images/background.webp') as ImageProvider;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AspectRatio(
+          aspectRatio: 16 / 9,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: PawPalette.midnight.withValues(alpha: 0.08 * 255)),
+              ),
+              child: Image(image: image, fit: BoxFit.cover),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: PawPalette.grape,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                onPressed: _pickBackground,
+                icon: const Icon(Icons.photo_library_rounded),
+                label: Text(l10n.background_change_button),
+              ),
+            ),
+            const SizedBox(width: 10),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: PawPalette.midnight,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+              ),
+              onPressed: hasCustom ? _resetBackground : null,
+              child: Text(l10n.background_reset_button),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(l10n.background_hint, style: PawTextStyles.cardSubtitle),
+      ],
+    );
+  }
+
+  Future<void> _pickBackground() async {
+    final picker = ImagePicker();
+    final result = await picker.pickImage(source: ImageSource.gallery, maxWidth: 2048, maxHeight: 2048);
+    if (result == null) return;
+    final savedPath = await _persistPickedImage(result);
+    setState(() => _db?.backgroundPath = savedPath);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.background_selected_snackbar), duration: const Duration(seconds: 2)));
+  }
+
+  void _resetBackground() {
+    setState(() => _db?.backgroundPath = '');
+  }
+
+  Future<String> _persistPickedImage(XFile picked) async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final extension = picked.name.split('.').last;
+    final targetPath = '${appDir.path}/bg_${DateTime.now().millisecondsSinceEpoch}.$extension';
+
+    // Clean previous custom file to avoid storage bloat.
+    final oldPath = _db?.backgroundPath ?? '';
+    if (oldPath.isNotEmpty) {
+      final oldFile = File(oldPath);
+      if (await oldFile.exists()) {
+        await oldFile.delete().catchError((_) => oldFile);
+      }
+    }
+
+    await File(picked.path).copy(targetPath);
+    return targetPath;
   }
 
   Widget _buildSlider({required double value, required ValueChanged<double> onChanged, required Color activeColor}) {

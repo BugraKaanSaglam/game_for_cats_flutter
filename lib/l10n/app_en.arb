@@ -53,5 +53,11 @@
     "activity_legend_miss": "Miss taps",
     "activity_total_label": "Total",
     "activity_miss_label": "Misses",
-    "activity_accuracy_label": "Accuracy"
+    "activity_accuracy_label": "Accuracy",
+    "background_title": "Background Image",
+    "background_subtitle": "Pick a photo for the playfield or reset to default.",
+    "background_change_button": "Change Background",
+    "background_reset_button": "Reset",
+    "background_hint": "Choosing a bright, high-contrast image keeps kitty engaged.",
+    "background_selected_snackbar": "New background selected. Tap Save to apply."
 }

@@ -6,6 +6,7 @@ class OPCDataBase {
     required this.characterVolume,
     required this.time,
     required this.difficulty,
+    required this.backgroundPath,
   });
 
   late int ver;
@@ -14,6 +15,7 @@ class OPCDataBase {
   late double characterVolume;
   late int time;
   late int difficulty;
+  late String backgroundPath;
 
   Map<String, dynamic> toMap() => {
         'Ver': ver,
@@ -22,6 +24,7 @@ class OPCDataBase {
         'CharacterVolume': characterVolume,
         'Time': time,
         'Difficulty': difficulty,
+        'BackgroundPath': backgroundPath,
       };
 
   OPCDataBase.fromMap(Map<String, dynamic> map) {
@@ -31,10 +34,11 @@ class OPCDataBase {
     characterVolume = map['CharacterVolume'];
     time = map['Time'];
     difficulty = map['Difficulty'] ?? 0;
+    backgroundPath = map['BackgroundPath'] ?? '';
   }
 
   // Implement toString to make it easier to see information about each column when using the print statement.
   @override
   String toString() =>
-      '{Ver: $ver ,LanguageCode: $languageCode, MusicVolume: $musicVolume, CharacterVolume: $characterVolume, Time: $time, Difficulty: $difficulty}';
+      '{Ver: $ver ,LanguageCode: $languageCode, MusicVolume: $musicVolume, CharacterVolume: $characterVolume, Time: $time, Difficulty: $difficulty, BackgroundPath: $backgroundPath}';
 }

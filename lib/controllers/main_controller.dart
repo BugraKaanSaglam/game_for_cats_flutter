@@ -26,6 +26,7 @@ class MainController {
       characterVolume: 1,
       time: Time.fifty.value,
       difficulty: Difficulty.easy.value,
+      backgroundPath: '',
     );
 
     await _dbHelper.add(defaultConfig);
