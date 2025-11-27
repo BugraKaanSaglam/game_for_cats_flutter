@@ -196,6 +196,17 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           delay: 0.45,
           child: CoolAnimatedButton(text: AppLocalizations.of(context)!.credits_button, icon: const Icon(Icons.pest_control_rodent_sharp), onPressed: () => _controller.navigateTo(context, '/credits_screen', AppLocalizations.of(context)!.credits_button)),
         ),
+        SizedBox(height: spacing),
+        _buildStaggeredAnimatedButton(
+          delay: 0.55,
+          child: CoolAnimatedButton(
+            text: AppLocalizations.of(context)!.activity_button,
+            icon: const Icon(Icons.show_chart_rounded),
+            onPressed: () => _controller.navigateTo(context, '/activity_screen', AppLocalizations.of(context)!.activity_button),
+            startColor: const Color(0xFF4FACFE),
+            endColor: const Color(0xFF00F2FE),
+          ),
+        ),
       ],
     );
   }

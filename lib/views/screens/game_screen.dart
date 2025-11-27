@@ -21,6 +21,8 @@ import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:game_for_cats_2025/controllers/game_functions.dart';
 import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
 import 'package:game_for_cats_2025/models/enums/game_enums.dart';
+import 'package:game_for_cats_2025/models/database/db_helper.dart';
+import 'package:game_for_cats_2025/models/database/session_log.dart';
 
 bool isBackButtonClicked = false;
 int elapsedTicks = 0; // Seconds
@@ -32,6 +34,7 @@ OPCDataBase? _gameDatabase;
 bool isOverlayBlocking = false;
 bool isGameOverTriggered = false;
 GameResult? lastGameResult;
+bool hasSessionLogged = false;
 
 class GameResult {
   GameResult({
@@ -180,6 +183,9 @@ Future<void> closeGame(
   ArgumentSender? arguments,
 }) async {
   lastGameResult ??= GameResult.fromCounter(clicksCounter);
+  if (game is Game) {
+    await game._persistSessionResult();
+  }
   await FlameAudio.bgm.stop();
   game.pauseEngine();
   clicksCounter.reset();
@@ -360,6 +366,7 @@ class _GameScreenState extends State<GameScreen> {
     isBackButtonDialogOpen = false;
     isBackButtonClicked = false;
     lastGameResult = null;
+    hasSessionLogged = false;
     elapsedTicks = 0;
     elapsedTicksNotifier.value = 0;
     _game = null;
@@ -587,6 +594,7 @@ class Game extends FlameGame
     isGameOverTriggered = true;
     isOverlayBlocking = true;
     lastGameResult = GameResult.fromCounter(clicksCounter);
+    await _persistSessionResult();
     pauseEngine();
     await FlameAudio.bgm.stop();
     showDialog(
@@ -605,6 +613,26 @@ class Game extends FlameGame
     final progress = (elapsedSeconds / effectiveDuration).clamp(0.0, 1.0);
     final rampMultiplier = 1 + (_difficultyProfile.speedRamp * progress);
     return _difficultyProfile.baseSpeed * rampMultiplier;
+  }
+
+  Future<void> _persistSessionResult() async {
+    if (hasSessionLogged || lastGameResult == null) return;
+    final result = lastGameResult!;
+    final dbHelper = DBHelper();
+    final log = SessionLog(
+      dateKey: _todayKey(),
+      totalTaps: result.totalTaps,
+      wrongTaps: result.wrongTaps,
+    );
+    await dbHelper.addSessionLog(log);
+    hasSessionLogged = true;
+  }
+
+  String _todayKey() {
+    final now = DateTime.now();
+    final mm = now.month.toString().padLeft(2, '0');
+    final dd = now.day.toString().padLeft(2, '0');
+    return '${now.year}-$mm-$dd';
   }
 
   @override

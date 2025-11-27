@@ -151,4 +151,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get difficulty_sandbox => 'Sandbox / Free Play';
+
+  @override
+  String get activity_title => 'Activity Trend';
+
+  @override
+  String get activity_subtitle =>
+      'Daily taps and misses from recent play sessions.';
+
+  @override
+  String get activity_empty =>
+      'No play sessions logged yet. Start a round to track activity!';
+
+  @override
+  String get activity_button => 'Activity Trend';
+
+  @override
+  String get activity_error => 'Could not load activity. Pull to refresh.';
+
+  @override
+  String get activity_legend_total => 'Total taps';
+
+  @override
+  String get activity_legend_miss => 'Miss taps';
+
+  @override
+  String get activity_total_label => 'Total';
+
+  @override
+  String get activity_miss_label => 'Misses';
+
+  @override
+  String get activity_accuracy_label => 'Accuracy';
 }

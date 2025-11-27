@@ -150,4 +150,37 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get difficulty_sandbox => 'Kum Havuzu / Serbest';
+
+  @override
+  String get activity_title => 'Aktivite Trendi';
+
+  @override
+  String get activity_subtitle =>
+      'Son oyunlarda günlük tıklamalar ve kaçırmalar.';
+
+  @override
+  String get activity_empty =>
+      'Henüz kayıtlı oyun yok. Takip için bir tur başlat!';
+
+  @override
+  String get activity_button => 'Aktivite Trendi';
+
+  @override
+  String get activity_error =>
+      'Aktivite yüklenemedi. Yenilemek için aşağı çekin.';
+
+  @override
+  String get activity_legend_total => 'Toplam tıklama';
+
+  @override
+  String get activity_legend_miss => 'Kaçırılan tıklama';
+
+  @override
+  String get activity_total_label => 'Toplam';
+
+  @override
+  String get activity_miss_label => 'Kaçırma';
+
+  @override
+  String get activity_accuracy_label => 'İsabet';
 }

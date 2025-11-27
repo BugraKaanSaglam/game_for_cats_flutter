@@ -7,6 +7,7 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:io' as io;
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
+import 'package:game_for_cats_2025/models/database/session_log.dart';
 
 class DBHelper {
   DBHelper();
@@ -27,7 +28,7 @@ class DBHelper {
       String path = join(documentDirectory.path, fileName);
       var db = await openDatabase(
         path,
-        version: 2,
+        version: 3,
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,
         onOpen: (db) {},
@@ -43,12 +44,20 @@ class DBHelper {
     await db.execute(
       'CREATE TABLE OPCGameTable(Ver INTEGER not null PRIMARY KEY, LanguageCode INTEGER not null, MusicVolume DOUBLE not null, CharacterVolume DOUBLE not null, Time INTEGER not null, Difficulty INTEGER not null)',
     );
+    await db.execute(
+      'CREATE TABLE SessionHistory(Id INTEGER PRIMARY KEY AUTOINCREMENT, Date TEXT not null, TotalTaps INTEGER not null, WrongTaps INTEGER not null)',
+    );
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute(
         'ALTER TABLE OPCGameTable ADD COLUMN Difficulty INTEGER not null DEFAULT 0',
+      );
+    }
+    if (oldVersion < 3) {
+      await db.execute(
+        'CREATE TABLE IF NOT EXISTS SessionHistory(Id INTEGER PRIMARY KEY AUTOINCREMENT, Date TEXT not null, TotalTaps INTEGER not null, WrongTaps INTEGER not null)',
       );
     }
   }
@@ -91,5 +100,28 @@ class DBHelper {
   Future<int> delete(OPCDataBase column) async {
     var dbClient = await db;
     return await dbClient!.delete('OPCGameTable', where: 'Ver = ?', whereArgs: [column.ver]);
+  }
+
+  Future<void> addSessionLog(SessionLog sessionLog) async {
+    try {
+      var dbClient = await db;
+      await dbClient!.insert(
+        'SessionHistory',
+        sessionLog.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (e) {
+      log("Session insert error: $e");
+    }
+  }
+
+  Future<List<SessionLog>> fetchSessionLogs({int limit = 30}) async {
+    var dbClient = await db;
+    final maps = await dbClient!.query(
+      'SessionHistory',
+      orderBy: 'Id DESC',
+      limit: limit,
+    );
+    return maps.map(SessionLog.fromMap).toList();
   }
 }

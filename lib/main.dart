@@ -7,6 +7,7 @@ import 'views/screens/game_screen.dart';
 import 'views/screens/howtoplay_screen.dart';
 import 'views/screens/main_screen.dart';
 import 'views/screens/settings_screen.dart';
+import 'views/screens/activity_screen.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 
 void main() async {
@@ -42,7 +43,7 @@ class MainAppState extends State<MainApp> {
       locale: Locale.fromSubtags(languageCode: languageCode.shortName),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      routes: {'/main_screen': (context) => const MainScreen(), '/settings_screen': (context) => const SettingsScreen(), '/credits_screen': (context) => const CreditsScreen(), '/howtoplay_screen': (context) => const HowToPlayScreen(), '/game_screen': (context) => const GameScreen()},
+      routes: {'/main_screen': (context) => const MainScreen(), '/settings_screen': (context) => const SettingsScreen(), '/credits_screen': (context) => const CreditsScreen(), '/howtoplay_screen': (context) => const HowToPlayScreen(), '/game_screen': (context) => const GameScreen(), '/activity_screen': (context) => const ActivityScreen()},
     );
   }
 

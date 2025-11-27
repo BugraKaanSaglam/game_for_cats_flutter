@@ -43,5 +43,15 @@
     "difficulty_easy": "Kitten (Easy)",
     "difficulty_medium": "Playful (Medium)",
     "difficulty_hard": "Hunter (Hard)",
-    "difficulty_sandbox": "Sandbox / Free Play"
+    "difficulty_sandbox": "Sandbox / Free Play",
+    "activity_title": "Activity Trend",
+    "activity_subtitle": "Daily taps and misses from recent play sessions.",
+    "activity_empty": "No play sessions logged yet. Start a round to track activity!",
+    "activity_button": "Activity Trend",
+    "activity_error": "Could not load activity. Pull to refresh.",
+    "activity_legend_total": "Total taps",
+    "activity_legend_miss": "Miss taps",
+    "activity_total_label": "Total",
+    "activity_miss_label": "Misses",
+    "activity_accuracy_label": "Accuracy"
 }

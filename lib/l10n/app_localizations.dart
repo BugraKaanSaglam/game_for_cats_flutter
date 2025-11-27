@@ -367,6 +367,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sandbox / Free Play'**
   String get difficulty_sandbox;
+
+  /// No description provided for @activity_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity Trend'**
+  String get activity_title;
+
+  /// No description provided for @activity_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily taps and misses from recent play sessions.'**
+  String get activity_subtitle;
+
+  /// No description provided for @activity_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No play sessions logged yet. Start a round to track activity!'**
+  String get activity_empty;
+
+  /// No description provided for @activity_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity Trend'**
+  String get activity_button;
+
+  /// No description provided for @activity_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load activity. Pull to refresh.'**
+  String get activity_error;
+
+  /// No description provided for @activity_legend_total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total taps'**
+  String get activity_legend_total;
+
+  /// No description provided for @activity_legend_miss.
+  ///
+  /// In en, this message translates to:
+  /// **'Miss taps'**
+  String get activity_legend_miss;
+
+  /// No description provided for @activity_total_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get activity_total_label;
+
+  /// No description provided for @activity_miss_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Misses'**
+  String get activity_miss_label;
+
+  /// No description provided for @activity_accuracy_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Accuracy'**
+  String get activity_accuracy_label;
 }
 
 class _AppLocalizationsDelegate

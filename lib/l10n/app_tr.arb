@@ -43,5 +43,15 @@
     "difficulty_easy": "Yavru Kedi (Kolay)",
     "difficulty_medium": "Meraklı (Orta)",
     "difficulty_hard": "Avcı (Zor)",
-    "difficulty_sandbox": "Kum Havuzu / Serbest"
+    "difficulty_sandbox": "Kum Havuzu / Serbest",
+    "activity_title": "Aktivite Trendi",
+    "activity_subtitle": "Son oyunlarda günlük tıklamalar ve kaçırmalar.",
+    "activity_empty": "Henüz kayıtlı oyun yok. Takip için bir tur başlat!",
+    "activity_button": "Aktivite Trendi",
+    "activity_error": "Aktivite yüklenemedi. Yenilemek için aşağı çekin.",
+    "activity_legend_total": "Toplam tıklama",
+    "activity_legend_miss": "Kaçırılan tıklama",
+    "activity_total_label": "Toplam",
+    "activity_miss_label": "Kaçırma",
+    "activity_accuracy_label": "İsabet"
 }
