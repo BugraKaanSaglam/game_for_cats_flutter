@@ -67,6 +67,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
               PlayfulCard(emoji: '⏱️', title: l10n.select_time, subtitle: l10n.settings_time_hint, gradient: PawPalette.tealToLemon(), child: _buildTimeDropdown(context)),
               PlayfulCard(emoji: '🎯', title: l10n.select_difficulty, subtitle: l10n.settings_difficulty_hint, child: _buildDifficultyDropdown(context)),
               PlayfulCard(
+                emoji: '🔇',
+                title: l10n.mute_title,
+                subtitle: l10n.mute_subtitle,
+                gradient: PawPalette.tealToLemon(),
+                child: SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  value: _db?.muted ?? false,
+                  onChanged: (v) => setState(() => _db?.muted = v),
+                  title: Text(l10n.mute_toggle_label, style: PawTextStyles.cardTitle),
+                ),
+              ),
+              PlayfulCard(
+                emoji: '⚡',
+                title: l10n.lowpower_title,
+                subtitle: l10n.lowpower_subtitle,
+                gradient: PawPalette.pinkToOrange(),
+                child: SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  value: _db?.lowPower ?? false,
+                  onChanged: (v) => setState(() => _db?.lowPower = v),
+                  title: Text(l10n.lowpower_toggle_label, style: PawTextStyles.cardTitle),
+                ),
+              ),
+              PlayfulCard(
                 emoji: '🖼️',
                 title: l10n.background_title,
                 subtitle: l10n.background_subtitle,

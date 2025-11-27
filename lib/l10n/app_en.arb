@@ -59,5 +59,11 @@
     "background_change_button": "Change Background",
     "background_reset_button": "Reset",
     "background_hint": "Choosing a bright, high-contrast image keeps kitty engaged.",
-    "background_selected_snackbar": "New background selected. Tap Save to apply."
+    "background_selected_snackbar": "New background selected. Tap Save to apply.",
+    "mute_title": "Mute",
+    "mute_subtitle": "Silence all music and sound effects instantly.",
+    "mute_toggle_label": "Tap to mute/unmute",
+    "lowpower_title": "Energy Saver",
+    "lowpower_subtitle": "Reduce creature count and speed for smoother play on older devices.",
+    "lowpower_toggle_label": "Lower motion & power"
 }

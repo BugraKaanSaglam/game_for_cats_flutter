@@ -493,6 +493,7 @@ class Game extends FlameGame
   BuildContext context;
   OPCDataBase? gameDataBase;
   final Random _random = Random();
+  bool get _isMuted => gameDataBase?.muted ?? false;
 
   late Timer interval; // Time Variable
   late DifficultyProfile _difficultyProfile;
@@ -502,36 +503,27 @@ class Game extends FlameGame
 
   DifficultyProfile _resolveDifficultyProfile() {
     final difficulty = getDifficultyFromValue(gameDataBase?.difficulty);
-    switch (difficulty) {
-      case Difficulty.easy:
-        return const DifficultyProfile(
-          spawnIntervalSeconds: 5,
-          maxActiveCreatures: 8,
-          baseSpeed: 55,
-          speedRamp: 0.2,
-        );
-      case Difficulty.medium:
-        return const DifficultyProfile(
-          spawnIntervalSeconds: 4,
-          maxActiveCreatures: 12,
-          baseSpeed: 70,
-          speedRamp: 0.35,
-        );
-      case Difficulty.hard:
-        return const DifficultyProfile(
-          spawnIntervalSeconds: 3,
-          maxActiveCreatures: 18,
-          baseSpeed: 85,
-          speedRamp: 0.5,
-        );
-      case Difficulty.sandbox:
-        return const DifficultyProfile(
-          spawnIntervalSeconds: 4,
-          maxActiveCreatures: 24,
-          baseSpeed: 70,
-          speedRamp: 0.1,
-        );
+    final baseProfile = switch (difficulty) {
+      Difficulty.easy => const DifficultyProfile(
+          spawnIntervalSeconds: 5, maxActiveCreatures: 8, baseSpeed: 55, speedRamp: 0.2),
+      Difficulty.medium => const DifficultyProfile(
+          spawnIntervalSeconds: 4, maxActiveCreatures: 12, baseSpeed: 70, speedRamp: 0.35),
+      Difficulty.hard => const DifficultyProfile(
+          spawnIntervalSeconds: 3, maxActiveCreatures: 18, baseSpeed: 85, speedRamp: 0.5),
+      Difficulty.sandbox => const DifficultyProfile(
+          spawnIntervalSeconds: 4, maxActiveCreatures: 24, baseSpeed: 70, speedRamp: 0.1),
+    };
+
+    if (gameDataBase?.lowPower ?? false) {
+      return DifficultyProfile(
+        spawnIntervalSeconds: baseProfile.spawnIntervalSeconds + 1,
+        maxActiveCreatures: max(4, (baseProfile.maxActiveCreatures * 0.6).round()),
+        baseSpeed: baseProfile.baseSpeed * 0.7,
+        speedRamp: baseProfile.speedRamp * 0.5,
+      );
     }
+
+    return baseProfile;
   }
 
   @override
@@ -555,7 +547,7 @@ class Game extends FlameGame
     add(ScreenHitbox());
     FlameAudio.bgm.play(
       'bird_background_sound.mp3',
-      volume: gameDataBase?.musicVolume ?? 1,
+      volume: _isMuted ? 0 : (gameDataBase?.musicVolume ?? 1),
     );
 
     interval = Timer(
@@ -650,7 +642,7 @@ class Game extends FlameGame
       if (component is Mice && component.containsPoint(touchPoint)) {
         FlameAudio.play(
           'mice_tap.mp3',
-          volume: gameDataBase?.characterVolume ?? 1,
+          volume: _isMuted ? 0 : (gameDataBase?.characterVolume ?? 1),
         );
         clicksCounter.recordMiceTap();
         remove(component);
@@ -659,7 +651,7 @@ class Game extends FlameGame
       } else if (component is Bug && component.containsPoint(touchPoint)) {
         FlameAudio.play(
           'bug_tap.wav',
-          volume: gameDataBase?.characterVolume ?? 1,
+          volume: _isMuted ? 0 : (gameDataBase?.characterVolume ?? 1),
         );
         clicksCounter.recordBugTap();
         remove(component);

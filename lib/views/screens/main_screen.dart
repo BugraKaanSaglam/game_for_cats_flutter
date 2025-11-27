@@ -211,6 +211,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
+
   Widget _buildAmbientOrbs() {
     return IgnorePointer(
       child: AnimatedBuilder(

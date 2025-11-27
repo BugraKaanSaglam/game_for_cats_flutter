@@ -27,11 +27,15 @@ class MainController {
       time: Time.fifty.value,
       difficulty: Difficulty.easy.value,
       backgroundPath: '',
+      muted: false,
+      lowPower: false,
     );
 
     await _dbHelper.add(defaultConfig);
     return defaultConfig;
   }
+
+  Future<void> updateConfiguration(OPCDataBase configuration) => _dbHelper.update(configuration);
 
   Time applyGameTime(OPCDataBase configuration) => getTimeFromValue(configuration.time);
 

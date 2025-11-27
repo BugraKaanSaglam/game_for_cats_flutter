@@ -59,5 +59,11 @@
     "background_change_button": "Arka Planı Değiştir",
     "background_reset_button": "Sıfırla",
     "background_hint": "Parlak ve kontrastlı görseller kedinin ilgisini canlı tutar.",
-    "background_selected_snackbar": "Yeni arka plan seçildi. Uygulamak için Kaydet'e bas."
+    "background_selected_snackbar": "Yeni arka plan seçildi. Uygulamak için Kaydet'e bas.",
+    "mute_title": "Sessize Al",
+    "mute_subtitle": "Tüm müzik ve efektleri anında kapat.",
+    "mute_toggle_label": "Aç/Kapat",
+    "lowpower_title": "Enerji Tasarrufu",
+    "lowpower_subtitle": "Daha az yaratık ve hız ile eski cihazlarda daha akıcı oynat.",
+    "lowpower_toggle_label": "Hareketi azalt"
 }

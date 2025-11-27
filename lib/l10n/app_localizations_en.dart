@@ -204,4 +204,23 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get background_selected_snackbar =>
       'New background selected. Tap Save to apply.';
+
+  @override
+  String get mute_title => 'Mute';
+
+  @override
+  String get mute_subtitle => 'Silence all music and sound effects instantly.';
+
+  @override
+  String get mute_toggle_label => 'Tap to mute/unmute';
+
+  @override
+  String get lowpower_title => 'Energy Saver';
+
+  @override
+  String get lowpower_subtitle =>
+      'Reduce creature count and speed for smoother play on older devices.';
+
+  @override
+  String get lowpower_toggle_label => 'Lower motion & power';
 }

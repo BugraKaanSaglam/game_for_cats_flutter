@@ -463,6 +463,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New background selected. Tap Save to apply.'**
   String get background_selected_snackbar;
+
+  /// No description provided for @mute_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute'**
+  String get mute_title;
+
+  /// No description provided for @mute_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Silence all music and sound effects instantly.'**
+  String get mute_subtitle;
+
+  /// No description provided for @mute_toggle_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to mute/unmute'**
+  String get mute_toggle_label;
+
+  /// No description provided for @lowpower_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy Saver'**
+  String get lowpower_title;
+
+  /// No description provided for @lowpower_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reduce creature count and speed for smoother play on older devices.'**
+  String get lowpower_subtitle;
+
+  /// No description provided for @lowpower_toggle_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Lower motion & power'**
+  String get lowpower_toggle_label;
 }
 
 class _AppLocalizationsDelegate

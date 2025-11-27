@@ -204,4 +204,23 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get background_selected_snackbar =>
       'Yeni arka plan seçildi. Uygulamak için Kaydet\'e bas.';
+
+  @override
+  String get mute_title => 'Sessize Al';
+
+  @override
+  String get mute_subtitle => 'Tüm müzik ve efektleri anında kapat.';
+
+  @override
+  String get mute_toggle_label => 'Aç/Kapat';
+
+  @override
+  String get lowpower_title => 'Enerji Tasarrufu';
+
+  @override
+  String get lowpower_subtitle =>
+      'Daha az yaratık ve hız ile eski cihazlarda daha akıcı oynat.';
+
+  @override
+  String get lowpower_toggle_label => 'Hareketi azalt';
 }
