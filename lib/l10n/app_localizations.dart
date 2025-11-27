@@ -337,6 +337,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Special Thanks'**
   String get credits_special_thanks;
+
+  /// No description provided for @settings_difficulty_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Control spawn speed, speed curve and active critters.'**
+  String get settings_difficulty_hint;
+
+  /// No description provided for @difficulty_easy.
+  ///
+  /// In en, this message translates to:
+  /// **'Kitten (Easy)'**
+  String get difficulty_easy;
+
+  /// No description provided for @difficulty_medium.
+  ///
+  /// In en, this message translates to:
+  /// **'Playful (Medium)'**
+  String get difficulty_medium;
+
+  /// No description provided for @difficulty_hard.
+  ///
+  /// In en, this message translates to:
+  /// **'Hunter (Hard)'**
+  String get difficulty_hard;
+
+  /// No description provided for @difficulty_sandbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Sandbox / Free Play'**
+  String get difficulty_sandbox;
 }
 
 class _AppLocalizationsDelegate

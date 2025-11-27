@@ -38,5 +38,10 @@
     "settings_music_hint": "Miyavları dans partisine çevir!",
     "settings_character_hint": "Ciyaklama ve mırıldanma sesleri.",
     "credits_subtitle": "Kedilere ve renklere aşık küçücük bir ekip.",
-    "credits_special_thanks": "Özel Teşekkürler"
+    "credits_special_thanks": "Özel Teşekkürler",
+    "settings_difficulty_hint": "Doğma aralığı, hız eğrisi ve aynı anda ekrandaki canlı sayısını ayarla.",
+    "difficulty_easy": "Yavru Kedi (Kolay)",
+    "difficulty_medium": "Meraklı (Orta)",
+    "difficulty_hard": "Avcı (Zor)",
+    "difficulty_sandbox": "Kum Havuzu / Serbest"
 }

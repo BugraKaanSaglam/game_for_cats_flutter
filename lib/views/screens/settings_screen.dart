@@ -61,6 +61,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildHeader(context),
               PlayfulCard(emoji: '🌍', title: l10n.select_language, subtitle: l10n.settings_language_hint, gradient: PawPalette.pinkToOrange(), child: _buildLanguageDropdown(context)),
               PlayfulCard(emoji: '⏱️', title: l10n.select_time, subtitle: l10n.settings_time_hint, gradient: PawPalette.tealToLemon(), child: _buildTimeDropdown(context)),
+              PlayfulCard(emoji: '🎯', title: l10n.select_difficulty, subtitle: l10n.settings_difficulty_hint, child: _buildDifficultyDropdown(context)),
               PlayfulCard(
                 emoji: '🎵',
                 title: l10n.select_musicvolume,
@@ -103,6 +104,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final items = [DropdownMenuItem(value: Time.fifty.value, child: Text(Time.fifty.name)), DropdownMenuItem(value: Time.hundered.value, child: Text(Time.hundered.name)), DropdownMenuItem(value: Time.twohundered.value, child: Text(Time.twohundered.name)), DropdownMenuItem(value: Time.sandbox.value, child: Text(Time.sandbox.name))];
 
     return _PillDropdown(value: _db?.time ?? Time.fifty.value, items: items, onChanged: (v) => setState(() => _db?.time = v ?? Time.fifty.value));
+  }
+
+  Widget _buildDifficultyDropdown(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final items = [
+      DropdownMenuItem(value: Difficulty.easy.value, child: Text(l10n.difficulty_easy)),
+      DropdownMenuItem(value: Difficulty.medium.value, child: Text(l10n.difficulty_medium)),
+      DropdownMenuItem(value: Difficulty.hard.value, child: Text(l10n.difficulty_hard)),
+      DropdownMenuItem(value: Difficulty.sandbox.value, child: Text(l10n.difficulty_sandbox)),
+    ];
+
+    return _PillDropdown(
+      value: _db?.difficulty ?? Difficulty.easy.value,
+      items: items,
+      onChanged: (v) => setState(() => _db?.difficulty = v ?? Difficulty.easy.value),
+    );
   }
 
   Widget _buildSlider({required double value, required ValueChanged<double> onChanged, required Color activeColor}) {

@@ -38,5 +38,10 @@
     "settings_music_hint": "Turn the meows into a dance party!",
     "settings_character_hint": "Squeaks & squeals volume.",
     "credits_subtitle": "A tiny team with giant love for cats and colors.",
-    "credits_special_thanks": "Special Thanks"
+    "credits_special_thanks": "Special Thanks",
+    "settings_difficulty_hint": "Control spawn speed, speed curve and active critters.",
+    "difficulty_easy": "Kitten (Easy)",
+    "difficulty_medium": "Playful (Medium)",
+    "difficulty_hard": "Hunter (Hard)",
+    "difficulty_sandbox": "Sandbox / Free Play"
 }

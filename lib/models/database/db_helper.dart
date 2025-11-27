@@ -25,7 +25,13 @@ class DBHelper {
       String fileName = 'miceandpawsdatabase0.db';
       io.Directory documentDirectory = await getApplicationDocumentsDirectory();
       String path = join(documentDirectory.path, fileName);
-      var db = await openDatabase(path, version: 1, onCreate: _onCreate, onOpen: (db) {});
+      var db = await openDatabase(
+        path,
+        version: 2,
+        onCreate: _onCreate,
+        onUpgrade: _onUpgrade,
+        onOpen: (db) {},
+      );
       return db;
     } catch (e) {
       log("Database initialization error: $e");
@@ -34,7 +40,17 @@ class DBHelper {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    await db.execute('CREATE TABLE OPCGameTable(Ver INTEGER not null PRIMARY KEY, LanguageCode INTEGER not null, MusicVolume DOUBLE not null, CharacterVolume DOUBLE not null, Time INTEGER not null)');
+    await db.execute(
+      'CREATE TABLE OPCGameTable(Ver INTEGER not null PRIMARY KEY, LanguageCode INTEGER not null, MusicVolume DOUBLE not null, CharacterVolume DOUBLE not null, Time INTEGER not null, Difficulty INTEGER not null)',
+    );
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute(
+        'ALTER TABLE OPCGameTable ADD COLUMN Difficulty INTEGER not null DEFAULT 0',
+      );
+    }
   }
 
   Future<void> add(OPCDataBase column) async {
@@ -48,7 +64,12 @@ class DBHelper {
 
   Future<OPCDataBase?> getList(int ver) async {
     var dbClient = await db;
-    List<Map<String, dynamic>> maps = await dbClient!.query('OPCGameTable', columns: ['Ver', 'LanguageCode', 'MusicVolume', 'CharacterVolume', 'Time'], where: 'Ver = ?', whereArgs: [ver]);
+    List<Map<String, dynamic>> maps = await dbClient!.query(
+      'OPCGameTable',
+      columns: ['Ver', 'LanguageCode', 'MusicVolume', 'CharacterVolume', 'Time', 'Difficulty'],
+      where: 'Ver = ?',
+      whereArgs: [ver],
+    );
     if (maps.isNotEmpty) {
       OPCDataBase retResult = OPCDataBase.fromMap(maps.first);
       return retResult;

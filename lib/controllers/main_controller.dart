@@ -25,6 +25,7 @@ class MainController {
       musicVolume: 0.5,
       characterVolume: 1,
       time: Time.fifty.value,
+      difficulty: Difficulty.easy.value,
     );
 
     await _dbHelper.add(defaultConfig);

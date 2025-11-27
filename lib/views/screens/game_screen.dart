@@ -19,6 +19,8 @@ import 'package:game_for_cats_2025/controllers/utils.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:game_for_cats_2025/controllers/game_functions.dart';
+import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
+import 'package:game_for_cats_2025/models/enums/game_enums.dart';
 
 bool isBackButtonClicked = false;
 int elapsedTicks = 0; // Seconds
@@ -53,6 +55,20 @@ class GameResult {
       wrongTaps: max(wrong, 0),
     );
   }
+}
+
+class DifficultyProfile {
+  const DifficultyProfile({
+    required this.spawnIntervalSeconds,
+    required this.maxActiveCreatures,
+    required this.baseSpeed,
+    required this.speedRamp,
+  });
+
+  final int spawnIntervalSeconds;
+  final int maxActiveCreatures;
+  final double baseSpeed;
+  final double speedRamp;
 }
 
 class GameScreen extends StatefulWidget {
@@ -469,14 +485,51 @@ class Game extends FlameGame
 
   BuildContext context;
   OPCDataBase? gameDataBase;
+  final Random _random = Random();
 
   late Timer interval; // Time Variable
+  late DifficultyProfile _difficultyProfile;
 
   @override
   bool get debugMode => false;
 
+  DifficultyProfile _resolveDifficultyProfile() {
+    final difficulty = getDifficultyFromValue(gameDataBase?.difficulty);
+    switch (difficulty) {
+      case Difficulty.easy:
+        return const DifficultyProfile(
+          spawnIntervalSeconds: 5,
+          maxActiveCreatures: 8,
+          baseSpeed: 55,
+          speedRamp: 0.2,
+        );
+      case Difficulty.medium:
+        return const DifficultyProfile(
+          spawnIntervalSeconds: 4,
+          maxActiveCreatures: 12,
+          baseSpeed: 70,
+          speedRamp: 0.35,
+        );
+      case Difficulty.hard:
+        return const DifficultyProfile(
+          spawnIntervalSeconds: 3,
+          maxActiveCreatures: 18,
+          baseSpeed: 85,
+          speedRamp: 0.5,
+        );
+      case Difficulty.sandbox:
+        return const DifficultyProfile(
+          spawnIntervalSeconds: 4,
+          maxActiveCreatures: 24,
+          baseSpeed: 70,
+          speedRamp: 0.1,
+        );
+    }
+  }
+
   @override
   Future<void> onLoad() async {
+    _difficultyProfile = _resolveDifficultyProfile();
     try {
       await loadGameAudio();
       await loadGameImagesAndAssets();
@@ -502,30 +555,19 @@ class Game extends FlameGame
       1.0,
       onTick: () async {
         if (isOverlayBlocking || isGameOverTriggered) return;
-        if (elapsedTicks % 4 == 0) {
-          double startingSpeed = 50;
-          final activeCreatures = children
-              .where((component) => component is Mice || component is Bug)
-              .length;
-          if (activeCreatures < 20) {
-            //Adding Mice or Bug Every 4 Seconds
-            int randomValue = Random().nextInt(2); // 0 or 1
-            Vector2 startPosition = Vector2(
+        if (_shouldSpawnThisTick(elapsedTicks)) {
+          final activeCreatures = children.where((component) => component is Mice || component is Bug).length;
+          if (activeCreatures < _difficultyProfile.maxActiveCreatures) {
+            final startingSpeed = _currentSpeed(elapsedTicks);
+            final startPosition = Vector2(
               0,
-              gameScreenTopBarHeight +
-                  Random().nextDouble() * (size.y - gameScreenTopBarHeight),
+              gameScreenTopBarHeight + _random.nextDouble() * (size.y - gameScreenTopBarHeight),
             );
-            Vector2 startRndVelocity = Utils.generateRandomVelocity(
-              size,
-              10,
-              100,
-            );
-            if (randomValue == 0) {
-              Mice mice = Mice(startPosition, startRndVelocity, startingSpeed);
-              add(mice);
+            final startRndVelocity = Utils.generateRandomVelocity(size, 10, 100);
+            if (_random.nextBool()) {
+              add(Mice(startPosition, startRndVelocity, startingSpeed));
             } else {
-              Bug bug = Bug(startPosition, startRndVelocity, startingSpeed);
-              add(bug);
+              add(Bug(startPosition, startRndVelocity, startingSpeed));
             }
           }
         }
@@ -551,6 +593,18 @@ class Game extends FlameGame
       context: context,
       builder: (context) => endGameDialog(context),
     );
+  }
+
+  bool _shouldSpawnThisTick(int elapsedSeconds) {
+    final intervalSeconds = max(_difficultyProfile.spawnIntervalSeconds, 1);
+    return elapsedSeconds % intervalSeconds == 0;
+  }
+
+  double _currentSpeed(int elapsedSeconds) {
+    final effectiveDuration = max(gameTimer, 1);
+    final progress = (elapsedSeconds / effectiveDuration).clamp(0.0, 1.0);
+    final rampMultiplier = 1 + (_difficultyProfile.speedRamp * progress);
+    return _difficultyProfile.baseSpeed * rampMultiplier;
   }
 
   @override

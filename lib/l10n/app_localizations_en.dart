@@ -135,4 +135,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get credits_special_thanks => 'Special Thanks';
+
+  @override
+  String get settings_difficulty_hint =>
+      'Control spawn speed, speed curve and active critters.';
+
+  @override
+  String get difficulty_easy => 'Kitten (Easy)';
+
+  @override
+  String get difficulty_medium => 'Playful (Medium)';
+
+  @override
+  String get difficulty_hard => 'Hunter (Hard)';
+
+  @override
+  String get difficulty_sandbox => 'Sandbox / Free Play';
 }

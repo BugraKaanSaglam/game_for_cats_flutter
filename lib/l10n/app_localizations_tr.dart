@@ -134,4 +134,20 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get credits_special_thanks => 'Özel Teşekkürler';
+
+  @override
+  String get settings_difficulty_hint =>
+      'Doğma aralığı, hız eğrisi ve aynı anda ekrandaki canlı sayısını ayarla.';
+
+  @override
+  String get difficulty_easy => 'Yavru Kedi (Kolay)';
+
+  @override
+  String get difficulty_medium => 'Meraklı (Orta)';
+
+  @override
+  String get difficulty_hard => 'Avcı (Zor)';
+
+  @override
+  String get difficulty_sandbox => 'Kum Havuzu / Serbest';
 }
