@@ -215,7 +215,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mute_toggle_label => 'Tap to mute/unmute';
 
   @override
-  String get lowpower_title => 'Energy Saver';
+  String get lowpower_title => 'Low Performance Mode';
 
   @override
   String get lowpower_subtitle =>
