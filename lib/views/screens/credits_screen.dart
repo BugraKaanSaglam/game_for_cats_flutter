@@ -1,6 +1,5 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/models/global/argument_sender.dart';
 import 'package:game_for_cats_2025/views/widgets/playful_card.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
@@ -12,10 +11,8 @@ class CreditsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as ArgumentSender;
-
     return Scaffold(
-      appBar: mainAppBar(args.title!, context),
+      appBar: mainAppBar(AppLocalizations.of(context)!.credits_button, context),
       body: Container(
         decoration: const BoxDecoration(gradient: PawPalette.lightBackground),
         child: mainBody(context),

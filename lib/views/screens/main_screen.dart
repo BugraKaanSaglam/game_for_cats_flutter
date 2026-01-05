@@ -8,6 +8,7 @@ import 'package:game_for_cats_2025/controllers/main_controller.dart';
 import 'package:game_for_cats_2025/models/database/db_error.dart';
 import 'package:game_for_cats_2025/models/database/opc_database_list.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
+import 'package:game_for_cats_2025/routing/app_routes.dart';
 import 'package:game_for_cats_2025/views/widgets/animated_gradient_background.dart';
 import 'package:game_for_cats_2025/views/widgets/cool_animated_buttons.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
@@ -178,23 +179,23 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           child: CoolAnimatedButton(
             text: AppLocalizations.of(context)!.start_button,
             icon: const Icon(Icons.arrow_right_alt_sharp),
-            onPressed: () => _controller.navigateTo(context, '/game_screen', AppLocalizations.of(context)!.start_button, configuration: _db),
+            onPressed: () => _controller.navigateTo(context, AppRoutes.game, extra: _db),
           ),
         ),
         SizedBox(height: spacing),
         _buildStaggeredAnimatedButton(
           delay: 0.15,
-          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.settings_button, icon: const Icon(Icons.settings), onPressed: () => _controller.navigateTo(context, '/settings_screen', AppLocalizations.of(context)!.settings_button)),
+          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.settings_button, icon: const Icon(Icons.settings), onPressed: () => _controller.navigateTo(context, AppRoutes.settings)),
         ),
         SizedBox(height: spacing),
         _buildStaggeredAnimatedButton(
           delay: 0.30,
-          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.howtoplay_button, icon: const Icon(Icons.menu_book), onPressed: () => _controller.navigateTo(context, '/howtoplay_screen', AppLocalizations.of(context)!.howtoplay_button)),
+          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.howtoplay_button, icon: const Icon(Icons.menu_book), onPressed: () => _controller.navigateTo(context, AppRoutes.howToPlay)),
         ),
         SizedBox(height: spacing),
         _buildStaggeredAnimatedButton(
           delay: 0.45,
-          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.credits_button, icon: const Icon(Icons.pest_control_rodent_sharp), onPressed: () => _controller.navigateTo(context, '/credits_screen', AppLocalizations.of(context)!.credits_button)),
+          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.credits_button, icon: const Icon(Icons.pest_control_rodent_sharp), onPressed: () => _controller.navigateTo(context, AppRoutes.credits)),
         ),
         SizedBox(height: spacing),
         _buildStaggeredAnimatedButton(
@@ -202,7 +203,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           child: CoolAnimatedButton(
             text: AppLocalizations.of(context)!.activity_button,
             icon: const Icon(Icons.show_chart_rounded),
-            onPressed: () => _controller.navigateTo(context, '/activity_screen', AppLocalizations.of(context)!.activity_button),
+            onPressed: () => _controller.navigateTo(context, AppRoutes.activity),
             startColor: const Color(0xFF4FACFE),
             endColor: const Color(0xFF00F2FE),
           ),

@@ -7,10 +7,10 @@ import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:game_for_cats_2025/models/notifiers/game_classes.dart';
 import 'package:game_for_cats_2025/models/database/opc_database_list.dart';
 import 'package:game_for_cats_2025/views/components/loading_screen_view.dart';
-import 'package:game_for_cats_2025/models/global/argument_sender.dart';
 import 'package:game_for_cats_2025/models/global/global_variables.dart';
 import 'package:game_for_cats_2025/models/entities/bug.dart';
 import 'package:game_for_cats_2025/models/entities/mice.dart';
@@ -23,14 +23,13 @@ import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
 import 'package:game_for_cats_2025/models/enums/game_enums.dart';
 import 'package:game_for_cats_2025/models/database/db_helper.dart';
 import 'package:game_for_cats_2025/models/database/session_log.dart';
+import 'package:game_for_cats_2025/routing/app_routes.dart';
 
 bool isBackButtonClicked = false;
 int elapsedTicks = 0; // Seconds
 ValueNotifier<int> elapsedTicksNotifier = ValueNotifier<int>(0);
 bool isBackButtonDialogOpen = false;
-FlameGame<World>? _game;
 GameClicksCounter clicksCounter = GameClicksCounter();
-OPCDataBase? _gameDatabase;
 bool isOverlayBlocking = false;
 bool isGameOverTriggered = false;
 GameResult? lastGameResult;
@@ -75,15 +74,17 @@ class DifficultyProfile {
 }
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({super.key});
+  const GameScreen({super.key, this.database});
+
+  final OPCDataBase? database;
   @override
   State<GameScreen> createState() => _GameScreenState();
 }
 
 //* Alert for End Game
-Dialog endGameDialog(BuildContext context) {
+Dialog endGameDialog(BuildContext context, {required Game game, OPCDataBase? database}) {
   isOverlayBlocking = true;
-  _game?.pauseEngine();
+  game.pauseEngine();
   final stats = lastGameResult ?? GameResult.fromCounter(clicksCounter);
   final wrongTaps = stats.wrongTaps;
   return Dialog(
@@ -149,13 +150,10 @@ Dialog endGameDialog(BuildContext context) {
                 label: AppLocalizations.of(context)!.tryagain_button,
                 onPressed: () async {
                   await closeGame(
-                    _game!,
+                    game,
                     context,
-                    adress: '/game_screen',
-                    arguments: ArgumentSender(
-                      title: "",
-                      dataBase: _gameDatabase,
-                    ),
+                    routePath: AppRoutes.game,
+                    extra: database,
                   );
                 },
               ),
@@ -164,8 +162,11 @@ Dialog endGameDialog(BuildContext context) {
                 foregroundColor: PawPalette.midnight,
                 icon: Icons.home,
                 label: AppLocalizations.of(context)!.return_mainmenu_button,
-                onPressed: () async =>
-                    await closeGame(_game!, context, adress: '/main_screen'),
+                onPressed: () async => await closeGame(
+                  game,
+                  context,
+                  routePath: AppRoutes.main,
+                ),
               ),
             ],
           ),
@@ -177,15 +178,13 @@ Dialog endGameDialog(BuildContext context) {
 
 //* Game Ended, After This Function Triggers
 Future<void> closeGame(
-  FlameGame<World> game,
+  Game game,
   BuildContext context, {
-  String? adress,
-  ArgumentSender? arguments,
+  String? routePath,
+  Object? extra,
 }) async {
   lastGameResult ??= GameResult.fromCounter(clicksCounter);
-  if (game is Game) {
-    await game._persistSessionResult();
-  }
+  await game._persistSessionResult();
   await FlameAudio.bgm.stop();
   game.pauseEngine();
   clicksCounter.reset();
@@ -194,27 +193,21 @@ Future<void> closeGame(
   isOverlayBlocking = false;
   isGameOverTriggered = false;
 
-  if (adress != null) {
-    if (arguments == null) {
-      Navigator.pushNamedAndRemoveUntil(context, adress, (route) => false);
+  if (routePath != null && context.mounted) {
+    if (extra == null) {
+      context.go(routePath);
       return;
-    } else {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        adress,
-        (route) => false,
-        arguments: arguments,
-      );
     }
+    context.go(routePath, extra: extra);
   }
   isBackButtonClicked = false;
 }
 
 //* Alert for BackButtonClicked
-Dialog backButtonDialog(FlameGame<World> game, BuildContext context) {
+Dialog backButtonDialog(Game game, BuildContext context, {OPCDataBase? database}) {
   isBackButtonDialogOpen = true;
   isOverlayBlocking = true;
-  _game?.pauseEngine();
+  game.pauseEngine();
   return Dialog(
     backgroundColor: Colors.transparent,
     child: Container(
@@ -262,7 +255,7 @@ Dialog backButtonDialog(FlameGame<World> game, BuildContext context) {
                   onPressed: () {
                     isBackButtonDialogOpen = false;
                     isOverlayBlocking = false;
-                    _game?.resumeEngine();
+                    game.resumeEngine();
                     Navigator.pop(context);
                   },
                   child: Text(AppLocalizations.of(context)!.i_am_cat),
@@ -285,7 +278,11 @@ Dialog backButtonDialog(FlameGame<World> game, BuildContext context) {
                     await closeGame(game, context);
                     showDialog(
                       context: context,
-                      builder: (context) => endGameDialog(context),
+                      builder: (context) => endGameDialog(
+                        context,
+                        game: game,
+                        database: database,
+                      ),
                     );
                   },
                   child: Text(AppLocalizations.of(context)!.i_am_human),
@@ -300,15 +297,15 @@ Dialog backButtonDialog(FlameGame<World> game, BuildContext context) {
 }
 
 //* Function to close the dialog
-void closeDialogAutomatically(BuildContext context) {
+void closeDialogAutomatically(Game game, BuildContext context) {
   if (isBackButtonDialogOpen && context.mounted == true) Navigator.pop(context);
   isBackButtonDialogOpen = false;
   if (!isOverlayBlocking) return;
   isOverlayBlocking = false;
-  _game?.resumeEngine();
+  game.resumeEngine();
 }
 
-PreferredSizeWidget gameAppBar(BuildContext context) {
+PreferredSizeWidget gameAppBar(BuildContext context, Game game, {OPCDataBase? database}) {
   return AppBar(
     automaticallyImplyLeading: false,
     backgroundColor: Colors.transparent,
@@ -331,9 +328,9 @@ PreferredSizeWidget gameAppBar(BuildContext context) {
           isBackButtonClicked = true;
           Future.delayed(
             const Duration(seconds: 2),
-            () => closeDialogAutomatically(context),
+            () => closeDialogAutomatically(game, context),
           );
-          return backButtonDialog(_game!, context);
+          return backButtonDialog(game, context, database: database);
         },
       ),
     ),
@@ -358,6 +355,9 @@ PreferredSizeWidget gameAppBar(BuildContext context) {
 }
 
 class _GameScreenState extends State<GameScreen> {
+  late final Game _gameInstance;
+  late final OPCDataBase? _gameDatabase;
+
   @override
   void initState() {
     super.initState();
@@ -369,22 +369,29 @@ class _GameScreenState extends State<GameScreen> {
     hasSessionLogged = false;
     elapsedTicks = 0;
     elapsedTicksNotifier.value = 0;
-    _game = null;
+    _gameDatabase = widget.database;
+    _gameInstance = Game(_gameDatabase, context);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       clicksCounter.reset();
     });
   }
 
   @override
+  void dispose() {
+    _gameInstance.pauseEngine();
+    unawaited(FlameAudio.bgm.stop());
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)?.settings.arguments as ArgumentSender;
     return Scaffold(
-      appBar: gameAppBar(context),
+      appBar: gameAppBar(context, _gameInstance, database: _gameDatabase),
       body: Stack(
         children: [
           Positioned.fill(
             child: GameWidget(
-              game: Game(args.dataBase, context),
+              game: _gameInstance,
               loadingBuilder: (p0) => loadingScreen(context),
             ),
           ),
@@ -532,8 +539,6 @@ class Game extends FlameGame
     try {
       await loadGameAudio();
       await loadGameImagesAndAssets(backgroundPath: gameDataBase?.backgroundPath);
-      _game = this;
-      _gameDatabase = gameDataBase;
     } catch (e) {
       showDialog(
         context: context,
@@ -591,7 +596,11 @@ class Game extends FlameGame
     await FlameAudio.bgm.stop();
     showDialog(
       context: context,
-      builder: (context) => endGameDialog(context),
+      builder: (context) => endGameDialog(
+        context,
+        game: this,
+        database: gameDataBase,
+      ),
     );
   }
 

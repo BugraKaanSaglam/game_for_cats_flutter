@@ -3,7 +3,7 @@ import 'package:game_for_cats_2025/models/database/db_helper.dart';
 import 'package:game_for_cats_2025/models/database/opc_database_list.dart';
 import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
 import 'package:game_for_cats_2025/models/enums/game_enums.dart';
-import 'package:game_for_cats_2025/models/global/argument_sender.dart';
+import 'package:go_router/go_router.dart';
 import 'package:game_for_cats_2025/models/global/global_variables.dart';
 
 /// Handles the non-visual workflow of the main menu screen.
@@ -41,8 +41,7 @@ class MainController {
 
   Language applyLanguage(OPCDataBase configuration) => getLanguageFromValue(configuration.languageCode);
 
-  void navigateTo(BuildContext context, String routeName, String title, {OPCDataBase? configuration}) {
-    final argumentSender = ArgumentSender(title: title, dataBase: configuration);
-    Navigator.pushNamedAndRemoveUntil(context, routeName, (route) => false, arguments: argumentSender);
+  void navigateTo(BuildContext context, String routePath, {Object? extra}) {
+    context.go(routePath, extra: extra);
   }
 }

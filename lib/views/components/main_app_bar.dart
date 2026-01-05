@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:game_for_cats_2025/routing/app_routes.dart';
 
 AppBar mainAppBar(String title, BuildContext context, {bool hasBackButton = true}) {
-  final leading = hasBackButton ? IconButton(icon: const Icon(Icons.arrow_back_ios_new_rounded), onPressed: () => Navigator.pushNamedAndRemoveUntil(context, '/main_screen', (route) => false)) : null;
+  final leading = hasBackButton
+      ? IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          onPressed: () => context.go(AppRoutes.main),
+        )
+      : null;
 
   return AppBar(
     title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.8)),

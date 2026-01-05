@@ -55,14 +55,10 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   return const Center(child: CircularProgressIndicator(color: Colors.white));
                 }
 
-                if (snapshot.hasError) {
-                  return _buildMessage(l10n.activity_error);
-                }
+                if (snapshot.hasError) return _buildMessage(l10n.activity_error);
 
                 final history = snapshot.data ?? [];
-                if (history.isEmpty) {
-                  return _buildMessage(l10n.activity_empty);
-                }
+                if (history.isEmpty) return _buildMessage(l10n.activity_empty);
 
                 final aggregates = _aggregate(history);
                 return ListView(

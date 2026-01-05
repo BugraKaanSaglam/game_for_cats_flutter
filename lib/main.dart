@@ -1,5 +1,7 @@
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'models/database/opc_database_list.dart';
 import 'models/enums/enum_functions.dart';
 import 'models/enums/game_enums.dart';
 import 'views/screens/credits_screen.dart';
@@ -9,6 +11,7 @@ import 'views/screens/main_screen.dart';
 import 'views/screens/settings_screen.dart';
 import 'views/screens/activity_screen.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
+import 'routing/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,21 +32,38 @@ Language languageCode = Language.english;
 Color appThemeColor = const Color.fromARGB(255, 183, 202, 219);
 
 class MainAppState extends State<MainApp> {
+  late final GoRouter _router = GoRouter(
+    initialLocation: AppRoutes.main,
+    routes: [
+      GoRoute(path: AppRoutes.main, builder: (context, state) => const MainScreen()),
+      GoRoute(path: AppRoutes.settings, builder: (context, state) => const SettingsScreen()),
+      GoRoute(path: AppRoutes.credits, builder: (context, state) => const CreditsScreen()),
+      GoRoute(path: AppRoutes.howToPlay, builder: (context, state) => const HowToPlayScreen()),
+      GoRoute(
+        path: AppRoutes.game,
+        builder: (context, state) {
+          final database = state.extra as OPCDataBase?;
+          return GameScreen(database: database);
+        },
+      ),
+      GoRoute(path: AppRoutes.activity, builder: (context, state) => const ActivityScreen()),
+    ],
+  );
+
   void setLocale(int value) {
     setState(() => languageCode = getLanguageFromValue(value));
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: _router,
       themeMode: ThemeMode.light,
       theme: gameTheme,
       debugShowCheckedModeBanner: false,
-      home: const MainScreen(),
       locale: Locale.fromSubtags(languageCode: languageCode.shortName),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      routes: {'/main_screen': (context) => const MainScreen(), '/settings_screen': (context) => const SettingsScreen(), '/credits_screen': (context) => const CreditsScreen(), '/howtoplay_screen': (context) => const HowToPlayScreen(), '/game_screen': (context) => const GameScreen(), '/activity_screen': (context) => const ActivityScreen()},
     );
   }
 
