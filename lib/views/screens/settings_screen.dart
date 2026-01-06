@@ -1,7 +1,10 @@
 // ignore_for_file: must_be_immutable, use_build_context_synchronously
-import 'package:flutter/material.dart';
 import 'dart:io';
+import 'dart:math' as math;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
+import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/controllers/settings_controller.dart';
 import 'package:game_for_cats_2025/models/database/db_error.dart';
 import 'package:game_for_cats_2025/models/database/opc_database_list.dart';
@@ -22,6 +25,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  static const int _backgroundMaxDimension = 1280;
   late final SettingsController _controller;
   OPCDataBase? _db;
   late final Future<OPCDataBase?> _dbFuture;
@@ -215,7 +219,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _pickBackground() async {
     final picker = ImagePicker();
-    final result = await picker.pickImage(source: ImageSource.gallery, maxWidth: 2048, maxHeight: 2048);
+    final result = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: _backgroundMaxDimension.toDouble(),
+      maxHeight: _backgroundMaxDimension.toDouble(),
+    );
     if (result == null) return;
     final savedPath = await _persistPickedImage(result);
     setState(() => _db?.backgroundPath = savedPath);
@@ -228,8 +236,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<String> _persistPickedImage(XFile picked) async {
     final appDir = await getApplicationDocumentsDirectory();
-    final extension = picked.name.split('.').last;
-    final targetPath = '${appDir.path}/bg_${DateTime.now().millisecondsSinceEpoch}.$extension';
+    final baseName = 'bg_${DateTime.now().millisecondsSinceEpoch}';
+    final pngPath = '${appDir.path}/$baseName.png';
+    final fallbackExtension = picked.name.split('.').last;
+    final fallbackPath = '${appDir.path}/$baseName.$fallbackExtension';
 
     // Clean previous custom file to avoid storage bloat.
     final oldPath = _db?.backgroundPath ?? '';
@@ -240,8 +250,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     }
 
-    await File(picked.path).copy(targetPath);
-    return targetPath;
+    final resizedBytes = await _resizeAndEncodeBackground(picked.path);
+    if (resizedBytes != null) {
+      await File(pngPath).writeAsBytes(resizedBytes, flush: true);
+      return pngPath;
+    }
+
+    await File(picked.path).copy(fallbackPath);
+    return fallbackPath;
+  }
+
+  Future<Uint8List?> _resizeAndEncodeBackground(String sourcePath) async {
+    ui.ImmutableBuffer? buffer;
+    ui.ImageDescriptor? descriptor;
+    ui.Codec? codec;
+    ui.Image? image;
+
+    try {
+      final bytes = await File(sourcePath).readAsBytes();
+      buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
+      descriptor = await ui.ImageDescriptor.encoded(buffer);
+
+      final width = descriptor.width;
+      final height = descriptor.height;
+      final scale = math.min(
+        1.0,
+        math.min(
+          _backgroundMaxDimension / width,
+          _backgroundMaxDimension / height,
+        ),
+      );
+      final targetWidth = math.max(1, (width * scale).round());
+      final targetHeight = math.max(1, (height * scale).round());
+
+      codec = await descriptor.instantiateCodec(
+        targetWidth: targetWidth,
+        targetHeight: targetHeight,
+      );
+      final frame = await codec.getNextFrame();
+      image = frame.image;
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return null;
+      return byteData.buffer.asUint8List();
+    } catch (_) {
+      return null;
+    } finally {
+      image?.dispose();
+      codec?.dispose();
+      descriptor?.dispose();
+      buffer?.dispose();
+    }
   }
 
   Widget _buildSlider({required double value, required ValueChanged<double> onChanged, required Color activeColor}) {
