@@ -38,7 +38,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     _controller = MainController();
     _configurationFuture = _controller.fetchConfiguration().then((value) => _controller.ensureConfiguration(value));
     _buttonController = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
-    _ambientController = AnimationController(vsync: this, duration: const Duration(seconds: 8))..repeat(reverse: true);
+    _ambientController = AnimationController(vsync: this, duration: const Duration(milliseconds: 5333))..repeat(reverse: true);
   }
 
   @override
