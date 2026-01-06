@@ -35,6 +35,20 @@ bool isGameOverTriggered = false;
 GameResult? lastGameResult;
 bool hasSessionLogged = false;
 
+void resetRoundState({bool clearResult = true}) {
+  clicksCounter.reset();
+  elapsedTicks = 0;
+  elapsedTicksNotifier.value = 0;
+  isOverlayBlocking = false;
+  isGameOverTriggered = false;
+  isBackButtonDialogOpen = false;
+  isBackButtonClicked = false;
+  hasSessionLogged = false;
+  if (clearResult) {
+    lastGameResult = null;
+  }
+}
+
 class GameResult {
   GameResult({
     required this.totalTaps,
@@ -82,95 +96,96 @@ class GameScreen extends StatefulWidget {
 }
 
 //* Alert for End Game
-Dialog endGameDialog(BuildContext context, {required Game game, OPCDataBase? database}) {
+Dialog endGameDialog(BuildContext context, {required Game game}) {
   isOverlayBlocking = true;
   game.pauseEngine();
   final stats = lastGameResult ?? GameResult.fromCounter(clicksCounter);
   final wrongTaps = stats.wrongTaps;
+  final dialogWidth = min(MediaQuery.of(context).size.width * 0.92, 440.0);
   return Dialog(
+    insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
     backgroundColor: Colors.transparent,
-    child: Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(32),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1E1F29), Color(0xFF3B1D60)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black54,
-            blurRadius: 30,
-            offset: Offset(0, 20),
+    child: SizedBox(
+      width: dialogWidth,
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(32),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1E1F29), Color(0xFF3B1D60)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.celebration, color: Colors.amber, size: 48),
-          const SizedBox(height: 12),
-          Text(
-            AppLocalizations.of(context)!.game_over,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black54,
+              blurRadius: 30,
+              offset: Offset(0, 20),
             ),
-          ),
-          const SizedBox(height: 20),
-          _StatResultTile(
-            icon: Icons.pest_control,
-            label: AppLocalizations.of(context)!.bugtap_count,
-            value: stats.bugTaps,
-            color: Colors.pinkAccent,
-          ),
-          _StatResultTile(
-            icon: Icons.pets,
-            label: AppLocalizations.of(context)!.micetap_count,
-            value: stats.miceTaps,
-            color: Colors.lightBlueAccent,
-          ),
-          _StatResultTile(
-            icon: Icons.cancel_outlined,
-            label: AppLocalizations.of(context)!.wrongtap_count,
-            value: wrongTaps,
-            color: Colors.orangeAccent,
-          ),
-          const SizedBox(height: 28),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 14,
-            runSpacing: 12,
-            children: [
-              _DialogActionButton(
-                color: PawPalette.bubbleGum,
-                icon: Icons.refresh,
-                label: AppLocalizations.of(context)!.tryagain_button,
-                onPressed: () async {
-                  await closeGame(
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.celebration, color: Colors.amber, size: 48),
+            const SizedBox(height: 12),
+            Text(
+              AppLocalizations.of(context)!.game_over,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _StatResultTile(
+              icon: Icons.pest_control,
+              label: AppLocalizations.of(context)!.bugtap_count,
+              value: stats.bugTaps,
+              color: Colors.pinkAccent,
+            ),
+            _StatResultTile(
+              icon: Icons.pets,
+              label: AppLocalizations.of(context)!.micetap_count,
+              value: stats.miceTaps,
+              color: Colors.lightBlueAccent,
+            ),
+            _StatResultTile(
+              icon: Icons.cancel_outlined,
+              label: AppLocalizations.of(context)!.wrongtap_count,
+              value: wrongTaps,
+              color: Colors.orangeAccent,
+            ),
+            const SizedBox(height: 28),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 14,
+              runSpacing: 12,
+              children: [
+                _DialogActionButton(
+                  color: PawPalette.bubbleGum,
+                  icon: Icons.refresh,
+                  label: AppLocalizations.of(context)!.tryagain_button,
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    await game.restart();
+                  },
+                ),
+                _DialogActionButton(
+                  color: Colors.white,
+                  foregroundColor: PawPalette.midnight,
+                  icon: Icons.home,
+                  label: AppLocalizations.of(context)!.return_mainmenu_button,
+                  onPressed: () async => await closeGame(
                     game,
                     context,
-                    routePath: AppRoutes.game,
-                    extra: database,
-                  );
-                },
-              ),
-              _DialogActionButton(
-                color: Colors.white,
-                foregroundColor: PawPalette.midnight,
-                icon: Icons.home,
-                label: AppLocalizations.of(context)!.return_mainmenu_button,
-                onPressed: () async => await closeGame(
-                  game,
-                  context,
-                  routePath: AppRoutes.main,
+                    routePath: AppRoutes.main,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     ),
   );
@@ -187,11 +202,9 @@ Future<void> closeGame(
   await game._persistSessionResult();
   await FlameAudio.bgm.stop();
   game.pauseEngine();
-  clicksCounter.reset();
-  elapsedTicks = 0;
-  elapsedTicksNotifier.value = 0;
   isOverlayBlocking = false;
   isGameOverTriggered = false;
+  isBackButtonDialogOpen = false;
 
   if (routePath != null && context.mounted) {
     if (extra == null) {
@@ -204,93 +217,103 @@ Future<void> closeGame(
 }
 
 //* Alert for BackButtonClicked
-Dialog backButtonDialog(Game game, BuildContext context, {OPCDataBase? database}) {
+Dialog backButtonDialog(Game game, BuildContext context) {
   isBackButtonDialogOpen = true;
   isOverlayBlocking = true;
   game.pauseEngine();
+  final dialogWidth = min(MediaQuery.of(context).size.width * 0.92, 420.0);
   return Dialog(
+    insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
     backgroundColor: Colors.transparent,
-    child: Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2A2D3E), Color(0xFF1E1F29)],
+    child: SizedBox(
+      width: dialogWidth,
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF2A2D3E), Color(0xFF1E1F29)],
+          ),
         ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.logout, color: Colors.white, size: 46),
-          const SizedBox(height: 12),
-          Text(
-            AppLocalizations.of(context)!.exit_validation,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.logout, color: Colors.white, size: 46),
+            const SizedBox(height: 12),
+            Text(
+              AppLocalizations.of(context)!.exit_validation,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            AppLocalizations.of(
-              context,
-            )!.this_will_close_automatically_in_seconds,
-            style: const TextStyle(color: Colors.white70),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: PawPalette.teal,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  onPressed: () {
-                    isBackButtonDialogOpen = false;
-                    isOverlayBlocking = false;
-                    game.resumeEngine();
-                    Navigator.pop(context);
-                  },
-                  child: Text(AppLocalizations.of(context)!.i_am_cat),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.redAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  onPressed: () async {
-                    isBackButtonDialogOpen = false;
-                    isOverlayBlocking = false;
-                    Navigator.pop(context);
-                    await closeGame(game, context);
-                    showDialog(
-                      context: context,
-                      builder: (context) => endGameDialog(
-                        context,
-                        game: game,
-                        database: database,
+            const SizedBox(height: 8),
+            Text(
+              AppLocalizations.of(
+                context,
+              )!.this_will_close_automatically_in_seconds,
+              style: const TextStyle(color: Colors.white70),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: PawPalette.teal,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                    );
-                  },
-                  child: Text(AppLocalizations.of(context)!.i_am_human),
+                    ),
+                    onPressed: () {
+                      isBackButtonDialogOpen = false;
+                      isOverlayBlocking = false;
+                      game.resumeEngine();
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      AppLocalizations.of(context)!.i_am_cat,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.redAccent,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    onPressed: () async {
+                      isBackButtonDialogOpen = false;
+                      isOverlayBlocking = false;
+                      Navigator.pop(context);
+                      await closeGame(game, context);
+                      showDialog(
+                        context: context,
+                        builder: (context) => endGameDialog(
+                          context,
+                          game: game,
+                        ),
+                      );
+                },
+                    child: Text(
+                      AppLocalizations.of(context)!.i_am_human,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     ),
   );
@@ -298,14 +321,16 @@ Dialog backButtonDialog(Game game, BuildContext context, {OPCDataBase? database}
 
 //* Function to close the dialog
 void closeDialogAutomatically(Game game, BuildContext context) {
-  if (isBackButtonDialogOpen && context.mounted == true) Navigator.pop(context);
+  if (!isBackButtonDialogOpen) return;
+  if (context.mounted == true) {
+    Navigator.pop(context);
+  }
   isBackButtonDialogOpen = false;
-  if (!isOverlayBlocking) return;
   isOverlayBlocking = false;
   game.resumeEngine();
 }
 
-PreferredSizeWidget gameAppBar(BuildContext context, Game game, {OPCDataBase? database}) {
+PreferredSizeWidget gameAppBar(BuildContext context, Game game) {
   return AppBar(
     automaticallyImplyLeading: false,
     backgroundColor: Colors.transparent,
@@ -330,7 +355,7 @@ PreferredSizeWidget gameAppBar(BuildContext context, Game game, {OPCDataBase? da
             const Duration(seconds: 2),
             () => closeDialogAutomatically(game, context),
           );
-          return backButtonDialog(game, context, database: database);
+          return backButtonDialog(game, context);
         },
       ),
     ),
@@ -361,19 +386,9 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
-    isOverlayBlocking = false;
-    isGameOverTriggered = false;
-    isBackButtonDialogOpen = false;
-    isBackButtonClicked = false;
-    lastGameResult = null;
-    hasSessionLogged = false;
-    elapsedTicks = 0;
-    elapsedTicksNotifier.value = 0;
+    resetRoundState();
     _gameDatabase = widget.database;
     _gameInstance = Game(_gameDatabase, context);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      clicksCounter.reset();
-    });
   }
 
   @override
@@ -386,7 +401,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: gameAppBar(context, _gameInstance, database: _gameDatabase),
+      appBar: gameAppBar(context, _gameInstance),
       body: Stack(
         children: [
           Positioned.fill(
@@ -533,6 +548,13 @@ class Game extends FlameGame
     return baseProfile;
   }
 
+  Future<void> _startBackgroundAudio() async {
+    await FlameAudio.bgm.play(
+      'bird_background_sound.mp3',
+      volume: _isMuted ? 0 : (gameDataBase?.musicVolume ?? 1),
+    );
+  }
+
   @override
   Future<void> onLoad() async {
     _difficultyProfile = _resolveDifficultyProfile();
@@ -550,10 +572,7 @@ class Game extends FlameGame
     }
     //Add Collision
     add(ScreenHitbox());
-    FlameAudio.bgm.play(
-      'bird_background_sound.mp3',
-      volume: _isMuted ? 0 : (gameDataBase?.musicVolume ?? 1),
-    );
+    await _startBackgroundAudio();
 
     interval = Timer(
       1.0,
@@ -586,6 +605,26 @@ class Game extends FlameGame
     return super.onLoad();
   }
 
+  Future<void> restart() async {
+    pauseEngine();
+    await FlameAudio.bgm.stop();
+    _clearCreatures();
+    resetRoundState();
+    _difficultyProfile = _resolveDifficultyProfile();
+    interval.start();
+    await _startBackgroundAudio();
+    resumeEngine();
+  }
+
+  void _clearCreatures() {
+    final toRemove = children
+        .where((component) => component is Mice || component is Bug)
+        .toList();
+    for (final component in toRemove) {
+      component.removeFromParent();
+    }
+  }
+
   Future<void> _handleGameOver() async {
     if (isGameOverTriggered) return;
     isGameOverTriggered = true;
@@ -599,7 +638,6 @@ class Game extends FlameGame
       builder: (context) => endGameDialog(
         context,
         game: this,
-        database: gameDataBase,
       ),
     );
   }
