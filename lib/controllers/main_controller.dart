@@ -15,21 +15,9 @@ class MainController {
   Future<OPCDataBase?> fetchConfiguration() => _dbHelper.getList(databaseVersion);
 
   Future<OPCDataBase> ensureConfiguration(OPCDataBase? configuration) async {
-    if (configuration != null) {
-      return configuration;
-    }
+    if (configuration != null) return configuration;
 
-    final defaultConfig = OPCDataBase(
-      ver: databaseVersion,
-      languageCode: Language.english.value,
-      musicVolume: 0.5,
-      characterVolume: 1,
-      time: Time.fifty.value,
-      difficulty: Difficulty.easy.value,
-      backgroundPath: '',
-      muted: false,
-      lowPower: false,
-    );
+    final defaultConfig = OPCDataBase(ver: databaseVersion, languageCode: Language.english.value, musicVolume: 0.5, characterVolume: 1, time: Time.fifty.value, difficulty: Difficulty.easy.value, backgroundPath: '', muted: false, lowPower: false);
 
     await _dbHelper.add(defaultConfig);
     return defaultConfig;
@@ -41,6 +29,7 @@ class MainController {
 
   Language applyLanguage(OPCDataBase configuration) => getLanguageFromValue(configuration.languageCode);
 
+  //* Navigates to the specified route.
   void navigateTo(BuildContext context, String routePath, {Object? extra}) {
     context.go(routePath, extra: extra);
   }

@@ -58,24 +58,12 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       child: FutureBuilder<OPCDataBase>(
         future: _configurationFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Colors.white));
-          }
-
-          if (snapshot.hasError) {
-            return dbError(context);
-          }
-
+          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator(color: Colors.white));
+          if (snapshot.hasError) return dbError(context);
           final configuration = snapshot.data;
-          if (configuration == null) {
-            return dbError(context);
-          }
-
+          if (configuration == null) return dbError(context);
           _db = configuration;
-
-          if (_buttonController.status != AnimationStatus.forward && _buttonController.status != AnimationStatus.completed) {
-            unawaited(_buttonController.forward());
-          }
+          if (_buttonController.status != AnimationStatus.forward && _buttonController.status != AnimationStatus.completed) unawaited(_buttonController.forward());
 
           _controller.applyGameTime(configuration);
           final language = _controller.applyLanguage(configuration);
@@ -98,14 +86,17 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          //! Greeting
                           _buildGreeting(context),
                           const SizedBox(height: 12),
+                          //! Menu Buttons
                           Expanded(
                             child: Align(
                               alignment: Alignment.topCenter,
                               child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 520), child: _buildMenuButtons(constraints)),
                             ),
                           ),
+                          //! Exit Button
                           _buildStaggeredAnimatedButton(
                             delay: 0.6,
                             child: CoolAnimatedButton(text: AppLocalizations.of(context)!.exit_button, icon: const Icon(Icons.exit_to_app_outlined), onPressed: () => exit(0), startColor: const Color(0xFFF9605F), endColor: const Color(0xFFEF5350)),
@@ -174,6 +165,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        //! Game Start Button
         _buildStaggeredAnimatedButton(
           delay: 0.0,
           child: CoolAnimatedButton(
@@ -183,35 +175,32 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           ),
         ),
         SizedBox(height: spacing),
+        //! Settings Button
         _buildStaggeredAnimatedButton(
           delay: 0.15,
           child: CoolAnimatedButton(text: AppLocalizations.of(context)!.settings_button, icon: const Icon(Icons.settings), onPressed: () => _controller.navigateTo(context, AppRoutes.settings)),
         ),
         SizedBox(height: spacing),
+        //! How to Play Button
         _buildStaggeredAnimatedButton(
           delay: 0.30,
           child: CoolAnimatedButton(text: AppLocalizations.of(context)!.howtoplay_button, icon: const Icon(Icons.menu_book), onPressed: () => _controller.navigateTo(context, AppRoutes.howToPlay)),
         ),
         SizedBox(height: spacing),
+        //! Credits Button
         _buildStaggeredAnimatedButton(
           delay: 0.45,
           child: CoolAnimatedButton(text: AppLocalizations.of(context)!.credits_button, icon: const Icon(Icons.pest_control_rodent_sharp), onPressed: () => _controller.navigateTo(context, AppRoutes.credits)),
         ),
         SizedBox(height: spacing),
+        //! Activity Button
         _buildStaggeredAnimatedButton(
           delay: 0.55,
-          child: CoolAnimatedButton(
-            text: AppLocalizations.of(context)!.activity_button,
-            icon: const Icon(Icons.show_chart_rounded),
-            onPressed: () => _controller.navigateTo(context, AppRoutes.activity),
-            startColor: const Color(0xFF4FACFE),
-            endColor: const Color(0xFF00F2FE),
-          ),
+          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.activity_button, icon: const Icon(Icons.show_chart_rounded), onPressed: () => _controller.navigateTo(context, AppRoutes.activity), startColor: const Color(0xFF4FACFE), endColor: const Color(0xFF00F2FE)),
         ),
       ],
     );
   }
-
 
   Widget _buildAmbientOrbs() {
     return IgnorePointer(
