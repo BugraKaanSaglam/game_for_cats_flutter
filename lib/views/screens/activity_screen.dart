@@ -42,7 +42,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: mainAppBar(l10n.activity_title, context),
+      appBar: MainAppBar(title: l10n.activity_title),
       body: AnimatedGradientBackground(
         overlayOpacity: 0.12,
         child: SafeArea(

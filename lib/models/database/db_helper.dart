@@ -2,7 +2,7 @@
 
 import 'dart:developer';
 
-import 'opc_database_list.dart';
+import 'package:game_for_cats_2025/models/app_settings.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:io' as io;
 import 'package:path/path.dart' show join;
@@ -75,7 +75,7 @@ class DBHelper {
     }
   }
 
-  Future<void> add(OPCDataBase column) async {
+  Future<void> add(AppSettings column) async {
     try {
       var dbClient = await db;
       await dbClient!.insert('OPCGameTable', column.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
@@ -84,7 +84,7 @@ class DBHelper {
     }
   }
 
-  Future<OPCDataBase?> getList(int ver) async {
+  Future<AppSettings?> getList(int ver) async {
     var dbClient = await db;
     List<Map<String, dynamic>> maps = await dbClient!.query(
       'OPCGameTable',
@@ -93,16 +93,16 @@ class DBHelper {
       whereArgs: [ver],
     );
     if (maps.isNotEmpty) {
-      OPCDataBase retResult = OPCDataBase.fromMap(maps.first);
+      AppSettings retResult = AppSettings.fromMap(maps.first);
       return retResult;
     } else {
       return null;
     }
   }
 
-  Future<int> update(OPCDataBase column) async {
+  Future<int> update(AppSettings column) async {
     var dbClient = await db;
-    return await dbClient!.update('OPCGameTable', column.toMap(), where: 'Ver = ?', whereArgs: [column.ver]);
+    return await dbClient!.update('OPCGameTable', column.toMap(), where: 'Ver = ?', whereArgs: [column.version]);
   }
 
   Future close() async {
@@ -110,9 +110,9 @@ class DBHelper {
     dbClient!.close();
   }
 
-  Future<int> delete(OPCDataBase column) async {
+  Future<int> delete(AppSettings column) async {
     var dbClient = await db;
-    return await dbClient!.delete('OPCGameTable', where: 'Ver = ?', whereArgs: [column.ver]);
+    return await dbClient!.delete('OPCGameTable', where: 'Ver = ?', whereArgs: [column.version]);
   }
 
   Future<void> addSessionLog(SessionLog sessionLog) async {

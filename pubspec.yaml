@@ -12,6 +12,9 @@ dependencies:
   flame_audio: ^2.11.8
   go_router: ^14.1.0
   image_picker: ^1.0.7
+  provider: ^6.1.2
+  shared_preferences: ^2.2.2
+  freezed_annotation: ^2.4.4
   flutter_localizations:
     sdk: flutter
   flutter:
@@ -27,6 +30,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  build_runner: ^2.4.12
+  freezed: ^2.5.7
 
 flutter_launcher_icons:
   android: true

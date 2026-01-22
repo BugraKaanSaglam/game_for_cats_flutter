@@ -12,7 +12,7 @@ class CreditsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: mainAppBar(AppLocalizations.of(context)!.credits_button, context),
+      appBar: MainAppBar(title: AppLocalizations.of(context)!.credits_button),
       body: Container(
         decoration: const BoxDecoration(gradient: PawPalette.lightBackground),
         child: mainBody(context),

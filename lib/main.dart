@@ -1,77 +1,94 @@
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'models/database/opc_database_list.dart';
-import 'models/enums/enum_functions.dart';
-import 'models/enums/game_enums.dart';
-import 'views/screens/credits_screen.dart';
-import 'views/screens/game_screen.dart';
-import 'views/screens/howtoplay_screen.dart';
-import 'views/screens/main_screen.dart';
-import 'views/screens/settings_screen.dart';
-import 'views/screens/activity_screen.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'routing/app_routes.dart';
+import 'package:game_for_cats_2025/models/app_settings.dart';
+import 'package:game_for_cats_2025/state/app_state.dart';
+import 'package:game_for_cats_2025/views/components/loading_screen_view.dart';
+import 'package:game_for_cats_2025/views/screens/activity_screen.dart';
+import 'package:game_for_cats_2025/views/screens/credits_screen.dart';
+import 'package:game_for_cats_2025/views/screens/game_screen.dart';
+import 'package:game_for_cats_2025/views/screens/howtoplay_screen.dart';
+import 'package:game_for_cats_2025/views/screens/main_screen.dart';
+import 'package:game_for_cats_2025/views/screens/onboarding_screen.dart';
+import 'package:game_for_cats_2025/views/screens/settings_screen.dart';
+import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Flame.device.fullScreen();
-  runApp(const MainApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => AppState()..initialize(),
+      child: const MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatefulWidget {
   const MainApp({super.key});
 
   @override
-  State<MainApp> createState() => MainAppState();
-  static MainAppState? of(BuildContext context) => context.findAncestorStateOfType<MainAppState>();
+  State<MainApp> createState() => _MainAppState();
 }
 
-//Language Controller
-Language languageCode = Language.english;
-Color appThemeColor = const Color.fromARGB(255, 183, 202, 219);
+class _MainAppState extends State<MainApp> {
+  late final GoRouter _router;
 
-class MainAppState extends State<MainApp> {
-  late final GoRouter _router = GoRouter(
-    initialLocation: AppRoutes.main,
-    routes: [
-      GoRoute(path: AppRoutes.main, builder: (context, state) => const MainScreen()),
-      GoRoute(path: AppRoutes.settings, builder: (context, state) => const SettingsScreen()),
-      GoRoute(path: AppRoutes.credits, builder: (context, state) => const CreditsScreen()),
-      GoRoute(path: AppRoutes.howToPlay, builder: (context, state) => const HowToPlayScreen()),
-      GoRoute(
-        path: AppRoutes.game,
-        builder: (context, state) {
-          final database = state.extra as OPCDataBase?;
-          return GameScreen(database: database);
-        },
-      ),
-      GoRoute(path: AppRoutes.activity, builder: (context, state) => const ActivityScreen()),
-    ],
-  );
+  @override
+  void initState() {
+    super.initState();
+    final appState = context.read<AppState>();
+    _router = GoRouter(
+      initialLocation: AppRoutes.loading,
+      refreshListenable: appState,
+      redirect: (context, state) {
+        if (!appState.isReady) return AppRoutes.loading;
 
-  void setLocale(int value) {
-    setState(() => languageCode = getLanguageFromValue(value));
+        final isOnboarding = state.matchedLocation == AppRoutes.onboarding;
+        if (!appState.onboardingComplete && !isOnboarding) {
+          return AppRoutes.onboarding;
+        }
+        if (appState.onboardingComplete && isOnboarding) {
+          return AppRoutes.main;
+        }
+        if (state.matchedLocation == AppRoutes.loading) {
+          return AppRoutes.main;
+        }
+        return null;
+      },
+      routes: [
+        GoRoute(path: AppRoutes.loading, builder: (context, state) => const LoadingScreenView()),
+        GoRoute(path: AppRoutes.onboarding, builder: (context, state) => const OnboardingScreen()),
+        GoRoute(path: AppRoutes.main, builder: (context, state) => const MainScreen()),
+        GoRoute(path: AppRoutes.settings, builder: (context, state) => const SettingsScreen()),
+        GoRoute(path: AppRoutes.credits, builder: (context, state) => const CreditsScreen()),
+        GoRoute(path: AppRoutes.howToPlay, builder: (context, state) => const HowToPlayScreen()),
+        GoRoute(
+          path: AppRoutes.game,
+          builder: (context, state) {
+            final settings = state.extra as AppSettings? ?? context.read<AppState>().settings;
+            return GameScreen(settings: settings);
+          },
+        ),
+        GoRoute(path: AppRoutes.activity, builder: (context, state) => const ActivityScreen()),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final appState = context.watch<AppState>();
     return MaterialApp.router(
       routerConfig: _router,
       themeMode: ThemeMode.light,
-      theme: gameTheme,
+      theme: PawTheme.light,
       debugShowCheckedModeBanner: false,
-      locale: Locale.fromSubtags(languageCode: languageCode.shortName),
+      locale: appState.locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
     );
   }
-
-  ThemeData gameTheme = ThemeData(
-    navigationBarTheme: NavigationBarThemeData(backgroundColor: appThemeColor),
-    appBarTheme: AppBarTheme(backgroundColor: appThemeColor),
-    canvasColor: Colors.grey.shade400,
-    visualDensity: VisualDensity.adaptivePlatformDensity,
-    primaryColor: appThemeColor,
-  );
 }

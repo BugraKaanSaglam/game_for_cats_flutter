@@ -140,6 +140,60 @@ abstract class AppLocalizations {
   /// **'Catch the mice, dodge the bugs, make kitty proud!'**
   String get main_tagline;
 
+  /// No description provided for @onboarding_title_welcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to the Cat Playground'**
+  String get onboarding_title_welcome;
+
+  /// No description provided for @onboarding_subtitle_welcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up your space and let your cat chase the action.'**
+  String get onboarding_subtitle_welcome;
+
+  /// No description provided for @onboarding_title_play.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap, Chase, Celebrate'**
+  String get onboarding_title_play;
+
+  /// No description provided for @onboarding_subtitle_play.
+  ///
+  /// In en, this message translates to:
+  /// **'Mice bring points, bugs steal time. Quick paws win.'**
+  String get onboarding_subtitle_play;
+
+  /// No description provided for @onboarding_title_track.
+  ///
+  /// In en, this message translates to:
+  /// **'Track the Fun'**
+  String get onboarding_title_track;
+
+  /// No description provided for @onboarding_subtitle_track.
+  ///
+  /// In en, this message translates to:
+  /// **'See daily taps and misses in the activity chart.'**
+  String get onboarding_subtitle_track;
+
+  /// No description provided for @onboarding_skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboarding_skip;
+
+  /// No description provided for @onboarding_next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboarding_next;
+
+  /// No description provided for @onboarding_start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Playing'**
+  String get onboarding_start;
+
   /// No description provided for @select_language.
   ///
   /// In en, this message translates to:

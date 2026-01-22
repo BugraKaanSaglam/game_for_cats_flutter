@@ -12,7 +12,7 @@ class HowToPlayScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: mainAppBar(AppLocalizations.of(context)!.howtoplay_button, context),
+      appBar: MainAppBar(title: AppLocalizations.of(context)!.howtoplay_button),
       body: Container(
         decoration: const BoxDecoration(gradient: PawPalette.lightBackground),
         child: mainBody(context),

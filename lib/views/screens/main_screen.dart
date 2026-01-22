@@ -4,17 +4,18 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/controllers/main_controller.dart';
 import 'package:game_for_cats_2025/models/database/db_error.dart';
-import 'package:game_for_cats_2025/models/database/opc_database_list.dart';
+import 'package:game_for_cats_2025/models/app_settings.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/routing/app_routes.dart';
+import 'package:game_for_cats_2025/state/app_state.dart';
 import 'package:game_for_cats_2025/views/widgets/animated_gradient_background.dart';
 import 'package:game_for_cats_2025/views/widgets/cool_animated_buttons.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../components/main_app_bar.dart';
-import 'package:game_for_cats_2025/main.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -24,19 +25,13 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
-  late final MainController _controller;
-  late Future<OPCDataBase> _configurationFuture;
-  OPCDataBase? _db;
   late AnimationController _buttonController;
   late AnimationController _ambientController;
-  bool _didApplyLocale = false;
   final List<_OrbConfig> _orbConfigs = const [_OrbConfig(alignment: Alignment(-0.9, -0.8), color: Color(0xFFFFD6E8), size: 190, travel: 0.08), _OrbConfig(alignment: Alignment(0.85, -0.6), color: Color(0xFFB8E1FF), size: 150, travel: 0.06, phase: 1.2), _OrbConfig(alignment: Alignment(-0.5, 0.75), color: Color(0xFFFFF5D7), size: 230, travel: 0.05, phase: 2.4)];
 
   @override
   void initState() {
     super.initState();
-    _controller = MainController();
-    _configurationFuture = _controller.fetchConfiguration().then((value) => _controller.ensureConfiguration(value));
     _buttonController = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
     _ambientController = AnimationController(vsync: this, duration: const Duration(milliseconds: 5333))..repeat(reverse: true);
   }
@@ -50,66 +45,73 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: mainAppBar(AppLocalizations.of(context)!.game_name, context, hasBackButton: false), body: mainBody(context));
+    final appState = context.watch<AppState>();
+    if (!appState.isReady) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator(color: PawPalette.bubbleGum)),
+      );
+    }
+
+    final settings = appState.settings;
+    if (appState.initError != null || settings == null) {
+      return Scaffold(
+        appBar: MainAppBar(title: AppLocalizations.of(context)!.game_name, hasBackButton: false),
+        body: Center(child: dbError(context)),
+      );
+    }
+
+    if (_buttonController.status != AnimationStatus.forward && _buttonController.status != AnimationStatus.completed) {
+      unawaited(_buttonController.forward());
+    }
+
+    return Scaffold(
+      appBar: MainAppBar(title: AppLocalizations.of(context)!.game_name, hasBackButton: false),
+      body: mainBody(context, settings),
+    );
   }
 
-  Widget mainBody(BuildContext context) {
+  Widget mainBody(BuildContext context, AppSettings settings) {
     return AnimatedGradientBackground(
-      child: FutureBuilder<OPCDataBase>(
-        future: _configurationFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator(color: Colors.white));
-          if (snapshot.hasError) return dbError(context);
-          final configuration = snapshot.data;
-          if (configuration == null) return dbError(context);
-          _db = configuration;
-          if (_buttonController.status != AnimationStatus.forward && _buttonController.status != AnimationStatus.completed) unawaited(_buttonController.forward());
-
-          _controller.applyGameTime(configuration);
-          final language = _controller.applyLanguage(configuration);
-          languageCode = language;
-
-          if (!_didApplyLocale) {
-            _didApplyLocale = true;
-            WidgetsBinding.instance.addPostFrameCallback((_) => MainApp.of(context)?.setLocale(language.value));
-          }
-
-          return Stack(
-            children: [
-              _buildAmbientOrbs(),
-              SafeArea(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final horizontalPadding = constraints.maxWidth > 800 ? constraints.maxWidth * 0.25 : 24.0;
-                    return Padding(
-                      padding: EdgeInsets.fromLTRB(horizontalPadding, 20, horizontalPadding, 32),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          //! Greeting
-                          _buildGreeting(context),
-                          const SizedBox(height: 12),
-                          //! Menu Buttons
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.topCenter,
-                              child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 520), child: _buildMenuButtons(constraints)),
-                            ),
+      child: Stack(
+        children: [
+          _buildAmbientOrbs(),
+          SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final horizontalPadding = constraints.maxWidth > 800 ? constraints.maxWidth * 0.25 : 24.0;
+                return Padding(
+                  padding: EdgeInsets.fromLTRB(horizontalPadding, 20, horizontalPadding, 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildGreeting(context),
+                      const SizedBox(height: 12),
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 520),
+                            child: _buildMenuButtons(constraints, settings),
                           ),
-                          //! Exit Button
-                          _buildStaggeredAnimatedButton(
-                            delay: 0.6,
-                            child: CoolAnimatedButton(text: AppLocalizations.of(context)!.exit_button, icon: const Icon(Icons.exit_to_app_outlined), onPressed: () => exit(0), startColor: const Color(0xFFF9605F), endColor: const Color(0xFFEF5350)),
-                          ),
-                        ],
+                        ),
                       ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        },
+                      _buildStaggeredAnimatedButton(
+                        delay: 0.6,
+                        child: CoolAnimatedButton(
+                          text: AppLocalizations.of(context)!.exit_button,
+                          icon: const Icon(Icons.exit_to_app_outlined),
+                          onPressed: () => exit(0),
+                          startColor: const Color(0xFFF9605F),
+                          endColor: const Color(0xFFEF5350),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -159,7 +161,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildMenuButtons(BoxConstraints constraints) {
+  Widget _buildMenuButtons(BoxConstraints constraints, AppSettings settings) {
     final spacing = constraints.maxHeight * 0.02;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -171,32 +173,38 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           child: CoolAnimatedButton(
             text: AppLocalizations.of(context)!.start_button,
             icon: const Icon(Icons.arrow_right_alt_sharp),
-            onPressed: () => _controller.navigateTo(context, AppRoutes.game, extra: _db),
+            onPressed: () => context.go(AppRoutes.game, extra: settings),
           ),
         ),
         SizedBox(height: spacing),
         //! Settings Button
         _buildStaggeredAnimatedButton(
           delay: 0.15,
-          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.settings_button, icon: const Icon(Icons.settings), onPressed: () => _controller.navigateTo(context, AppRoutes.settings)),
+          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.settings_button, icon: const Icon(Icons.settings), onPressed: () => context.go(AppRoutes.settings)),
         ),
         SizedBox(height: spacing),
         //! How to Play Button
         _buildStaggeredAnimatedButton(
           delay: 0.30,
-          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.howtoplay_button, icon: const Icon(Icons.menu_book), onPressed: () => _controller.navigateTo(context, AppRoutes.howToPlay)),
+          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.howtoplay_button, icon: const Icon(Icons.menu_book), onPressed: () => context.go(AppRoutes.howToPlay)),
         ),
         SizedBox(height: spacing),
         //! Credits Button
         _buildStaggeredAnimatedButton(
           delay: 0.45,
-          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.credits_button, icon: const Icon(Icons.pest_control_rodent_sharp), onPressed: () => _controller.navigateTo(context, AppRoutes.credits)),
+          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.credits_button, icon: const Icon(Icons.pest_control_rodent_sharp), onPressed: () => context.go(AppRoutes.credits)),
         ),
         SizedBox(height: spacing),
         //! Activity Button
         _buildStaggeredAnimatedButton(
           delay: 0.55,
-          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.activity_button, icon: const Icon(Icons.show_chart_rounded), onPressed: () => _controller.navigateTo(context, AppRoutes.activity), startColor: const Color(0xFF4FACFE), endColor: const Color(0xFF00F2FE)),
+          child: CoolAnimatedButton(
+            text: AppLocalizations.of(context)!.activity_button,
+            icon: const Icon(Icons.show_chart_rounded),
+            onPressed: () => context.go(AppRoutes.activity),
+            startColor: const Color(0xFF4FACFE),
+            endColor: const Color(0xFF00F2FE),
+          ),
         ),
       ],
     );

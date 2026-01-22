@@ -5,17 +5,17 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/controllers/settings_controller.dart';
 import 'package:game_for_cats_2025/models/database/db_error.dart';
-import 'package:game_for_cats_2025/models/database/opc_database_list.dart';
+import 'package:game_for_cats_2025/models/app_settings.dart';
 import 'package:game_for_cats_2025/models/enums/game_enums.dart';
-import 'package:game_for_cats_2025/main.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/views/components/main_app_bar.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:game_for_cats_2025/views/widgets/playful_card.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:game_for_cats_2025/state/app_state.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -26,99 +26,125 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   static const int _backgroundMaxDimension = 1280;
-  late final SettingsController _controller;
-  OPCDataBase? _db;
-  late final Future<OPCDataBase?> _dbFuture;
+  AppSettings? _draftSettings;
 
   @override
   void initState() {
     super.initState();
-    _controller = SettingsController();
-    _dbFuture = _controller.loadConfiguration();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final settings = context.read<AppState>().settings;
+    if (_draftSettings == null && settings != null) {
+      _draftSettings = settings;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final appState = context.watch<AppState>();
+    if (!appState.isReady) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator(color: PawPalette.bubbleGum)),
+      );
+    }
+
     return Scaffold(
-      appBar: mainAppBar(AppLocalizations.of(context)!.settings_button, context),
+      appBar: MainAppBar(title: AppLocalizations.of(context)!.settings_button),
       body: Container(
         decoration: const BoxDecoration(gradient: PawPalette.lightBackground),
         child: _buildBody(),
       ),
-      bottomNavigationBar: SafeArea(minimum: const EdgeInsets.fromLTRB(24, 0, 24, 16), child: _db == null ? const SizedBox.shrink() : _buildSaveButton(context)),
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+        child: _draftSettings == null ? const SizedBox.shrink() : _buildSaveButton(context),
+      ),
     );
   }
 
   Widget _buildBody() {
-    return FutureBuilder<OPCDataBase?>(
-      future: _dbFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const Center(child: CircularProgressIndicator(color: Colors.white));
-        }
-        if (snapshot.hasError) return dbError(context);
+    final appState = context.watch<AppState>();
+    if (appState.initError != null) {
+      return Center(child: dbError(context));
+    }
 
-        _db ??= snapshot.data;
-        if (_db == null) return dbError(context);
+    final settings = _draftSettings;
+    if (settings == null) {
+      return const Center(child: CircularProgressIndicator(color: Colors.white));
+    }
 
-        final l10n = AppLocalizations.of(context)!;
-        return SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            children: [
-              _buildHeader(context),
-              PlayfulCard(emoji: '🌍', title: l10n.select_language, subtitle: l10n.settings_language_hint, gradient: PawPalette.pinkToOrange(), child: _buildLanguageDropdown(context)),
-              PlayfulCard(emoji: '⏱️', title: l10n.select_time, subtitle: l10n.settings_time_hint, gradient: PawPalette.tealToLemon(), child: _buildTimeDropdown(context)),
-              PlayfulCard(emoji: '🎯', title: l10n.select_difficulty, subtitle: l10n.settings_difficulty_hint, child: _buildDifficultyDropdown(context)),
-              PlayfulCard(
-                emoji: '🔇',
-                title: l10n.mute_title,
-                subtitle: l10n.mute_subtitle,
-                gradient: PawPalette.tealToLemon(),
-                child: SwitchListTile.adaptive(
-                  contentPadding: EdgeInsets.zero,
-                  value: _db?.muted ?? false,
-                  onChanged: (v) => setState(() => _db?.muted = v),
-                  title: Text(l10n.mute_toggle_label, style: PawTextStyles.cardTitle),
-                ),
-              ),
-              PlayfulCard(
-                emoji: '⚡',
-                title: l10n.lowpower_title,
-                subtitle: l10n.lowpower_subtitle,
-                gradient: PawPalette.pinkToOrange(),
-                child: SwitchListTile.adaptive(
-                  contentPadding: EdgeInsets.zero,
-                  value: _db?.lowPower ?? false,
-                  onChanged: (v) => setState(() => _db?.lowPower = v),
-                  title: Text(l10n.lowpower_toggle_label, style: PawTextStyles.cardTitle),
-                ),
-              ),
-              PlayfulCard(
-                emoji: '🖼️',
-                title: l10n.background_title,
-                subtitle: l10n.background_subtitle,
-                gradient: PawPalette.pinkToOrange(),
-                child: _buildBackgroundPicker(context),
-              ),
-              PlayfulCard(
-                emoji: '🎵',
-                title: l10n.select_musicvolume,
-                subtitle: l10n.settings_music_hint,
-                child: _buildSlider(value: _db?.musicVolume ?? 0.5, onChanged: (v) => setState(() => _db?.musicVolume = v), activeColor: PawPalette.grape),
-              ),
-              PlayfulCard(
-                emoji: '🐁',
-                title: l10n.select_charactervolume,
-                subtitle: l10n.settings_character_hint,
-                child: _buildSlider(value: _db?.characterVolume ?? 1.0, onChanged: (v) => setState(() => _db?.characterVolume = v), activeColor: PawPalette.teal),
-              ),
-              const SizedBox(height: 80),
-            ],
+    final l10n = AppLocalizations.of(context)!;
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+        children: [
+          _buildHeader(context),
+          PlayfulCard(emoji: '🌍', title: l10n.select_language, subtitle: l10n.settings_language_hint, gradient: PawPalette.pinkToOrange(), child: _buildLanguageDropdown(context)),
+          PlayfulCard(emoji: '⏱️', title: l10n.select_time, subtitle: l10n.settings_time_hint, gradient: PawPalette.tealToLemon(), child: _buildTimeDropdown(context)),
+          PlayfulCard(emoji: '🎯', title: l10n.select_difficulty, subtitle: l10n.settings_difficulty_hint, child: _buildDifficultyDropdown(context)),
+          PlayfulCard(
+            emoji: '🔇',
+            title: l10n.mute_title,
+            subtitle: l10n.mute_subtitle,
+            gradient: PawPalette.tealToLemon(),
+            child: SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              value: settings.muted,
+              onChanged: (v) => _updateSettings((current) => current.copyWith(muted: v)),
+              title: Text(l10n.mute_toggle_label, style: PawTextStyles.cardTitle),
+            ),
           ),
-        );
-      },
+          PlayfulCard(
+            emoji: '⚡',
+            title: l10n.lowpower_title,
+            subtitle: l10n.lowpower_subtitle,
+            gradient: PawPalette.pinkToOrange(),
+            child: SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              value: settings.lowPower,
+              onChanged: (v) => _updateSettings((current) => current.copyWith(lowPower: v)),
+              title: Text(l10n.lowpower_toggle_label, style: PawTextStyles.cardTitle),
+            ),
+          ),
+          PlayfulCard(
+            emoji: '🖼️',
+            title: l10n.background_title,
+            subtitle: l10n.background_subtitle,
+            gradient: PawPalette.pinkToOrange(),
+            child: _buildBackgroundPicker(context),
+          ),
+          PlayfulCard(
+            emoji: '🎵',
+            title: l10n.select_musicvolume,
+            subtitle: l10n.settings_music_hint,
+            child: _buildSlider(
+              value: settings.musicVolume,
+              onChanged: (v) => _updateSettings((current) => current.copyWith(musicVolume: v)),
+              activeColor: PawPalette.grape,
+            ),
+          ),
+          PlayfulCard(
+            emoji: '🐁',
+            title: l10n.select_charactervolume,
+            subtitle: l10n.settings_character_hint,
+            child: _buildSlider(
+              value: settings.characterVolume,
+              onChanged: (v) => _updateSettings((current) => current.copyWith(characterVolume: v)),
+              activeColor: PawPalette.teal,
+            ),
+          ),
+          const SizedBox(height: 80),
+        ],
+      ),
     );
+  }
+
+  void _updateSettings(AppSettings Function(AppSettings current) update) {
+    final current = _draftSettings;
+    if (current == null) return;
+    setState(() => _draftSettings = update(current));
   }
 
   Widget _buildHeader(BuildContext context) {
@@ -136,13 +162,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildLanguageDropdown(BuildContext context) {
     final items = [DropdownMenuItem(value: Language.turkish.value, child: Text(Language.turkish.name)), DropdownMenuItem(value: Language.english.value, child: Text(Language.english.name))];
 
-    return _PillDropdown(value: _db?.languageCode ?? Language.english.value, items: items, onChanged: (v) => setState(() => _db?.languageCode = v ?? Language.english.value));
+    final settings = _draftSettings;
+    if (settings == null) return const SizedBox.shrink();
+    return _PillDropdown(
+      value: settings.languageCode,
+      items: items,
+      onChanged: (v) => _updateSettings((current) => current.copyWith(languageCode: v ?? Language.english.value)),
+    );
   }
 
   Widget _buildTimeDropdown(BuildContext context) {
     final items = [DropdownMenuItem(value: Time.fifty.value, child: Text(Time.fifty.name)), DropdownMenuItem(value: Time.hundered.value, child: Text(Time.hundered.name)), DropdownMenuItem(value: Time.twohundered.value, child: Text(Time.twohundered.name)), DropdownMenuItem(value: Time.sandbox.value, child: Text(Time.sandbox.name))];
 
-    return _PillDropdown(value: _db?.time ?? Time.fifty.value, items: items, onChanged: (v) => setState(() => _db?.time = v ?? Time.fifty.value));
+    final settings = _draftSettings;
+    if (settings == null) return const SizedBox.shrink();
+    return _PillDropdown(
+      value: settings.time,
+      items: items,
+      onChanged: (v) => _updateSettings((current) => current.copyWith(time: v ?? Time.fifty.value)),
+    );
   }
 
   Widget _buildDifficultyDropdown(BuildContext context) {
@@ -154,18 +192,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
       DropdownMenuItem(value: Difficulty.sandbox.value, child: Text(l10n.difficulty_sandbox)),
     ];
 
+    final settings = _draftSettings;
+    if (settings == null) return const SizedBox.shrink();
     return _PillDropdown(
-      value: _db?.difficulty ?? Difficulty.easy.value,
+      value: settings.difficulty,
       items: items,
-      onChanged: (v) => setState(() => _db?.difficulty = v ?? Difficulty.easy.value),
+      onChanged: (v) => _updateSettings((current) => current.copyWith(difficulty: v ?? Difficulty.easy.value)),
     );
   }
 
   Widget _buildBackgroundPicker(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final path = _db?.backgroundPath ?? '';
-    final hasCustom = path.isNotEmpty;
-    final image = hasCustom ? FileImage(File(path)) : const AssetImage('assets/images/background.webp') as ImageProvider;
+    final path = _draftSettings?.backgroundPath ?? '';
+    final file = path.isNotEmpty ? File(path) : null;
+    final hasCustom = file != null && file.existsSync();
+    final ImageProvider image = hasCustom ? FileImage(file!) : const AssetImage('assets/images/background.webp');
+
+    if (!hasCustom && path.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _updateSettings((current) => current.copyWith(backgroundPath: ''));
+      });
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,12 +274,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     if (result == null) return;
     final savedPath = await _persistPickedImage(result);
-    setState(() => _db?.backgroundPath = savedPath);
+    _updateSettings((current) => current.copyWith(backgroundPath: savedPath));
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.background_selected_snackbar), duration: const Duration(seconds: 2)));
   }
 
   void _resetBackground() {
-    setState(() => _db?.backgroundPath = '');
+    _updateSettings((current) => current.copyWith(backgroundPath: ''));
   }
 
   Future<String> _persistPickedImage(XFile picked) async {
@@ -242,7 +290,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final fallbackPath = '${appDir.path}/$baseName.$fallbackExtension';
 
     // Clean previous custom file to avoid storage bloat.
-    final oldPath = _db?.backgroundPath ?? '';
+    final oldPath = _draftSettings?.backgroundPath ?? '';
     if (oldPath.isNotEmpty) {
       final oldFile = File(oldPath);
       if (await oldFile.exists()) {
@@ -336,10 +384,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: InkWell(
           onTap: () async {
             final messenger = ScaffoldMessenger.of(context);
+            final settings = _draftSettings;
+            if (settings == null) return;
 
-            await _controller.saveConfiguration(_db!);
-            MainApp.of(context)?.setLocale(_controller.localeValue(_db!));
+            await context.read<AppState>().updateSettings(settings);
 
+            if (!mounted) return;
             messenger.showSnackBar(SnackBar(content: Text(l10n.save_complete_snackbar), elevation: 10, duration: const Duration(seconds: 2)));
           },
           borderRadius: BorderRadius.circular(28),

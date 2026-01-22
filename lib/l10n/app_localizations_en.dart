@@ -31,6 +31,36 @@ class AppLocalizationsEn extends AppLocalizations {
       'Catch the mice, dodge the bugs, make kitty proud!';
 
   @override
+  String get onboarding_title_welcome => 'Welcome to the Cat Playground';
+
+  @override
+  String get onboarding_subtitle_welcome =>
+      'Set up your space and let your cat chase the action.';
+
+  @override
+  String get onboarding_title_play => 'Tap, Chase, Celebrate';
+
+  @override
+  String get onboarding_subtitle_play =>
+      'Mice bring points, bugs steal time. Quick paws win.';
+
+  @override
+  String get onboarding_title_track => 'Track the Fun';
+
+  @override
+  String get onboarding_subtitle_track =>
+      'See daily taps and misses in the activity chart.';
+
+  @override
+  String get onboarding_skip => 'Skip';
+
+  @override
+  String get onboarding_next => 'Next';
+
+  @override
+  String get onboarding_start => 'Start Playing';
+
+  @override
   String get select_language => 'Select Language';
 
   @override

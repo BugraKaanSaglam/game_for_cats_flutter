@@ -31,6 +31,36 @@ class AppLocalizationsTr extends AppLocalizations {
       'Fareleri yakala, böceklerden kaç, kedini gururlandır!';
 
   @override
+  String get onboarding_title_welcome => 'Kedi Oyun Alanına Hoş Geldin';
+
+  @override
+  String get onboarding_subtitle_welcome =>
+      'Alanı hazırlayıp kedinin aksiyonu yakalamasını izle.';
+
+  @override
+  String get onboarding_title_play => 'Dokun, Yakala, Kutla';
+
+  @override
+  String get onboarding_subtitle_play =>
+      'Fareler puan getirir, böcekler zaman çalar. Hızlı patiler kazanır.';
+
+  @override
+  String get onboarding_title_track => 'Eğlenceyi Takip Et';
+
+  @override
+  String get onboarding_subtitle_track =>
+      'Günlük dokunuşları ve kaçırmaları etkinlik grafiğinde gör.';
+
+  @override
+  String get onboarding_skip => 'Atla';
+
+  @override
+  String get onboarding_next => 'İleri';
+
+  @override
+  String get onboarding_start => 'Başla';
+
+  @override
   String get select_language => 'Dil Seçiniz';
 
   @override

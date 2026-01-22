@@ -63,3 +63,24 @@ class PawTextStyles {
     height: 1.4,
   );
 }
+
+class PawTheme {
+  static ThemeData light = ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: PawPalette.bubbleGum,
+      brightness: Brightness.light,
+    ),
+    scaffoldBackgroundColor: const Color(0xFFFDF8F4),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+    ),
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: const Color(0xFFFFE3ED),
+      indicatorColor: PawPalette.bubbleGum.withOpacity(0.18),
+    ),
+    visualDensity: VisualDensity.adaptivePlatformDensity,
+  );
+}
