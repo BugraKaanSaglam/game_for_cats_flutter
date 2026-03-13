@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
-import 'package:game_for_cats_2025/services/app_crash_reporter.dart';
 import 'package:game_for_cats_2025/services/app_info_service.dart';
 import 'package:game_for_cats_2025/services/app_logger.dart';
 import 'package:game_for_cats_2025/services/app_share_service.dart';
@@ -52,10 +51,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 ),
                 const SizedBox(height: 20),
                 _AppInfoCard(packageInfo: packageInfo),
-                const SizedBox(height: 8),
                 const _ConnectivityCard(),
-                const SizedBox(height: 8),
-                const _CrashReportingCard(),
                 const SizedBox(height: 32),
               ],
             );
@@ -77,7 +73,6 @@ class _AppInfoCard extends StatelessWidget {
     final versionText = packageInfo == null
         ? l10n.credits_version_loading
         : '${packageInfo!.version}+${packageInfo!.buildNumber}';
-    final packageName = packageInfo?.packageName ?? 'game_for_cats_2025';
 
     return PlayfulCard(
       emoji: 'ℹ️',
@@ -88,7 +83,6 @@ class _AppInfoCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _InfoLine(label: l10n.credits_version_label, value: versionText),
-          _InfoLine(label: l10n.about_package_label, value: packageName),
           _InfoLine(
             label: l10n.about_platform_label,
             value: defaultTargetPlatform.name,
@@ -171,84 +165,6 @@ class _ConnectivityCard extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class _CrashReportingCard extends StatefulWidget {
-  const _CrashReportingCard();
-
-  @override
-  State<_CrashReportingCard> createState() => _CrashReportingCardState();
-}
-
-class _CrashReportingCardState extends State<_CrashReportingCard> {
-  bool _sending = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final isConfigured = AppCrashReporter.isConfigured;
-
-    return PlayfulCard(
-      emoji: '🛟',
-      title: l10n.crash_reporting_title,
-      subtitle: isConfigured
-          ? l10n.crash_reporting_enabled_hint
-          : l10n.crash_reporting_disabled_hint,
-      gradient: PawPalette.pinkToOrange(opacity: 0.85),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _InfoLine(
-            label: l10n.crash_reporting_status_label,
-            value: isConfigured
-                ? l10n.crash_reporting_status_enabled
-                : l10n.crash_reporting_status_disabled,
-          ),
-          if (kDebugMode) ...[
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: (!isConfigured || _sending) ? null : _sendTestEvent,
-              icon: _sending
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.bug_report_outlined),
-              label: Text(l10n.crash_reporting_test_button),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Future<void> _sendTestEvent() async {
-    final messenger = ScaffoldMessenger.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    setState(() => _sending = true);
-    try {
-      final eventId = await AppCrashReporter.sendTestEvent();
-      if (!mounted) return;
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            eventId == null
-                ? l10n.crash_reporting_disabled_hint
-                : l10n.crash_reporting_test_sent,
-          ),
-        ),
-      );
-    } catch (error, stackTrace) {
-      AppLogger.error('Sending test crash event failed', error, stackTrace);
-      if (!mounted) return;
-      messenger.showSnackBar(
-        SnackBar(content: Text(l10n.crash_reporting_test_failed)),
-      );
-    } finally {
-      if (mounted) setState(() => _sending = false);
-    }
   }
 }
 

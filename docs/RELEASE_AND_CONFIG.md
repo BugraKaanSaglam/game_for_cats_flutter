@@ -43,23 +43,6 @@ Optional HTML report:
 genhtml coverage/lcov.info -o coverage/html
 ```
 
-## Crash Reporting
-
-Crash reporting is disabled by default.
-
-To enable Sentry:
-
-```bash
-flutter run --dart-define=SENTRY_DSN=your_dsn_here
-```
-
-For CI or release builds:
-
-```bash
-flutter build apk --dart-define=SENTRY_DSN=your_dsn_here
-flutter build ios --dart-define=SENTRY_DSN=your_dsn_here
-```
-
 ## GitHub Actions
 
 The CI workflow:
@@ -86,14 +69,11 @@ Workflow file:
 6. `flutter test --coverage`
 7. verify `README.md` and docs are current
 8. verify version bump in `pubspec.yaml`
-9. verify DSN/config strategy for target environment
-10. build target artifacts
+9. build target artifacts
 
 ## Configuration Surface
 
-Current explicit runtime configuration:
-
-- `SENTRY_DSN`: optional crash reporting backend DSN
+Current explicit runtime configuration is intentionally minimal.
 
 Future expansion candidates:
 

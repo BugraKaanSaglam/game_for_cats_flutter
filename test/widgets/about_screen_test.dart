@@ -24,9 +24,7 @@ void main() {
     AppInfoService.instance.reset();
   });
 
-  testWidgets('renders app info, connectivity and crash reporting cards', (
-    tester,
-  ) async {
+  testWidgets('renders app info and connectivity cards', (tester) async {
     final connectivity = TestConnectivityController(
       ConnectionStateStatus.online,
     );
@@ -45,19 +43,8 @@ void main() {
       find.byWidgetPredicate(_richTextContains('3.5.0+35')),
       findsOneWidget,
     );
-    expect(
-      find.byWidgetPredicate(_richTextContains('com.example.game_for_cats')),
-      findsOneWidget,
-    );
     expect(find.text('Connectivity'), findsOneWidget);
     expect(find.text('Online'), findsOneWidget);
-    await tester.drag(find.byType(ListView), const Offset(0, -500));
-    await tester.pumpAndSettle();
-    expect(find.text('Crash Reporting'), findsOneWidget);
-    expect(
-      find.byWidgetPredicate(_richTextContains('Not configured')),
-      findsOneWidget,
-    );
     expect(find.text('Share App'), findsWidgets);
   });
 }

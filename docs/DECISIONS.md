@@ -2,6 +2,8 @@
 
 This file captures the most important engineering choices in the repository and why they were made.
 
+The project also intentionally preserves the context that this was my first app. The goal is not to present a perfect greenfield architecture, but to show sound decisions, visible tradeoffs, and disciplined iteration.
+
 ## ADR-001: Keep `provider` Instead of Migrating to `riverpod`
 
 ### Decision
@@ -32,29 +34,29 @@ Local persistence remains the source of truth for settings, onboarding state, an
 - simpler demo setup for reviewers and recruiters
 - faster cold-start and fewer failure modes
 
-## ADR-003: Make Crash Reporting Opt-In by Configuration
+## ADR-003: Add Analytics as a Thin Service Layer
 
 ### Decision
 
-Sentry is wired structurally but enabled only when `SENTRY_DSN` is provided.
+Analytics is modeled as a small internal service with typed events and no backend requirement.
 
 ### Why
 
-- the repo is safe to clone and run without third-party credentials
-- production posture is demonstrated without forcing secrets into the codebase
-- local development remains frictionless
-
-## ADR-004: Add Analytics as a Thin Service Layer
-
-### Decision
-
-Analytics is modeled as a small internal service with typed events and optional Sentry breadcrumbs.
-
-### Why
-
-- shows event taxonomy thinking without overbuilding a backend client
+- shows event taxonomy thinking without requiring any backend client
 - keeps instrumentation testable and readable
 - preserves a seam for later adapters such as Firebase Analytics, PostHog, or Segment
+
+## ADR-004: Keep the App Backend-Free
+
+### Decision
+
+Do not keep backend-dependent platform integrations in the repository unless they are actually wired to a real product need.
+
+### Why
+
+- the app is intentionally offline-first
+- half-configured backend features create noise for reviewers
+- a clean local-first architecture is a stronger signal than placeholder infrastructure
 
 ## ADR-005: Add Golden + Integration Coverage
 

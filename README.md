@@ -6,7 +6,7 @@
   <img src="assets/images/splashscreen.png" alt="Mice and Paws splash art" width="220">
 </p>
 
-Colorful Flutter + Flame cat game built as a polished public portfolio project. The repo is structured to show product thinking, maintainable state management, offline-friendly UX, app diagnostics, and automated quality gates.
+Colorful Flutter + Flame cat game built as a polished public portfolio project. This was my first app, so the repository is intentionally shaped to show both the product itself and how I approached architecture, testing, and iteration as I leveled up.
 
 ## Highlights
 
@@ -14,7 +14,6 @@ Colorful Flutter + Flame cat game built as a polished public portfolio project. 
 - Localized UI in English and Turkish
 - Persisted settings, onboarding, and play activity history
 - Connectivity status layer with offline banner
-- Optional Sentry crash reporting bootstrap
 - Typed internal analytics layer with event taxonomy
 - Share flow for app info and game results
 - Unit, widget, golden, and integration coverage
@@ -25,9 +24,10 @@ Colorful Flutter + Flame cat game built as a polished public portfolio project. 
 This repo is deliberately built to read well for hiring managers and senior engineers reviewing public code:
 
 - product thinking instead of toy-demo code
+- clear growth from a first app into a maintainable codebase
 - visible architecture boundaries
 - explicit engineering decisions and tradeoffs
-- app observability and release posture
+- offline-first observability and release posture
 - automated regression safety
 
 ## Architecture Snapshot
@@ -42,7 +42,6 @@ flowchart LR
     Routes --> Screens[Screens]
     Screens --> Flame[Flame Game]
     Services --> Analytics[Analytics]
-    Services --> Crash[Crash Reporter]
     Services --> Connectivity[Connectivity]
 ```
 
@@ -53,7 +52,6 @@ flowchart LR
 - Activity trend screen backed by local session logs
 - Credits and About screens with version/build metadata
 - Connectivity banner for offline state awareness
-- Optional crash reporting via `SENTRY_DSN`
 - Share entry points for both app metadata and round results
 - Cross-platform Flutter targets: Android, iOS, web, desktop shells
 
@@ -64,7 +62,7 @@ This project intentionally stays pragmatic.
 - `lib/main.dart`: app bootstrap, routing, global error capture, providers
 - `lib/state/`: application-level state via `provider`
 - `lib/data/`: repository layer for settings and onboarding persistence
-- `lib/services/`: app info, logging, sharing, connectivity, crash reporting
+- `lib/services/`: app info, logging, sharing, connectivity, analytics
 - `lib/views/screens/`: game-adjacent screens and product UI
 - `lib/views/widgets/`: reusable presentation widgets
 - `lib/models/`: entities, enums, DB models, global game variables
@@ -139,12 +137,6 @@ flutter pub get
 flutter run
 ```
 
-To enable remote crash reporting:
-
-```bash
-flutter run --dart-define=SENTRY_DSN=your_dsn_here
-```
-
 ## Test Inventory
 
 Current automated coverage includes:
@@ -160,10 +152,11 @@ Current automated coverage includes:
 
 This repository is meant to present more than a toy app. It demonstrates:
 
+- how I approached building my first app with increasing engineering rigor
 - game loop integration
 - product-focused UI layers outside the game canvas
 - local persistence and settings design
-- app observability basics
+- offline-first app observability basics
 - CI and automated testing discipline
 
 ## Tradeoffs And Next Steps

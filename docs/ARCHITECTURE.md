@@ -2,7 +2,7 @@
 
 ## Goal
 
-This project is intentionally positioned between a playful game and a production-minded Flutter application. The game loop is lightweight, but the surrounding product shell is structured to demonstrate maintainability, testability, and operational readiness.
+This project is intentionally positioned between a playful game and a production-minded Flutter application. It is also my first app, so the surrounding product shell is structured to show how the codebase evolved beyond a simple starter project into something maintainable, testable, and portfolio-ready.
 
 ## High-Level System
 
@@ -19,8 +19,7 @@ flowchart TD
     H --> J[Analytics / Sharing / App Info]
     H --> K[Flame Game Screen]
     D --> L[Logging]
-    D --> M[Crash Reporting]
-    D --> N[Connectivity]
+    D --> M[Connectivity]
 ```
 
 ## Layering
@@ -28,7 +27,7 @@ flowchart TD
 ### App Bootstrap
 
 - `lib/main.dart`
-- wires providers, routing, crash capture, connectivity banner, localization, and theme
+- wires providers, routing, connectivity banner, localization, and theme
 
 ### State
 
@@ -46,7 +45,6 @@ flowchart TD
 - `lib/services/`
 - contains cross-cutting runtime services:
   - `app_logger.dart`
-  - `app_crash_reporter.dart`
   - `app_info_service.dart`
   - `app_share_service.dart`
   - `connectivity_service.dart`
@@ -80,7 +78,7 @@ This keeps code readable and migration cost low. If the project grows into remot
 3. router redirects onboarding users before main navigation becomes available.
 4. screens render against `AppState`, repositories, and service abstractions.
 5. the game screen records local play-session output to SQLite and surfaces activity history.
-6. analytics and crash breadcrumbs annotate major user flows.
+6. analytics and logs annotate major user flows.
 
 ## Observability
 
@@ -88,7 +86,6 @@ The app includes a deliberately small but structured observability surface:
 
 - logging for boot and persistence flows
 - analytics event taxonomy for major user interactions
-- optional Sentry reporting enabled via `--dart-define=SENTRY_DSN=...`
 - connectivity status surfaced through UI and state
 
 ## Testing Strategy

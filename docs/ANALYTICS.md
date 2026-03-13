@@ -34,7 +34,7 @@ The analytics layer in this repository is intentionally lightweight. It exists t
 
 - typed enum prevents random string drift
 - logger output keeps local debugging simple
-- Sentry breadcrumb integration provides operational context when crash reporting is enabled
+- logger-backed event output keeps the app fully backend-free while preserving an upgrade path
 - parameters remain map-based for easy backend adaptation later
 
 ## Next Step If Product Expands

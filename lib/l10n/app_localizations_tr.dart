@@ -185,16 +185,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get about_subtitle =>
-      'Uygulama durumu, sürüm detayları ve raporlama altyapısı.';
+      'Uygulama durumu, sürüm detayları ve bağlantı görünürlüğü.';
 
   @override
   String get about_info_title => 'Sürüm Detayları';
 
   @override
-  String get about_info_subtitle => 'Yüklü uygulama paketinin hızlı özeti.';
-
-  @override
-  String get about_package_label => 'Paket';
+  String get about_info_subtitle => 'Yüklü uygulama sürümünün hızlı özeti.';
 
   @override
   String get about_platform_label => 'Platform';
@@ -217,35 +214,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get offline_banner =>
       'Çevrimdışısın. Oyun çalışmaya devam eder, çevrimiçi servisler beklemeye alınır.';
-
-  @override
-  String get crash_reporting_title => 'Hata Raporlama';
-
-  @override
-  String get crash_reporting_status_label => 'Durum';
-
-  @override
-  String get crash_reporting_status_enabled => 'Aktif';
-
-  @override
-  String get crash_reporting_status_disabled => 'Yapılandırılmadı';
-
-  @override
-  String get crash_reporting_enabled_hint =>
-      'Beklenmeyen hatalar yakalanıp Sentry\'ye gönderilir.';
-
-  @override
-  String get crash_reporting_disabled_hint =>
-      'Uzaktaki hata raporları için --dart-define=SENTRY_DSN=... ekleyin.';
-
-  @override
-  String get crash_reporting_test_button => 'Test Olayı Gönder';
-
-  @override
-  String get crash_reporting_test_sent => 'Test hata olayı gönderildi.';
-
-  @override
-  String get crash_reporting_test_failed => 'Test hata olayı gönderilemedi.';
 
   @override
   String get settings_difficulty_hint =>

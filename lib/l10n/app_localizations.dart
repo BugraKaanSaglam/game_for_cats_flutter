@@ -431,7 +431,7 @@ abstract class AppLocalizations {
   /// No description provided for @about_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Core app health, version details and reporting status.'**
+  /// **'Core app health, version details and connectivity status.'**
   String get about_subtitle;
 
   /// No description provided for @about_info_title.
@@ -443,14 +443,8 @@ abstract class AppLocalizations {
   /// No description provided for @about_info_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Quick snapshot of the installed app package.'**
+  /// **'Quick snapshot of the installed app build.'**
   String get about_info_subtitle;
-
-  /// No description provided for @about_package_label.
-  ///
-  /// In en, this message translates to:
-  /// **'Package'**
-  String get about_package_label;
 
   /// No description provided for @about_platform_label.
   ///
@@ -493,60 +487,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You are offline. The game still works, but online services are paused.'**
   String get offline_banner;
-
-  /// No description provided for @crash_reporting_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Crash Reporting'**
-  String get crash_reporting_title;
-
-  /// No description provided for @crash_reporting_status_label.
-  ///
-  /// In en, this message translates to:
-  /// **'Status'**
-  String get crash_reporting_status_label;
-
-  /// No description provided for @crash_reporting_status_enabled.
-  ///
-  /// In en, this message translates to:
-  /// **'Enabled'**
-  String get crash_reporting_status_enabled;
-
-  /// No description provided for @crash_reporting_status_disabled.
-  ///
-  /// In en, this message translates to:
-  /// **'Not configured'**
-  String get crash_reporting_status_disabled;
-
-  /// No description provided for @crash_reporting_enabled_hint.
-  ///
-  /// In en, this message translates to:
-  /// **'Unhandled errors will be captured and sent to Sentry.'**
-  String get crash_reporting_enabled_hint;
-
-  /// No description provided for @crash_reporting_disabled_hint.
-  ///
-  /// In en, this message translates to:
-  /// **'Add --dart-define=SENTRY_DSN=... to enable remote crash reports.'**
-  String get crash_reporting_disabled_hint;
-
-  /// No description provided for @crash_reporting_test_button.
-  ///
-  /// In en, this message translates to:
-  /// **'Send Test Event'**
-  String get crash_reporting_test_button;
-
-  /// No description provided for @crash_reporting_test_sent.
-  ///
-  /// In en, this message translates to:
-  /// **'Test crash event sent.'**
-  String get crash_reporting_test_sent;
-
-  /// No description provided for @crash_reporting_test_failed.
-  ///
-  /// In en, this message translates to:
-  /// **'Test crash event could not be sent.'**
-  String get crash_reporting_test_failed;
 
   /// No description provided for @settings_difficulty_hint.
   ///

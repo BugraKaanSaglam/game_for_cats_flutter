@@ -187,17 +187,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get about_subtitle =>
-      'Core app health, version details and reporting status.';
+      'Core app health, version details and connectivity status.';
 
   @override
   String get about_info_title => 'Build Details';
 
   @override
   String get about_info_subtitle =>
-      'Quick snapshot of the installed app package.';
-
-  @override
-  String get about_package_label => 'Package';
+      'Quick snapshot of the installed app build.';
 
   @override
   String get about_platform_label => 'Platform';
@@ -221,36 +218,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get offline_banner =>
       'You are offline. The game still works, but online services are paused.';
-
-  @override
-  String get crash_reporting_title => 'Crash Reporting';
-
-  @override
-  String get crash_reporting_status_label => 'Status';
-
-  @override
-  String get crash_reporting_status_enabled => 'Enabled';
-
-  @override
-  String get crash_reporting_status_disabled => 'Not configured';
-
-  @override
-  String get crash_reporting_enabled_hint =>
-      'Unhandled errors will be captured and sent to Sentry.';
-
-  @override
-  String get crash_reporting_disabled_hint =>
-      'Add --dart-define=SENTRY_DSN=... to enable remote crash reports.';
-
-  @override
-  String get crash_reporting_test_button => 'Send Test Event';
-
-  @override
-  String get crash_reporting_test_sent => 'Test crash event sent.';
-
-  @override
-  String get crash_reporting_test_failed =>
-      'Test crash event could not be sent.';
 
   @override
   String get settings_difficulty_hint =>
