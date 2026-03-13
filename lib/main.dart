@@ -1,12 +1,19 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
+import 'package:game_for_cats_2025/services/app_crash_reporter.dart';
 import 'routing/app_routes.dart';
 import 'package:game_for_cats_2025/models/app_settings.dart';
+import 'package:game_for_cats_2025/services/app_logger.dart';
+import 'package:game_for_cats_2025/services/connectivity_service.dart';
 import 'package:game_for_cats_2025/state/app_state.dart';
 import 'package:game_for_cats_2025/views/components/loading_screen_view.dart';
 import 'package:game_for_cats_2025/views/screens/activity_screen.dart';
+import 'package:game_for_cats_2025/views/screens/about_screen.dart';
 import 'package:game_for_cats_2025/views/screens/credits_screen.dart';
 import 'package:game_for_cats_2025/views/screens/game_screen.dart';
 import 'package:game_for_cats_2025/views/screens/howtoplay_screen.dart';
@@ -14,15 +21,46 @@ import 'package:game_for_cats_2025/views/screens/main_screen.dart';
 import 'package:game_for_cats_2025/views/screens/onboarding_screen.dart';
 import 'package:game_for_cats_2025/views/screens/settings_screen.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
+import 'package:game_for_cats_2025/views/widgets/connectivity_banner.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  FlutterError.onError = (details) {
+    AppLogger.error(
+      'Unhandled Flutter framework error',
+      details.exception,
+      details.stack,
+    );
+    unawaited(
+      AppCrashReporter.capture(
+        details.exception,
+        details.stack ?? StackTrace.current,
+        reason: 'flutter_error',
+      ),
+    );
+    FlutterError.presentError(details);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    AppLogger.error('Unhandled platform error', error, stack);
+    unawaited(
+      AppCrashReporter.capture(error, stack, reason: 'platform_dispatcher'),
+    );
+    return true;
+  };
   await Flame.device.fullScreen();
-  runApp(
-    ChangeNotifierProvider(
-      create: (_) => AppState()..initialize(),
-      child: const MainApp(),
+  AppLogger.info('Launching Mice and Paws: Cat Game');
+  await AppCrashReporter.initialize(
+    () async => runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => AppState()..initialize()),
+          ChangeNotifierProvider(
+            create: (_) => ConnectivityController()..initialize(),
+          ),
+        ],
+        child: const MainApp(),
+      ),
     ),
   );
 }
@@ -60,20 +98,47 @@ class _MainAppState extends State<MainApp> {
         return null;
       },
       routes: [
-        GoRoute(path: AppRoutes.loading, builder: (context, state) => const LoadingScreenView()),
-        GoRoute(path: AppRoutes.onboarding, builder: (context, state) => const OnboardingScreen()),
-        GoRoute(path: AppRoutes.main, builder: (context, state) => const MainScreen()),
-        GoRoute(path: AppRoutes.settings, builder: (context, state) => const SettingsScreen()),
-        GoRoute(path: AppRoutes.credits, builder: (context, state) => const CreditsScreen()),
-        GoRoute(path: AppRoutes.howToPlay, builder: (context, state) => const HowToPlayScreen()),
+        GoRoute(
+          path: AppRoutes.loading,
+          builder: (context, state) => const LoadingScreenView(),
+        ),
+        GoRoute(
+          path: AppRoutes.onboarding,
+          builder: (context, state) => const OnboardingScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.main,
+          builder: (context, state) => const MainScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.settings,
+          builder: (context, state) => const SettingsScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.credits,
+          builder: (context, state) => const CreditsScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.howToPlay,
+          builder: (context, state) => const HowToPlayScreen(),
+        ),
         GoRoute(
           path: AppRoutes.game,
           builder: (context, state) {
-            final settings = state.extra as AppSettings? ?? context.read<AppState>().settings;
+            final settings =
+                state.extra as AppSettings? ??
+                context.read<AppState>().settings;
             return GameScreen(settings: settings);
           },
         ),
-        GoRoute(path: AppRoutes.activity, builder: (context, state) => const ActivityScreen()),
+        GoRoute(
+          path: AppRoutes.activity,
+          builder: (context, state) => const ActivityScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.about,
+          builder: (context, state) => const AboutScreen(),
+        ),
       ],
     );
   }
@@ -89,6 +154,8 @@ class _MainAppState extends State<MainApp> {
       locale: appState.locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      builder: (context, child) =>
+          ConnectivityBanner(child: child ?? const SizedBox.shrink()),
     );
   }
 }

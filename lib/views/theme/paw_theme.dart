@@ -79,7 +79,7 @@ class PawTheme {
     ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: const Color(0xFFFFE3ED),
-      indicatorColor: PawPalette.bubbleGum.withOpacity(0.18),
+      indicatorColor: PawPalette.bubbleGum.withValues(alpha: 0.18 * 255),
     ),
     visualDensity: VisualDensity.adaptivePlatformDensity,
   );

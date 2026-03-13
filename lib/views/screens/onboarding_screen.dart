@@ -152,7 +152,7 @@ class _OnboardingPage extends StatelessWidget {
               gradient: LinearGradient(colors: data.accent),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withValues(alpha: 0.15 * 255),
                   blurRadius: 24,
                   offset: const Offset(0, 12),
                 ),
@@ -227,7 +227,7 @@ class _GradientButton extends StatelessWidget {
           gradient: LinearGradient(colors: gradient),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.18),
+            color: Colors.black.withValues(alpha: 0.18 * 255),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),

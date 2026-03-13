@@ -27,13 +27,40 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   late AnimationController _buttonController;
   late AnimationController _ambientController;
-  final List<_OrbConfig> _orbConfigs = const [_OrbConfig(alignment: Alignment(-0.9, -0.8), color: Color(0xFFFFD6E8), size: 190, travel: 0.08), _OrbConfig(alignment: Alignment(0.85, -0.6), color: Color(0xFFB8E1FF), size: 150, travel: 0.06, phase: 1.2), _OrbConfig(alignment: Alignment(-0.5, 0.75), color: Color(0xFFFFF5D7), size: 230, travel: 0.05, phase: 2.4)];
+  final List<_OrbConfig> _orbConfigs = const [
+    _OrbConfig(
+      alignment: Alignment(-0.9, -0.8),
+      color: Color(0xFFFFD6E8),
+      size: 190,
+      travel: 0.08,
+    ),
+    _OrbConfig(
+      alignment: Alignment(0.85, -0.6),
+      color: Color(0xFFB8E1FF),
+      size: 150,
+      travel: 0.06,
+      phase: 1.2,
+    ),
+    _OrbConfig(
+      alignment: Alignment(-0.5, 0.75),
+      color: Color(0xFFFFF5D7),
+      size: 230,
+      travel: 0.05,
+      phase: 2.4,
+    ),
+  ];
 
   @override
   void initState() {
     super.initState();
-    _buttonController = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
-    _ambientController = AnimationController(vsync: this, duration: const Duration(milliseconds: 5333))..repeat(reverse: true);
+    _buttonController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _ambientController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 5333),
+    )..repeat(reverse: true);
   }
 
   @override
@@ -48,24 +75,33 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     final appState = context.watch<AppState>();
     if (!appState.isReady) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator(color: PawPalette.bubbleGum)),
+        body: Center(
+          child: CircularProgressIndicator(color: PawPalette.bubbleGum),
+        ),
       );
     }
 
     final settings = appState.settings;
     if (appState.initError != null || settings == null) {
       return Scaffold(
-        appBar: MainAppBar(title: AppLocalizations.of(context)!.game_name, hasBackButton: false),
+        appBar: MainAppBar(
+          title: AppLocalizations.of(context)!.game_name,
+          hasBackButton: false,
+        ),
         body: Center(child: dbError(context)),
       );
     }
 
-    if (_buttonController.status != AnimationStatus.forward && _buttonController.status != AnimationStatus.completed) {
+    if (_buttonController.status != AnimationStatus.forward &&
+        _buttonController.status != AnimationStatus.completed) {
       unawaited(_buttonController.forward());
     }
 
     return Scaffold(
-      appBar: MainAppBar(title: AppLocalizations.of(context)!.game_name, hasBackButton: false),
+      appBar: MainAppBar(
+        title: AppLocalizations.of(context)!.game_name,
+        hasBackButton: false,
+      ),
       body: mainBody(context, settings),
     );
   }
@@ -78,9 +114,16 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final horizontalPadding = constraints.maxWidth > 800 ? constraints.maxWidth * 0.25 : 24.0;
+                final horizontalPadding = constraints.maxWidth > 800
+                    ? constraints.maxWidth * 0.25
+                    : 24.0;
                 return Padding(
-                  padding: EdgeInsets.fromLTRB(horizontalPadding, 20, horizontalPadding, 32),
+                  padding: EdgeInsets.fromLTRB(
+                    horizontalPadding,
+                    20,
+                    horizontalPadding,
+                    32,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -117,13 +160,17 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   // Helper function for staggered animation
-  Widget _buildStaggeredAnimatedButton({required Widget child, required double delay}) {
-    final animation = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(
-      CurvedAnimation(
-        parent: _buttonController,
-        curve: Interval(delay, 1.0, curve: Curves.easeOutCubic),
-      ),
-    );
+  Widget _buildStaggeredAnimatedButton({
+    required Widget child,
+    required double delay,
+  }) {
+    final animation =
+        Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _buttonController,
+            curve: Interval(delay, 1.0, curve: Curves.easeOutCubic),
+          ),
+        );
 
     return SlideTransition(
       position: animation,
@@ -151,9 +198,15 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(AppLocalizations.of(context)!.game_name, style: PawTextStyles.heading),
+              Text(
+                AppLocalizations.of(context)!.game_name,
+                style: PawTextStyles.heading,
+              ),
               const SizedBox(height: 6),
-              Text(AppLocalizations.of(context)!.main_tagline, style: PawTextStyles.subheading),
+              Text(
+                AppLocalizations.of(context)!.main_tagline,
+                style: PawTextStyles.subheading,
+              ),
             ],
           ),
         ),
@@ -180,19 +233,43 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         //! Settings Button
         _buildStaggeredAnimatedButton(
           delay: 0.15,
-          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.settings_button, icon: const Icon(Icons.settings), onPressed: () => context.go(AppRoutes.settings)),
+          child: CoolAnimatedButton(
+            text: AppLocalizations.of(context)!.settings_button,
+            icon: const Icon(Icons.settings),
+            onPressed: () => context.go(AppRoutes.settings),
+          ),
         ),
         SizedBox(height: spacing),
         //! How to Play Button
         _buildStaggeredAnimatedButton(
           delay: 0.30,
-          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.howtoplay_button, icon: const Icon(Icons.menu_book), onPressed: () => context.go(AppRoutes.howToPlay)),
+          child: CoolAnimatedButton(
+            text: AppLocalizations.of(context)!.howtoplay_button,
+            icon: const Icon(Icons.menu_book),
+            onPressed: () => context.go(AppRoutes.howToPlay),
+          ),
         ),
         SizedBox(height: spacing),
         //! Credits Button
         _buildStaggeredAnimatedButton(
           delay: 0.45,
-          child: CoolAnimatedButton(text: AppLocalizations.of(context)!.credits_button, icon: const Icon(Icons.pest_control_rodent_sharp), onPressed: () => context.go(AppRoutes.credits)),
+          child: CoolAnimatedButton(
+            text: AppLocalizations.of(context)!.credits_button,
+            icon: const Icon(Icons.pest_control_rodent_sharp),
+            onPressed: () => context.go(AppRoutes.credits),
+          ),
+        ),
+        SizedBox(height: spacing),
+        //! About Button
+        _buildStaggeredAnimatedButton(
+          delay: 0.50,
+          child: CoolAnimatedButton(
+            text: AppLocalizations.of(context)!.about_button,
+            icon: const Icon(Icons.info_outline_rounded),
+            onPressed: () => context.go(AppRoutes.about),
+            startColor: const Color(0xFF6D597A),
+            endColor: const Color(0xFF355070),
+          ),
         ),
         SizedBox(height: spacing),
         //! Activity Button
@@ -217,8 +294,15 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         builder: (context, _) {
           return Stack(
             children: _orbConfigs.map((orb) {
-              final oscillation = math.sin((_ambientController.value * 2 * math.pi) + orb.phase) * orb.travel;
-              final alignment = Alignment((orb.alignment.x + oscillation).clamp(-1.0, 1.0), (orb.alignment.y + oscillation).clamp(-1.0, 1.0));
+              final oscillation =
+                  math.sin(
+                    (_ambientController.value * 2 * math.pi) + orb.phase,
+                  ) *
+                  orb.travel;
+              final alignment = Alignment(
+                (orb.alignment.x + oscillation).clamp(-1.0, 1.0),
+                (orb.alignment.y + oscillation).clamp(-1.0, 1.0),
+              );
               return Align(
                 alignment: alignment,
                 child: Container(
@@ -244,7 +328,13 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 }
 
 class _OrbConfig {
-  const _OrbConfig({required this.alignment, required this.color, required this.size, required this.travel, this.phase = 0});
+  const _OrbConfig({
+    required this.alignment,
+    required this.color,
+    required this.size,
+    required this.travel,
+    this.phase = 0,
+  });
 
   final Alignment alignment;
   final Color color;

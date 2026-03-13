@@ -24,6 +24,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get credits_button => 'Emeği Geçenler';
 
   @override
+  String get about_button => 'Uygulama Hakkında';
+
+  @override
   String get exit_button => 'Çıkış Yap';
 
   @override
@@ -166,6 +169,85 @@ class AppLocalizationsTr extends AppLocalizations {
   String get credits_special_thanks => 'Özel Teşekkürler';
 
   @override
+  String get credits_version_label => 'Sürüm';
+
+  @override
+  String get credits_version_loading => 'Uygulama bilgileri yükleniyor...';
+
+  @override
+  String get credits_share_title => 'Oyunu paylaş';
+
+  @override
+  String get credits_share_subtitle => 'Oyunu başka bir kedi severle gönder.';
+
+  @override
+  String get about_title => 'Uygulama Bilgisi';
+
+  @override
+  String get about_subtitle =>
+      'Uygulama durumu, sürüm detayları ve raporlama altyapısı.';
+
+  @override
+  String get about_info_title => 'Sürüm Detayları';
+
+  @override
+  String get about_info_subtitle => 'Yüklü uygulama paketinin hızlı özeti.';
+
+  @override
+  String get about_package_label => 'Paket';
+
+  @override
+  String get about_platform_label => 'Platform';
+
+  @override
+  String get connectivity_title => 'Bağlantı Durumu';
+
+  @override
+  String get connectivity_subtitle => 'Cihazın güncel ağ erişim durumu.';
+
+  @override
+  String get connectivity_status_online => 'Çevrimiçi';
+
+  @override
+  String get connectivity_status_offline => 'Çevrimdışı';
+
+  @override
+  String get connectivity_status_unknown => 'Kontrol ediliyor...';
+
+  @override
+  String get offline_banner =>
+      'Çevrimdışısın. Oyun çalışmaya devam eder, çevrimiçi servisler beklemeye alınır.';
+
+  @override
+  String get crash_reporting_title => 'Hata Raporlama';
+
+  @override
+  String get crash_reporting_status_label => 'Durum';
+
+  @override
+  String get crash_reporting_status_enabled => 'Aktif';
+
+  @override
+  String get crash_reporting_status_disabled => 'Yapılandırılmadı';
+
+  @override
+  String get crash_reporting_enabled_hint =>
+      'Beklenmeyen hatalar yakalanıp Sentry\'ye gönderilir.';
+
+  @override
+  String get crash_reporting_disabled_hint =>
+      'Uzaktaki hata raporları için --dart-define=SENTRY_DSN=... ekleyin.';
+
+  @override
+  String get crash_reporting_test_button => 'Test Olayı Gönder';
+
+  @override
+  String get crash_reporting_test_sent => 'Test hata olayı gönderildi.';
+
+  @override
+  String get crash_reporting_test_failed => 'Test hata olayı gönderilemedi.';
+
+  @override
   String get settings_difficulty_hint =>
       'Doğma aralığı, hız eğrisi ve aynı anda ekrandaki canlı sayısını ayarla.';
 
@@ -253,4 +335,29 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get lowpower_toggle_label => 'Hareketi azalt';
+
+  @override
+  String get share_app_button => 'Uygulamayı paylaş';
+
+  @override
+  String get share_result_button => 'Sonucu paylaş';
+
+  @override
+  String share_app_text(Object gameName, Object version) {
+    return '$gameName oyununu $version sürümünde oynuyoruz. Fareleri yakala, böceklerden kaç, kedini gururlandır!';
+  }
+
+  @override
+  String get share_result_subject => 'Son kedi oyunu sonucumuz';
+
+  @override
+  String share_result_text(
+    Object gameName,
+    Object totalTaps,
+    Object miceTaps,
+    Object bugTaps,
+    Object wrongTaps,
+  ) {
+    return '$gameName oynadık ve $totalTaps dokunuş yaptık: $miceTaps fare, $bugTaps böcek, $wrongTaps kaçırma.';
+  }
 }

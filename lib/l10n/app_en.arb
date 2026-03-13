@@ -4,6 +4,7 @@
     "settings_button": "Settings",
     "howtoplay_button": "How To Play?",
     "credits_button": "Credits",
+    "about_button": "About App",
     "exit_button": "Exit",
     "main_tagline": "Catch the mice, dodge the bugs, make kitty proud!",
     "onboarding_title_welcome": "Welcome to the Cat Playground",
@@ -48,6 +49,31 @@
     "settings_character_hint": "Squeaks & squeals volume.",
     "credits_subtitle": "A tiny team with giant love for cats and colors.",
     "credits_special_thanks": "Special Thanks",
+    "credits_version_label": "Version",
+    "credits_version_loading": "Loading app details...",
+    "credits_share_title": "Share the game",
+    "credits_share_subtitle": "Send the game to another cat-loving human.",
+    "about_title": "App Info",
+    "about_subtitle": "Core app health, version details and reporting status.",
+    "about_info_title": "Build Details",
+    "about_info_subtitle": "Quick snapshot of the installed app package.",
+    "about_package_label": "Package",
+    "about_platform_label": "Platform",
+    "connectivity_title": "Connectivity",
+    "connectivity_subtitle": "Current network reachability state for the device.",
+    "connectivity_status_online": "Online",
+    "connectivity_status_offline": "Offline",
+    "connectivity_status_unknown": "Checking...",
+    "offline_banner": "You are offline. The game still works, but online services are paused.",
+    "crash_reporting_title": "Crash Reporting",
+    "crash_reporting_status_label": "Status",
+    "crash_reporting_status_enabled": "Enabled",
+    "crash_reporting_status_disabled": "Not configured",
+    "crash_reporting_enabled_hint": "Unhandled errors will be captured and sent to Sentry.",
+    "crash_reporting_disabled_hint": "Add --dart-define=SENTRY_DSN=... to enable remote crash reports.",
+    "crash_reporting_test_button": "Send Test Event",
+    "crash_reporting_test_sent": "Test crash event sent.",
+    "crash_reporting_test_failed": "Test crash event could not be sent.",
     "settings_difficulty_hint": "Control spawn speed, speed curve and active critters.",
     "difficulty_easy": "Kitten (Easy)",
     "difficulty_medium": "Playful (Medium)",
@@ -74,5 +100,25 @@
     "mute_toggle_label": "Tap to mute/unmute",
     "lowpower_title": "Low Performance Mode",
     "lowpower_subtitle": "Reduce creature count and speed for smoother play on older devices.",
-    "lowpower_toggle_label": "Lower motion & power"
+    "lowpower_toggle_label": "Lower motion & power",
+    "share_app_button": "Share App",
+    "share_result_button": "Share Result",
+    "share_app_text": "I am playing {gameName} on version {version}. Catch the mice, dodge the bugs, make kitty proud!",
+    "@share_app_text": {
+        "placeholders": {
+            "gameName": {},
+            "version": {}
+        }
+    },
+    "share_result_subject": "Our latest cat game result",
+    "share_result_text": "We played {gameName} and landed {totalTaps} taps: {miceTaps} mice, {bugTaps} bugs, {wrongTaps} misses.",
+    "@share_result_text": {
+        "placeholders": {
+            "gameName": {},
+            "totalTaps": {},
+            "miceTaps": {},
+            "bugTaps": {},
+            "wrongTaps": {}
+        }
+    }
 }

@@ -8,7 +8,7 @@ class LoadingScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: PawPalette.midnight.withOpacity(0.9),
+      backgroundColor: PawPalette.midnight.withValues(alpha: 0.9 * 255),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

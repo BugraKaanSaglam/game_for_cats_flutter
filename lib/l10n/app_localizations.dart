@@ -128,6 +128,12 @@ abstract class AppLocalizations {
   /// **'Credits'**
   String get credits_button;
 
+  /// No description provided for @about_button.
+  ///
+  /// In en, this message translates to:
+  /// **'About App'**
+  String get about_button;
+
   /// No description provided for @exit_button.
   ///
   /// In en, this message translates to:
@@ -392,6 +398,156 @@ abstract class AppLocalizations {
   /// **'Special Thanks'**
   String get credits_special_thanks;
 
+  /// No description provided for @credits_version_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get credits_version_label;
+
+  /// No description provided for @credits_version_loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading app details...'**
+  String get credits_version_loading;
+
+  /// No description provided for @credits_share_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Share the game'**
+  String get credits_share_title;
+
+  /// No description provided for @credits_share_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send the game to another cat-loving human.'**
+  String get credits_share_subtitle;
+
+  /// No description provided for @about_title.
+  ///
+  /// In en, this message translates to:
+  /// **'App Info'**
+  String get about_title;
+
+  /// No description provided for @about_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Core app health, version details and reporting status.'**
+  String get about_subtitle;
+
+  /// No description provided for @about_info_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Build Details'**
+  String get about_info_title;
+
+  /// No description provided for @about_info_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick snapshot of the installed app package.'**
+  String get about_info_subtitle;
+
+  /// No description provided for @about_package_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Package'**
+  String get about_package_label;
+
+  /// No description provided for @about_platform_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Platform'**
+  String get about_platform_label;
+
+  /// No description provided for @connectivity_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Connectivity'**
+  String get connectivity_title;
+
+  /// No description provided for @connectivity_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Current network reachability state for the device.'**
+  String get connectivity_subtitle;
+
+  /// No description provided for @connectivity_status_online.
+  ///
+  /// In en, this message translates to:
+  /// **'Online'**
+  String get connectivity_status_online;
+
+  /// No description provided for @connectivity_status_offline.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get connectivity_status_offline;
+
+  /// No description provided for @connectivity_status_unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking...'**
+  String get connectivity_status_unknown;
+
+  /// No description provided for @offline_banner.
+  ///
+  /// In en, this message translates to:
+  /// **'You are offline. The game still works, but online services are paused.'**
+  String get offline_banner;
+
+  /// No description provided for @crash_reporting_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Crash Reporting'**
+  String get crash_reporting_title;
+
+  /// No description provided for @crash_reporting_status_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get crash_reporting_status_label;
+
+  /// No description provided for @crash_reporting_status_enabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get crash_reporting_status_enabled;
+
+  /// No description provided for @crash_reporting_status_disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Not configured'**
+  String get crash_reporting_status_disabled;
+
+  /// No description provided for @crash_reporting_enabled_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Unhandled errors will be captured and sent to Sentry.'**
+  String get crash_reporting_enabled_hint;
+
+  /// No description provided for @crash_reporting_disabled_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add --dart-define=SENTRY_DSN=... to enable remote crash reports.'**
+  String get crash_reporting_disabled_hint;
+
+  /// No description provided for @crash_reporting_test_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Test Event'**
+  String get crash_reporting_test_button;
+
+  /// No description provided for @crash_reporting_test_sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Test crash event sent.'**
+  String get crash_reporting_test_sent;
+
+  /// No description provided for @crash_reporting_test_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Test crash event could not be sent.'**
+  String get crash_reporting_test_failed;
+
   /// No description provided for @settings_difficulty_hint.
   ///
   /// In en, this message translates to:
@@ -553,6 +709,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lower motion & power'**
   String get lowpower_toggle_label;
+
+  /// No description provided for @share_app_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Share App'**
+  String get share_app_button;
+
+  /// No description provided for @share_result_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Result'**
+  String get share_result_button;
+
+  /// No description provided for @share_app_text.
+  ///
+  /// In en, this message translates to:
+  /// **'I am playing {gameName} on version {version}. Catch the mice, dodge the bugs, make kitty proud!'**
+  String share_app_text(Object gameName, Object version);
+
+  /// No description provided for @share_result_subject.
+  ///
+  /// In en, this message translates to:
+  /// **'Our latest cat game result'**
+  String get share_result_subject;
+
+  /// No description provided for @share_result_text.
+  ///
+  /// In en, this message translates to:
+  /// **'We played {gameName} and landed {totalTaps} taps: {miceTaps} mice, {bugTaps} bugs, {wrongTaps} misses.'**
+  String share_result_text(
+    Object gameName,
+    Object totalTaps,
+    Object miceTaps,
+    Object bugTaps,
+    Object wrongTaps,
+  );
 }
 
 class _AppLocalizationsDelegate

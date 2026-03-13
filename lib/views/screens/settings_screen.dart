@@ -206,7 +206,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final path = _draftSettings?.backgroundPath ?? '';
     final file = path.isNotEmpty ? File(path) : null;
     final hasCustom = file != null && file.existsSync();
-    final ImageProvider image = hasCustom ? FileImage(file!) : const AssetImage('assets/images/background.webp');
+    final ImageProvider image = hasCustom ? FileImage(file) : const AssetImage('assets/images/background.webp');
 
     if (!hasCustom && path.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
