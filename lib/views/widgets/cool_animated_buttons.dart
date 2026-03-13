@@ -21,8 +21,19 @@ class CoolAnimatedButton extends StatefulWidget {
   CoolAnimatedButtonState createState() => CoolAnimatedButtonState();
 }
 
-class CoolAnimatedButtonState extends State<CoolAnimatedButton> {
+class CoolAnimatedButtonState extends State<CoolAnimatedButton>
+    with SingleTickerProviderStateMixin {
   bool _isPressed = false;
+  late final AnimationController _sheenController;
+
+  @override
+  void initState() {
+    super.initState();
+    _sheenController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2400),
+    )..repeat();
+  }
 
   void _onTapDown(TapDownDetails details) {
     setState(() => _isPressed = true);
@@ -35,6 +46,12 @@ class CoolAnimatedButtonState extends State<CoolAnimatedButton> {
 
   void _onTapCancel() {
     setState(() => _isPressed = false);
+  }
+
+  @override
+  void dispose() {
+    _sheenController.dispose();
+    super.dispose();
   }
 
   @override
@@ -72,21 +89,46 @@ class CoolAnimatedButtonState extends State<CoolAnimatedButton> {
           ),
           child: Stack(
             children: [
-              Positioned(
-                left: 16,
-                right: 16,
-                top: 0,
+              Positioned.fill(
                 child: IgnorePointer(
-                  child: Container(
-                    height: 20,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(999),
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.white.withValues(alpha: 0.45),
-                          Colors.white.withValues(alpha: 0),
-                        ],
-                      ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: AnimatedBuilder(
+                      animation: _sheenController,
+                      builder: (context, _) {
+                        return LayoutBuilder(
+                          builder: (context, constraints) {
+                            final travel =
+                                ((constraints.maxWidth + 120) *
+                                    _sheenController.value) -
+                                120;
+                            return Stack(
+                              children: [
+                                Transform.translate(
+                                  offset: Offset(travel, 0),
+                                  child: Transform.rotate(
+                                    angle: -0.35,
+                                    child: Container(
+                                      width: 72,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.white.withValues(alpha: 0),
+                                            Colors.white.withValues(
+                                              alpha: 0.18,
+                                            ),
+                                            Colors.white.withValues(alpha: 0),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
                     ),
                   ),
                 ),
