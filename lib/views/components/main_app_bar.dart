@@ -28,7 +28,10 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
         : null;
 
     return AppBar(
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.8)),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.8),
+      ),
       centerTitle: true,
       leading: leading,
       elevation: 0,
@@ -39,7 +42,10 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       flexibleSpace: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color.fromARGB(255, 226, 142, 16), Color.fromARGB(255, 242, 11, 19)],
+            colors: [
+              Color.fromARGB(255, 226, 142, 16),
+              Color.fromARGB(255, 242, 11, 19),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

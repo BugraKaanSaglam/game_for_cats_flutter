@@ -78,7 +78,11 @@ class DBHelper {
   Future<void> add(AppSettings column) async {
     try {
       var dbClient = await db;
-      await dbClient!.insert('OPCGameTable', column.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+      await dbClient!.insert(
+        'OPCGameTable',
+        column.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     } catch (e) {
       log("Database initialization error: $e");
     }
@@ -88,7 +92,17 @@ class DBHelper {
     var dbClient = await db;
     List<Map<String, dynamic>> maps = await dbClient!.query(
       'OPCGameTable',
-      columns: ['Ver', 'LanguageCode', 'MusicVolume', 'CharacterVolume', 'Time', 'Difficulty', 'BackgroundPath', 'Mute', 'LowPower'],
+      columns: [
+        'Ver',
+        'LanguageCode',
+        'MusicVolume',
+        'CharacterVolume',
+        'Time',
+        'Difficulty',
+        'BackgroundPath',
+        'Mute',
+        'LowPower',
+      ],
       where: 'Ver = ?',
       whereArgs: [ver],
     );
@@ -102,7 +116,12 @@ class DBHelper {
 
   Future<int> update(AppSettings column) async {
     var dbClient = await db;
-    return await dbClient!.update('OPCGameTable', column.toMap(), where: 'Ver = ?', whereArgs: [column.version]);
+    return await dbClient!.update(
+      'OPCGameTable',
+      column.toMap(),
+      where: 'Ver = ?',
+      whereArgs: [column.version],
+    );
   }
 
   Future close() async {
@@ -112,7 +131,11 @@ class DBHelper {
 
   Future<int> delete(AppSettings column) async {
     var dbClient = await db;
-    return await dbClient!.delete('OPCGameTable', where: 'Ver = ?', whereArgs: [column.version]);
+    return await dbClient!.delete(
+      'OPCGameTable',
+      where: 'Ver = ?',
+      whereArgs: [column.version],
+    );
   }
 
   Future<void> addSessionLog(SessionLog sessionLog) async {

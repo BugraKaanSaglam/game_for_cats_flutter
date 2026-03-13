@@ -9,6 +9,7 @@ import 'package:game_for_cats_2025/models/database/db_error.dart';
 import 'package:game_for_cats_2025/models/app_settings.dart';
 import 'package:game_for_cats_2025/models/enums/game_enums.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
+import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/views/components/main_app_bar.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:game_for_cats_2025/views/widgets/playful_card.dart';
@@ -31,6 +32,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
+    AppAnalytics.screenView('settings');
   }
 
   @override
@@ -47,7 +49,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final appState = context.watch<AppState>();
     if (!appState.isReady) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator(color: PawPalette.bubbleGum)),
+        body: Center(
+          child: CircularProgressIndicator(color: PawPalette.bubbleGum),
+        ),
       );
     }
 
@@ -59,7 +63,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-        child: _draftSettings == null ? const SizedBox.shrink() : _buildSaveButton(context),
+        child: _draftSettings == null
+            ? const SizedBox.shrink()
+            : _buildSaveButton(context),
       ),
     );
   }
@@ -72,7 +78,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     final settings = _draftSettings;
     if (settings == null) {
-      return const Center(child: CircularProgressIndicator(color: Colors.white));
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      );
     }
 
     final l10n = AppLocalizations.of(context)!;
@@ -81,9 +89,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         children: [
           _buildHeader(context),
-          PlayfulCard(emoji: '🌍', title: l10n.select_language, subtitle: l10n.settings_language_hint, gradient: PawPalette.pinkToOrange(), child: _buildLanguageDropdown(context)),
-          PlayfulCard(emoji: '⏱️', title: l10n.select_time, subtitle: l10n.settings_time_hint, gradient: PawPalette.tealToLemon(), child: _buildTimeDropdown(context)),
-          PlayfulCard(emoji: '🎯', title: l10n.select_difficulty, subtitle: l10n.settings_difficulty_hint, child: _buildDifficultyDropdown(context)),
+          PlayfulCard(
+            emoji: '🌍',
+            title: l10n.select_language,
+            subtitle: l10n.settings_language_hint,
+            gradient: PawPalette.pinkToOrange(),
+            child: _buildLanguageDropdown(context),
+          ),
+          PlayfulCard(
+            emoji: '⏱️',
+            title: l10n.select_time,
+            subtitle: l10n.settings_time_hint,
+            gradient: PawPalette.tealToLemon(),
+            child: _buildTimeDropdown(context),
+          ),
+          PlayfulCard(
+            emoji: '🎯',
+            title: l10n.select_difficulty,
+            subtitle: l10n.settings_difficulty_hint,
+            child: _buildDifficultyDropdown(context),
+          ),
           PlayfulCard(
             emoji: '🔇',
             title: l10n.mute_title,
@@ -92,8 +117,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: SwitchListTile.adaptive(
               contentPadding: EdgeInsets.zero,
               value: settings.muted,
-              onChanged: (v) => _updateSettings((current) => current.copyWith(muted: v)),
-              title: Text(l10n.mute_toggle_label, style: PawTextStyles.cardTitle),
+              onChanged: (v) =>
+                  _updateSettings((current) => current.copyWith(muted: v)),
+              title: Text(
+                l10n.mute_toggle_label,
+                style: PawTextStyles.cardTitle,
+              ),
             ),
           ),
           PlayfulCard(
@@ -104,8 +133,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: SwitchListTile.adaptive(
               contentPadding: EdgeInsets.zero,
               value: settings.lowPower,
-              onChanged: (v) => _updateSettings((current) => current.copyWith(lowPower: v)),
-              title: Text(l10n.lowpower_toggle_label, style: PawTextStyles.cardTitle),
+              onChanged: (v) =>
+                  _updateSettings((current) => current.copyWith(lowPower: v)),
+              title: Text(
+                l10n.lowpower_toggle_label,
+                style: PawTextStyles.cardTitle,
+              ),
             ),
           ),
           PlayfulCard(
@@ -121,7 +154,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: l10n.settings_music_hint,
             child: _buildSlider(
               value: settings.musicVolume,
-              onChanged: (v) => _updateSettings((current) => current.copyWith(musicVolume: v)),
+              onChanged: (v) => _updateSettings(
+                (current) => current.copyWith(musicVolume: v),
+              ),
               activeColor: PawPalette.grape,
             ),
           ),
@@ -131,7 +166,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: l10n.settings_character_hint,
             child: _buildSlider(
               value: settings.characterVolume,
-              onChanged: (v) => _updateSettings((current) => current.copyWith(characterVolume: v)),
+              onChanged: (v) => _updateSettings(
+                (current) => current.copyWith(characterVolume: v),
+              ),
               activeColor: PawPalette.teal,
             ),
           ),
@@ -151,45 +188,91 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(AppLocalizations.of(context)!.settings_button, style: PawTextStyles.heading),
+        Text(
+          AppLocalizations.of(context)!.settings_button,
+          style: PawTextStyles.heading,
+        ),
         const SizedBox(height: 6),
-        Text(AppLocalizations.of(context)!.settings_header_subtitle, style: PawTextStyles.subheading),
+        Text(
+          AppLocalizations.of(context)!.settings_header_subtitle,
+          style: PawTextStyles.subheading,
+        ),
         const SizedBox(height: 20),
       ],
     );
   }
 
   Widget _buildLanguageDropdown(BuildContext context) {
-    final items = [DropdownMenuItem(value: Language.turkish.value, child: Text(Language.turkish.name)), DropdownMenuItem(value: Language.english.value, child: Text(Language.english.name))];
+    final items = [
+      DropdownMenuItem(
+        value: Language.turkish.value,
+        child: Text(Language.turkish.name),
+      ),
+      DropdownMenuItem(
+        value: Language.english.value,
+        child: Text(Language.english.name),
+      ),
+    ];
 
     final settings = _draftSettings;
     if (settings == null) return const SizedBox.shrink();
     return _PillDropdown(
       value: settings.languageCode,
       items: items,
-      onChanged: (v) => _updateSettings((current) => current.copyWith(languageCode: v ?? Language.english.value)),
+      onChanged: (v) => _updateSettings(
+        (current) =>
+            current.copyWith(languageCode: v ?? Language.english.value),
+      ),
     );
   }
 
   Widget _buildTimeDropdown(BuildContext context) {
-    final items = [DropdownMenuItem(value: Time.fifty.value, child: Text(Time.fifty.name)), DropdownMenuItem(value: Time.hundered.value, child: Text(Time.hundered.name)), DropdownMenuItem(value: Time.twohundered.value, child: Text(Time.twohundered.name)), DropdownMenuItem(value: Time.sandbox.value, child: Text(Time.sandbox.name))];
+    final items = [
+      DropdownMenuItem(value: Time.fifty.value, child: Text(Time.fifty.name)),
+      DropdownMenuItem(
+        value: Time.hundered.value,
+        child: Text(Time.hundered.name),
+      ),
+      DropdownMenuItem(
+        value: Time.twohundered.value,
+        child: Text(Time.twohundered.name),
+      ),
+      DropdownMenuItem(
+        value: Time.sandbox.value,
+        child: Text(Time.sandbox.name),
+      ),
+    ];
 
     final settings = _draftSettings;
     if (settings == null) return const SizedBox.shrink();
     return _PillDropdown(
       value: settings.time,
       items: items,
-      onChanged: (v) => _updateSettings((current) => current.copyWith(time: v ?? Time.fifty.value)),
+      onChanged: (v) => _updateSettings(
+        (current) => current.copyWith(time: v ?? Time.fifty.value),
+      ),
     );
   }
 
   Widget _buildDifficultyDropdown(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final items = [
-      DropdownMenuItem(value: Difficulty.easy.value, child: Text(l10n.difficulty_easy)),
-      DropdownMenuItem(value: Difficulty.medium.value, child: Text(l10n.difficulty_medium)),
-      DropdownMenuItem(value: Difficulty.hard.value, child: Text(l10n.difficulty_hard)),
-      DropdownMenuItem(value: Difficulty.sandbox.value, child: Text(l10n.difficulty_sandbox)),
+      DropdownMenuItem(
+        value: Difficulty.easy.value,
+        child: Text(l10n.difficulty_easy),
+      ),
+      DropdownMenuItem(
+        value: Difficulty.medium.value,
+        child: Text(l10n.difficulty_medium),
+      ),
+      DropdownMenuItem(
+        value: Difficulty.hard.value,
+        child: Text(l10n.difficulty_hard),
+      ),
+      DropdownMenuItem(
+        value: Difficulty.sandbox.value,
+        child: Text(l10n.difficulty_sandbox),
+      ),
     ];
 
     final settings = _draftSettings;
@@ -197,7 +280,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return _PillDropdown(
       value: settings.difficulty,
       items: items,
-      onChanged: (v) => _updateSettings((current) => current.copyWith(difficulty: v ?? Difficulty.easy.value)),
+      onChanged: (v) => _updateSettings(
+        (current) => current.copyWith(difficulty: v ?? Difficulty.easy.value),
+      ),
     );
   }
 
@@ -206,7 +291,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final path = _draftSettings?.backgroundPath ?? '';
     final file = path.isNotEmpty ? File(path) : null;
     final hasCustom = file != null && file.existsSync();
-    final ImageProvider image = hasCustom ? FileImage(file) : const AssetImage('assets/images/background.webp');
+    final ImageProvider image = hasCustom
+        ? FileImage(file)
+        : const AssetImage('assets/images/background.webp');
 
     if (!hasCustom && path.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -224,7 +311,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             borderRadius: BorderRadius.circular(16),
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: PawPalette.midnight.withValues(alpha: 0.08 * 255)),
+                border: Border.all(
+                  color: PawPalette.midnight.withValues(alpha: 0.08 * 255),
+                ),
               ),
               child: Image(image: image, fit: BoxFit.cover),
             ),
@@ -238,7 +327,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: PawPalette.grape,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 onPressed: _pickBackground,
@@ -251,8 +342,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: PawPalette.midnight,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 14,
+                ),
               ),
               onPressed: hasCustom ? _resetBackground : null,
               child: Text(l10n.background_reset_button),
@@ -275,7 +371,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (result == null) return;
     final savedPath = await _persistPickedImage(result);
     _updateSettings((current) => current.copyWith(backgroundPath: savedPath));
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.background_selected_snackbar), duration: const Duration(seconds: 2)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          AppLocalizations.of(context)!.background_selected_snackbar,
+        ),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   void _resetBackground() {
@@ -350,7 +453,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Widget _buildSlider({required double value, required ValueChanged<double> onChanged, required Color activeColor}) {
+  Widget _buildSlider({
+    required double value,
+    required ValueChanged<double> onChanged,
+    required Color activeColor,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -365,7 +472,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         Align(
           alignment: Alignment.centerRight,
-          child: Text('${(value * 100).round()}%', style: PawTextStyles.cardSubtitle),
+          child: Text(
+            '${(value * 100).round()}%',
+            style: PawTextStyles.cardSubtitle,
+          ),
         ),
       ],
     );
@@ -378,7 +488,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       tween: Tween(begin: 0.9, end: 1),
       duration: const Duration(milliseconds: 450),
       curve: Curves.easeOutBack,
-      builder: (context, value, child) => Transform.scale(scale: value, child: child),
+      builder: (context, value, child) =>
+          Transform.scale(scale: value, child: child),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -390,7 +501,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             await context.read<AppState>().updateSettings(settings);
 
             if (!mounted) return;
-            messenger.showSnackBar(SnackBar(content: Text(l10n.save_complete_snackbar), elevation: 10, duration: const Duration(seconds: 2)));
+            messenger.showSnackBar(
+              SnackBar(
+                content: Text(l10n.save_complete_snackbar),
+                elevation: 10,
+                duration: const Duration(seconds: 2),
+              ),
+            );
           },
           borderRadius: BorderRadius.circular(28),
           child: Ink(
@@ -414,7 +531,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(width: 10),
                   Text(
                     l10n.save_button,
-                    style: PawTextStyles.subheading.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
+                    style: PawTextStyles.subheading.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),
@@ -427,7 +547,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 }
 
 class _PillDropdown extends StatelessWidget {
-  const _PillDropdown({required this.value, required this.items, required this.onChanged});
+  const _PillDropdown({
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
 
   final int value;
   final List<DropdownMenuItem<int>> items;
@@ -440,10 +564,18 @@ class _PillDropdown extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22),
         color: Colors.white,
-        border: Border.all(color: PawPalette.midnight.withValues(alpha: 0.08 * 255)),
+        border: Border.all(
+          color: PawPalette.midnight.withValues(alpha: 0.08 * 255),
+        ),
       ),
       child: DropdownButtonHideUnderline(
-        child: DropdownButton<int>(value: value, isExpanded: true, icon: const Icon(Icons.expand_more), items: items, onChanged: onChanged),
+        child: DropdownButton<int>(
+          value: value,
+          isExpanded: true,
+          icon: const Icon(Icons.expand_more),
+          items: items,
+          onChanged: onChanged,
+        ),
       ),
     );
   }

@@ -24,6 +24,7 @@ import 'package:game_for_cats_2025/models/enums/game_enums.dart';
 import 'package:game_for_cats_2025/models/database/db_helper.dart';
 import 'package:game_for_cats_2025/models/database/session_log.dart';
 import 'package:game_for_cats_2025/routing/app_routes.dart';
+import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/services/app_logger.dart';
 import 'package:game_for_cats_2025/services/app_share_service.dart';
 
@@ -210,6 +211,15 @@ Future<void> _shareResult(BuildContext context, GameResult stats) async {
         stats.bugTaps,
         stats.wrongTaps,
       ),
+    );
+    AppAnalytics.track(
+      AnalyticsEvent.resultShared,
+      parameters: <String, Object?>{
+        'totalTaps': stats.totalTaps,
+        'miceTaps': stats.miceTaps,
+        'bugTaps': stats.bugTaps,
+        'wrongTaps': stats.wrongTaps,
+      },
     );
   } catch (error, stackTrace) {
     AppLogger.error('Sharing game result failed', error, stackTrace);
@@ -410,6 +420,7 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     resetRoundState();
+    AppAnalytics.screenView('game');
     _gameSettings = widget.settings;
     _gameInstance = Game(_gameSettings, context);
   }

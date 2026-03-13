@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
+import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/services/app_crash_reporter.dart';
 import 'package:game_for_cats_2025/services/app_info_service.dart';
 import 'package:game_for_cats_2025/services/app_logger.dart';
@@ -12,8 +13,19 @@ import 'package:game_for_cats_2025/views/widgets/playful_card.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
-class AboutScreen extends StatelessWidget {
+class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
+
+  @override
+  State<AboutScreen> createState() => _AboutScreenState();
+}
+
+class _AboutScreenState extends State<AboutScreen> {
+  @override
+  void initState() {
+    super.initState();
+    AppAnalytics.screenView('about');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +112,13 @@ class _AppInfoCard extends StatelessWidget {
       await AppShareService.instance.shareText(
         subject: l10n.share_app_button,
         text: l10n.share_app_text(l10n.game_name, versionText),
+      );
+      AppAnalytics.track(
+        AnalyticsEvent.appShared,
+        parameters: <String, Object?>{
+          'source': 'about',
+          'version': versionText,
+        },
       );
     } catch (error, stackTrace) {
       AppLogger.error(

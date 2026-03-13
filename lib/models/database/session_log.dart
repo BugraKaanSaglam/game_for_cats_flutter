@@ -12,16 +12,16 @@ class SessionLog {
   final int wrongTaps;
 
   Map<String, dynamic> toMap() => {
-        'Id': id,
-        'Date': dateKey,
-        'TotalTaps': totalTaps,
-        'WrongTaps': wrongTaps,
-      };
+    'Id': id,
+    'Date': dateKey,
+    'TotalTaps': totalTaps,
+    'WrongTaps': wrongTaps,
+  };
 
   factory SessionLog.fromMap(Map<String, dynamic> map) => SessionLog(
-        id: map['Id'] as int?,
-        dateKey: map['Date'] as String,
-        totalTaps: map['TotalTaps'] as int,
-        wrongTaps: map['WrongTaps'] as int,
-      );
+    id: map['Id'] as int?,
+    dateKey: map['Date'] as String,
+    totalTaps: map['TotalTaps'] as int,
+    wrongTaps: map['WrongTaps'] as int,
+  );
 }

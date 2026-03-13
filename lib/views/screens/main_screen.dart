@@ -8,6 +8,7 @@ import 'package:game_for_cats_2025/models/database/db_error.dart';
 import 'package:game_for_cats_2025/models/app_settings.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/routing/app_routes.dart';
+import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/state/app_state.dart';
 import 'package:game_for_cats_2025/views/widgets/animated_gradient_background.dart';
 import 'package:game_for_cats_2025/views/widgets/cool_animated_buttons.dart';
@@ -53,6 +54,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    AppAnalytics.screenView('main_menu');
     _buttonController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -226,7 +228,16 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           child: CoolAnimatedButton(
             text: AppLocalizations.of(context)!.start_button,
             icon: const Icon(Icons.arrow_right_alt_sharp),
-            onPressed: () => context.go(AppRoutes.game, extra: settings),
+            onPressed: () {
+              AppAnalytics.track(
+                AnalyticsEvent.gameStarted,
+                parameters: <String, Object?>{
+                  'difficulty': settings.difficulty,
+                  'time': settings.time,
+                },
+              );
+              context.go(AppRoutes.game, extra: settings);
+            },
           ),
         ),
         SizedBox(height: spacing),

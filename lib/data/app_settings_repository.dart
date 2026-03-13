@@ -3,7 +3,8 @@ import 'package:game_for_cats_2025/models/database/db_helper.dart';
 import 'package:game_for_cats_2025/models/global/global_variables.dart';
 
 class AppSettingsRepository {
-  AppSettingsRepository({DBHelper? dbHelper}) : _dbHelper = dbHelper ?? DBHelper();
+  AppSettingsRepository({DBHelper? dbHelper})
+    : _dbHelper = dbHelper ?? DBHelper();
 
   final DBHelper _dbHelper;
 

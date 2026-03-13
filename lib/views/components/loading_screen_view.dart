@@ -22,7 +22,11 @@ class LoadingScreenView extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               AppLocalizations.of(context)!.loading,
-              style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),

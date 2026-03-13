@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
+import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/services/app_info_service.dart';
 import 'package:game_for_cats_2025/services/app_logger.dart';
 import 'package:game_for_cats_2025/services/app_share_service.dart';
@@ -10,8 +11,19 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import '../components/main_app_bar.dart';
 
-class CreditsScreen extends StatelessWidget {
+class CreditsScreen extends StatefulWidget {
   const CreditsScreen({super.key});
+
+  @override
+  State<CreditsScreen> createState() => _CreditsScreenState();
+}
+
+class _CreditsScreenState extends State<CreditsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    AppAnalytics.screenView('credits');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +110,14 @@ class CreditsScreen extends StatelessWidget {
           l10n.game_name,
           '${packageInfo.version}+${packageInfo.buildNumber}',
         ),
+      );
+      AppAnalytics.track(
+        AnalyticsEvent.appShared,
+        parameters: <String, Object?>{
+          'source': 'credits',
+          'version': packageInfo.version,
+          'buildNumber': packageInfo.buildNumber,
+        },
       );
     } catch (error, stackTrace) {
       AppLogger.error('Sharing app details failed', error, stackTrace);

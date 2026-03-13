@@ -22,16 +22,16 @@ class AppSettings with _$AppSettings {
   }) = _AppSettings;
 
   factory AppSettings.defaults() => AppSettings(
-        version: databaseVersion,
-        languageCode: Language.english.value,
-        musicVolume: 0.5,
-        characterVolume: 1,
-        time: Time.fifty.value,
-        difficulty: Difficulty.easy.value,
-        backgroundPath: '',
-        muted: false,
-        lowPower: false,
-      );
+    version: databaseVersion,
+    languageCode: Language.english.value,
+    musicVolume: 0.5,
+    characterVolume: 1,
+    time: Time.fifty.value,
+    difficulty: Difficulty.easy.value,
+    backgroundPath: '',
+    muted: false,
+    lowPower: false,
+  );
 
   factory AppSettings.fromMap(Map<String, dynamic> map) {
     return AppSettings(
@@ -48,16 +48,16 @@ class AppSettings with _$AppSettings {
   }
 
   Map<String, dynamic> toMap() => {
-        'Ver': version,
-        'LanguageCode': languageCode,
-        'MusicVolume': musicVolume,
-        'CharacterVolume': characterVolume,
-        'Time': time,
-        'Difficulty': difficulty,
-        'BackgroundPath': backgroundPath,
-        'Mute': muted ? 1 : 0,
-        'LowPower': lowPower ? 1 : 0,
-      };
+    'Ver': version,
+    'LanguageCode': languageCode,
+    'MusicVolume': musicVolume,
+    'CharacterVolume': characterVolume,
+    'Time': time,
+    'Difficulty': difficulty,
+    'BackgroundPath': backgroundPath,
+    'Mute': muted ? 1 : 0,
+    'LowPower': lowPower ? 1 : 0,
+  };
 
   Language get language => getLanguageFromValue(languageCode);
 }

@@ -5,6 +5,7 @@ import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
+import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/services/app_crash_reporter.dart';
 import 'routing/app_routes.dart';
 import 'package:game_for_cats_2025/models/app_settings.dart';
@@ -50,6 +51,7 @@ void main() async {
   };
   await Flame.device.fullScreen();
   AppLogger.info('Launching Mice and Paws: Cat Game');
+  AppAnalytics.track(AnalyticsEvent.appLaunched);
   await AppCrashReporter.initialize(
     () async => runApp(
       MultiProvider(

@@ -9,7 +9,8 @@ import 'package:game_for_cats_2025/models/global/global_variables.dart';
 import 'package:game_for_cats_2025/controllers/utils.dart';
 
 // Bug class is a PositionComponent so we get the angle and position of the element.
-class Bug extends SpriteAnimationComponent with HasGameRef<FlameGame>, CollisionCallbacks {
+class Bug extends SpriteAnimationComponent
+    with HasGameRef<FlameGame>, CollisionCallbacks {
   late Vector2 _velocity;
   late final double _speed;
   bool _isColliding = false;
@@ -20,7 +21,15 @@ class Bug extends SpriteAnimationComponent with HasGameRef<FlameGame>, Collision
   double steeringFactor = 0.01;
   Vector2 target = Vector2.zero();
 
-  Bug(Vector2 position, Vector2 velocity, double speed) : _velocity = velocity, _speed = speed, super(animation: animationHandler(globalBugImage, 3, 1, stepTime: 0.08), position: position, size: Vector2(60, 60), anchor: Anchor.center) {
+  Bug(Vector2 position, Vector2 velocity, double speed)
+    : _velocity = velocity,
+      _speed = speed,
+      super(
+        animation: animationHandler(globalBugImage, 3, 1, stepTime: 0.08),
+        position: position,
+        size: Vector2(60, 60),
+        anchor: Anchor.center,
+      ) {
     add(RectangleHitbox());
   }
 
@@ -37,7 +46,10 @@ class Bug extends SpriteAnimationComponent with HasGameRef<FlameGame>, Collision
     super.onCollision(intersectionPoints, other);
 
     final currentTime = DateTime.now();
-    if (!_isColliding || _lastCollisionTime == null || currentTime.difference(_lastCollisionTime!) >= Duration(milliseconds: waitTimeForCollisions)) {
+    if (!_isColliding ||
+        _lastCollisionTime == null ||
+        currentTime.difference(_lastCollisionTime!) >=
+            Duration(milliseconds: waitTimeForCollisions)) {
       _isColliding = true;
       _lastCollisionTime = currentTime;
       target = Utils.generateRandomPosition(gameRef.size, Vector2(0, 10));

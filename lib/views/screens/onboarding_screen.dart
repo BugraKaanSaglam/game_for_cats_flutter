@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/routing/app_routes.dart';
+import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/state/app_state.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:game_for_cats_2025/views/widgets/animated_gradient_background.dart';
@@ -17,6 +18,12 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
   int _pageIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    AppAnalytics.screenView('onboarding');
+  }
 
   @override
   void dispose() {
@@ -72,7 +79,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       height: 44,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: LinearGradient(colors: PawPalette.pinkToOrange()),
+                        gradient: LinearGradient(
+                          colors: PawPalette.pinkToOrange(),
+                        ),
                       ),
                       child: const Icon(Icons.pets, color: Colors.white),
                     ),
@@ -84,10 +93,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ),
                     TextButton(
-                      onPressed: _completeOnboarding,
+                      onPressed: () {
+                        AppAnalytics.track(AnalyticsEvent.onboardingSkipped);
+                        _completeOnboarding();
+                      },
                       child: Text(
                         l10n.onboarding_skip,
-                        style: PawTextStyles.cardSubtitle.copyWith(color: Colors.white),
+                        style: PawTextStyles.cardSubtitle.copyWith(
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
@@ -98,23 +112,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   controller: _controller,
                   itemCount: pages.length,
                   onPageChanged: (index) => setState(() => _pageIndex = index),
-                  itemBuilder: (context, index) => _OnboardingPage(data: pages[index]),
+                  itemBuilder: (context, index) =>
+                      _OnboardingPage(data: pages[index]),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
                 child: Row(
                   children: [
-                    _DotsIndicator(count: pages.length, activeIndex: _pageIndex),
+                    _DotsIndicator(
+                      count: pages.length,
+                      activeIndex: _pageIndex,
+                    ),
                     const Spacer(),
                     _GradientButton(
-                      label: isLastPage ? l10n.onboarding_start : l10n.onboarding_next,
+                      label: isLastPage
+                          ? l10n.onboarding_start
+                          : l10n.onboarding_next,
                       gradient: PawPalette.pinkToOrange(),
                       onPressed: () async {
                         if (isLastPage) {
                           await _completeOnboarding();
                           return;
                         }
+                        AppAnalytics.track(
+                          AnalyticsEvent.onboardingNextTapped,
+                          parameters: <String, Object?>{
+                            'pageIndex': _pageIndex,
+                          },
+                        );
                         await _controller.nextPage(
                           duration: const Duration(milliseconds: 420),
                           curve: Curves.easeOutCubic,
@@ -170,7 +196,10 @@ class _OnboardingPage extends StatelessWidget {
           Text(
             data.subtitle,
             textAlign: TextAlign.center,
-            style: PawTextStyles.subheading.copyWith(color: Colors.white70, height: 1.4),
+            style: PawTextStyles.subheading.copyWith(
+              color: Colors.white70,
+              height: 1.4,
+            ),
           ),
         ],
       ),
@@ -227,7 +256,7 @@ class _GradientButton extends StatelessWidget {
           gradient: LinearGradient(colors: gradient),
           boxShadow: [
             BoxShadow(
-            color: Colors.black.withValues(alpha: 0.18 * 255),
+              color: Colors.black.withValues(alpha: 0.18 * 255),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),

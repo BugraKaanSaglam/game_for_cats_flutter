@@ -7,5 +7,6 @@ class ActivityController {
 
   final DBHelper _dbHelper;
 
-  Future<List<SessionLog>> loadRecentHistory({int limit = 60}) => _dbHelper.fetchSessionLogs(limit: limit);
+  Future<List<SessionLog>> loadRecentHistory({int limit = 60}) =>
+      _dbHelper.fetchSessionLogs(limit: limit);
 }

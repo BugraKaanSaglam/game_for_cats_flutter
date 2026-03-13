@@ -3,6 +3,7 @@ import 'package:game_for_cats_2025/data/app_settings_repository.dart';
 import 'package:game_for_cats_2025/data/onboarding_repository.dart';
 import 'package:game_for_cats_2025/models/app_settings.dart';
 import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
+import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/services/app_logger.dart';
 
 class AppState extends ChangeNotifier {
@@ -58,6 +59,16 @@ class AppState extends ChangeNotifier {
     try {
       await _settingsRepository.save(settings);
       AppLogger.info('Settings updated');
+      AppAnalytics.track(
+        AnalyticsEvent.settingsSaved,
+        parameters: <String, Object?>{
+          'languageCode': settings.languageCode,
+          'time': settings.time,
+          'difficulty': settings.difficulty,
+          'muted': settings.muted,
+          'lowPower': settings.lowPower,
+        },
+      );
     } catch (error, stackTrace) {
       AppLogger.error('Saving settings failed', error, stackTrace);
       rethrow;
@@ -69,5 +80,6 @@ class AppState extends ChangeNotifier {
     notifyListeners();
     await _onboardingRepository.setCompleted(true);
     AppLogger.info('Onboarding completed');
+    AppAnalytics.track(AnalyticsEvent.onboardingCompleted);
   }
 }
