@@ -2,9 +2,7 @@
 
 [![Flutter CI](https://github.com/BugraKaanSaglam/game_for_cats_flutter/actions/workflows/flutter_ci.yml/badge.svg)](https://github.com/BugraKaanSaglam/game_for_cats_flutter/actions/workflows/flutter_ci.yml)
 
-<p align="center">
-  <img src="assets/images/splashscreen.png" alt="Mice and Paws splash art" width="220">
-</p>
+![Mice and Paws splash art](assets/images/splashscreen.png)
 
 Colorful Flutter + Flame cat game built as a polished public portfolio project. This was my first app, so the repository is intentionally shaped to show both the product itself and how I approached architecture, testing, and iteration as I leveled up.
 
