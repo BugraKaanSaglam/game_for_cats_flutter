@@ -90,9 +90,9 @@ class _AnimatedGradientBackgroundState
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.white.withValues(alpha: 0.08 * 255),
+                      Colors.white.withValues(alpha: 0.08),
                       Colors.transparent,
-                      Colors.white.withValues(alpha: 0.05 * 255),
+                      Colors.white.withValues(alpha: 0.05),
                     ],
                   ),
                 ),
@@ -102,7 +102,7 @@ class _AnimatedGradientBackgroundState
           Positioned.fill(
             child: Container(
               color: Colors.black.withValues(
-                alpha: widget.overlayOpacity.clamp(0, 1) * 255,
+                alpha: widget.overlayOpacity.clamp(0, 1),
               ),
             ),
           ),

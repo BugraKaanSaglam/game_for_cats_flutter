@@ -58,6 +58,10 @@
     "about_info_title": "Sürüm Detayları",
     "about_info_subtitle": "Yüklü uygulama sürümünün hızlı özeti.",
     "about_platform_label": "Platform",
+    "store_links_title": "Mağaza Linkleri",
+    "store_links_subtitle": "Oyunun yayınlanmış mağaza sayfalarını aç.",
+    "google_play_button": "Google Play",
+    "app_store_button": "App Store",
     "connectivity_title": "Bağlantı Durumu",
     "connectivity_subtitle": "Cihazın güncel ağ erişim durumu.",
     "connectivity_status_online": "Çevrimiçi",
@@ -92,23 +96,11 @@
     "lowpower_subtitle": "Daha az yaratık ve hız ile eski cihazlarda daha akıcı oynat.",
     "lowpower_toggle_label": "Hareketi azalt",
     "share_app_button": "Uygulamayı paylaş",
-    "share_result_button": "Sonucu paylaş",
     "share_app_text": "{gameName} oyununu {version} sürümünde oynuyoruz. Fareleri yakala, böceklerden kaç, kedini gururlandır!",
     "@share_app_text": {
         "placeholders": {
             "gameName": {},
             "version": {}
-        }
-    },
-    "share_result_subject": "Son kedi oyunu sonucumuz",
-    "share_result_text": "{gameName} oynadık ve {totalTaps} dokunuş yaptık: {miceTaps} fare, {bugTaps} böcek, {wrongTaps} kaçırma.",
-    "@share_result_text": {
-        "placeholders": {
-            "gameName": {},
-            "totalTaps": {},
-            "miceTaps": {},
-            "bugTaps": {},
-            "wrongTaps": {}
         }
     }
 }

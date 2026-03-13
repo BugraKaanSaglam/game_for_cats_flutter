@@ -9,7 +9,7 @@ enum AnalyticsEvent {
   gameStarted,
   settingsSaved,
   appShared,
-  resultShared,
+  storeOpened,
 }
 
 class AppAnalytics {

@@ -390,7 +390,7 @@ class _AnimatedBarState extends State<_AnimatedBar>
                         borderRadius: const BorderRadius.vertical(
                           bottom: Radius.circular(12),
                         ),
-                        color: Colors.redAccent.withValues(alpha: 0.75 * 255),
+                        color: Colors.redAccent.withValues(alpha: 0.75),
                       ),
                     ),
                 ],
@@ -462,8 +462,8 @@ class _StatPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Colors.white.withValues(alpha: 0.1 * 255),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2 * 255)),
+        color: Colors.white.withValues(alpha: 0.1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

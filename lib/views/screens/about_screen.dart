@@ -4,13 +4,20 @@ import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/services/app_info_service.dart';
 import 'package:game_for_cats_2025/services/app_logger.dart';
-import 'package:game_for_cats_2025/services/app_share_service.dart';
 import 'package:game_for_cats_2025/services/connectivity_service.dart';
 import 'package:game_for_cats_2025/views/components/main_app_bar.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:game_for_cats_2025/views/widgets/playful_card.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+final _googlePlayUri = Uri.parse(
+  'https://play.google.com/store/apps/details?id=com.mice_and_paws_cat_game&hl=tr',
+);
+final _appStoreUri = Uri.parse(
+  'https://apps.apple.com/tr/app/mice-and-paws-cat-game/id6739187435',
+);
 
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
@@ -88,38 +95,56 @@ class _AppInfoCard extends StatelessWidget {
             value: defaultTargetPlatform.name,
           ),
           const SizedBox(height: 12),
-          FilledButton.icon(
-            onPressed: packageInfo == null
-                ? null
-                : () => _shareApp(context, versionText),
-            icon: const Icon(Icons.share_outlined),
-            label: Text(l10n.share_app_button),
+          Text(
+            l10n.store_links_title,
+            style: PawTextStyles.cardTitle.copyWith(fontSize: 16),
+          ),
+          const SizedBox(height: 6),
+          Text(l10n.store_links_subtitle, style: PawTextStyles.cardSubtitle),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () =>
+                      _openStore(context, _googlePlayUri, 'google_play'),
+                  icon: const Icon(Icons.shop_2_outlined),
+                  label: Text(l10n.google_play_button),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () =>
+                      _openStore(context, _appStoreUri, 'app_store'),
+                  icon: const Icon(Icons.apple),
+                  label: Text(l10n.app_store_button),
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Future<void> _shareApp(BuildContext context, String versionText) async {
-    final l10n = AppLocalizations.of(context)!;
+  Future<void> _openStore(BuildContext context, Uri uri, String store) async {
     try {
-      await AppShareService.instance.shareText(
-        subject: l10n.share_app_button,
-        text: l10n.share_app_text(l10n.game_name, versionText),
+      final launched = await launchUrl(
+        uri,
+        mode: kIsWeb
+            ? LaunchMode.platformDefault
+            : LaunchMode.externalApplication,
       );
+      if (!launched) {
+        throw StateError('Store link could not be opened: $uri');
+      }
       AppAnalytics.track(
-        AnalyticsEvent.appShared,
-        parameters: <String, Object?>{
-          'source': 'about',
-          'version': versionText,
-        },
+        AnalyticsEvent.storeOpened,
+        parameters: <String, Object?>{'screen': 'about', 'store': store},
       );
     } catch (error, stackTrace) {
-      AppLogger.error(
-        'Sharing app from about screen failed',
-        error,
-        stackTrace,
-      );
+      AppLogger.error('Opening store link failed', error, stackTrace);
     }
   }
 }

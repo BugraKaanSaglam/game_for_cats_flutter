@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 InputDecoration formDecoration() {
   final border = OutlineInputBorder(
     borderRadius: BorderRadius.circular(20),
-    borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.35 * 255)),
+    borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.35)),
   );
   return InputDecoration(
     labelStyle: formTextStyle(),
@@ -19,15 +19,15 @@ InputDecoration formDecoration() {
       borderSide: const BorderSide(color: Colors.redAccent),
     ),
     filled: true,
-    fillColor: Colors.white.withValues(alpha: 0.08 * 255),
+    fillColor: Colors.white.withValues(alpha: 0.08),
   );
 }
 
 BoxDecoration switchDecoration() {
   return BoxDecoration(
     borderRadius: BorderRadius.circular(20),
-    color: Colors.white.withValues(alpha: 0.1 * 255),
-    border: Border.all(color: Colors.white.withValues(alpha: 0.35 * 255)),
+    color: Colors.white.withValues(alpha: 0.1),
+    border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
   );
 }
 

@@ -31,16 +31,16 @@ class GlassyPanel extends StatelessWidget {
           gradient ??
           LinearGradient(
             colors: [
-              Colors.white.withValues(alpha: opacity.clamp(0, 1) * 255),
-              Colors.white.withValues(alpha: (opacity * 0.6).clamp(0, 1) * 255),
+              Colors.white.withValues(alpha: opacity.clamp(0, 1)),
+              Colors.white.withValues(alpha: (opacity * 0.6).clamp(0, 1)),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-      border: Border.all(color: Colors.white.withValues(alpha: 0.18 * 255)),
+      border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.2 * 255),
+          color: Colors.black.withValues(alpha: 0.2),
           blurRadius: 20,
           offset: const Offset(0, 15),
         ),

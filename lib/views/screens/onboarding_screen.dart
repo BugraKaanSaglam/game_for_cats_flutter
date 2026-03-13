@@ -118,14 +118,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-                child: Row(
+                child: Column(
                   children: [
-                    _DotsIndicator(
-                      count: pages.length,
-                      activeIndex: _pageIndex,
+                    Row(
+                      children: [
+                        _DotsIndicator(
+                          count: pages.length,
+                          activeIndex: _pageIndex,
+                        ),
+                        const Spacer(),
+                      ],
                     ),
-                    const Spacer(),
+                    const SizedBox(height: 16),
                     _GradientButton(
+                      fullWidth: true,
                       label: isLastPage
                           ? l10n.onboarding_start
                           : l10n.onboarding_next,
@@ -167,41 +173,70 @@ class _OnboardingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 28),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 150,
-            height: 150,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(colors: data.accent),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15 * 255),
-                  blurRadius: 24,
-                  offset: const Offset(0, 12),
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(36),
+            color: Colors.white.withValues(alpha: 0.12),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.18),
+                blurRadius: 24,
+                offset: const Offset(0, 16),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 178,
+                    height: 178,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.08),
+                    ),
+                  ),
+                  Container(
+                    width: 142,
+                    height: 142,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(colors: data.accent),
+                      boxShadow: [
+                        BoxShadow(
+                          color: data.accent.first.withValues(alpha: 0.32),
+                          blurRadius: 28,
+                          offset: const Offset(0, 18),
+                        ),
+                      ],
+                    ),
+                    child: Icon(data.icon, color: Colors.white, size: 64),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 28),
+              Text(
+                data.title,
+                textAlign: TextAlign.center,
+                style: PawTextStyles.heading.copyWith(fontSize: 28),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                data.subtitle,
+                textAlign: TextAlign.center,
+                style: PawTextStyles.subheading.copyWith(
+                  color: Colors.white.withValues(alpha: 0.88),
                 ),
-              ],
-            ),
-            child: Icon(data.icon, color: Colors.white, size: 64),
+              ),
+            ],
           ),
-          const SizedBox(height: 32),
-          Text(
-            data.title,
-            textAlign: TextAlign.center,
-            style: PawTextStyles.heading.copyWith(fontSize: 26),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            data.subtitle,
-            textAlign: TextAlign.center,
-            style: PawTextStyles.subheading.copyWith(
-              color: Colors.white70,
-              height: 1.4,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -222,9 +257,14 @@ class _DotsIndicator extends StatelessWidget {
           duration: const Duration(milliseconds: 240),
           margin: const EdgeInsets.only(right: 8),
           height: 8,
-          width: isActive ? 24 : 8,
+          width: isActive ? 28 : 8,
           decoration: BoxDecoration(
-            color: isActive ? Colors.white : Colors.white70,
+            gradient: isActive
+                ? const LinearGradient(
+                    colors: [Color(0xFFFF8C42), Color(0xFFFF5D8F)],
+                  )
+                : null,
+            color: isActive ? null : Colors.white54,
             borderRadius: BorderRadius.circular(20),
           ),
         );
@@ -238,36 +278,44 @@ class _GradientButton extends StatelessWidget {
     required this.label,
     required this.gradient,
     required this.onPressed,
+    this.fullWidth = false,
   });
 
   final String label;
   final List<Color> gradient;
   final VoidCallback onPressed;
+  final bool fullWidth;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(24),
-      child: Ink(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(colors: gradient),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.18 * 255),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
+    return SizedBox(
+      width: fullWidth ? double.infinity : null,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(24),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            gradient: LinearGradient(colors: gradient),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.18),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                fontSize: 16,
+                letterSpacing: 0.3,
+              ),
             ),
-          ],
-        ),
-        child: Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.3,
           ),
         ),
       ),

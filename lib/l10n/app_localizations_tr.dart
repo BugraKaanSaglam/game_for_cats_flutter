@@ -197,6 +197,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get about_platform_label => 'Platform';
 
   @override
+  String get store_links_title => 'Mağaza Linkleri';
+
+  @override
+  String get store_links_subtitle =>
+      'Oyunun yayınlanmış mağaza sayfalarını aç.';
+
+  @override
+  String get google_play_button => 'Google Play';
+
+  @override
+  String get app_store_button => 'App Store';
+
+  @override
   String get connectivity_title => 'Bağlantı Durumu';
 
   @override
@@ -308,24 +321,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get share_app_button => 'Uygulamayı paylaş';
 
   @override
-  String get share_result_button => 'Sonucu paylaş';
-
-  @override
   String share_app_text(Object gameName, Object version) {
     return '$gameName oyununu $version sürümünde oynuyoruz. Fareleri yakala, böceklerden kaç, kedini gururlandır!';
-  }
-
-  @override
-  String get share_result_subject => 'Son kedi oyunu sonucumuz';
-
-  @override
-  String share_result_text(
-    Object gameName,
-    Object totalTaps,
-    Object miceTaps,
-    Object bugTaps,
-    Object wrongTaps,
-  ) {
-    return '$gameName oynadık ve $totalTaps dokunuş yaptık: $miceTaps fare, $bugTaps böcek, $wrongTaps kaçırma.';
   }
 }

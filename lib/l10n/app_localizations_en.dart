@@ -200,6 +200,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about_platform_label => 'Platform';
 
   @override
+  String get store_links_title => 'Store Links';
+
+  @override
+  String get store_links_subtitle =>
+      'Open the published listing for this game.';
+
+  @override
+  String get google_play_button => 'Google Play';
+
+  @override
+  String get app_store_button => 'App Store';
+
+  @override
   String get connectivity_title => 'Connectivity';
 
   @override
@@ -311,24 +324,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get share_app_button => 'Share App';
 
   @override
-  String get share_result_button => 'Share Result';
-
-  @override
   String share_app_text(Object gameName, Object version) {
     return 'I am playing $gameName on version $version. Catch the mice, dodge the bugs, make kitty proud!';
-  }
-
-  @override
-  String get share_result_subject => 'Our latest cat game result';
-
-  @override
-  String share_result_text(
-    Object gameName,
-    Object totalTaps,
-    Object miceTaps,
-    Object bugTaps,
-    Object wrongTaps,
-  ) {
-    return 'We played $gameName and landed $totalTaps taps: $miceTaps mice, $bugTaps bugs, $wrongTaps misses.';
   }
 }

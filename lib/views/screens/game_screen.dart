@@ -25,8 +25,6 @@ import 'package:game_for_cats_2025/models/database/db_helper.dart';
 import 'package:game_for_cats_2025/models/database/session_log.dart';
 import 'package:game_for_cats_2025/routing/app_routes.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
-import 'package:game_for_cats_2025/services/app_logger.dart';
-import 'package:game_for_cats_2025/services/app_share_service.dart';
 
 bool isBackButtonClicked = false;
 int elapsedTicks = 0; // Seconds
@@ -104,6 +102,10 @@ Dialog endGameDialog(BuildContext context, {required Game game}) {
   game.pauseEngine();
   final stats = lastGameResult ?? GameResult.fromCounter(clicksCounter);
   final wrongTaps = stats.wrongTaps;
+  final successfulTaps = stats.miceTaps + stats.bugTaps;
+  final accuracy = stats.totalTaps == 0
+      ? 0
+      : ((successfulTaps / stats.totalTaps) * 100).round();
   final l10n = AppLocalizations.of(context)!;
   final dialogWidth = min(MediaQuery.of(context).size.width * 0.92, 440.0);
   return Dialog(
@@ -116,22 +118,36 @@ Dialog endGameDialog(BuildContext context, {required Game game}) {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(32),
           gradient: const LinearGradient(
-            colors: [Color(0xFF1E1F29), Color(0xFF3B1D60)],
+            colors: [Color(0xFF160F34), Color(0xFF372D74), Color(0xFFFF5D8F)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Colors.black54,
+              color: PawPalette.midnight.withValues(alpha: 0.42),
               blurRadius: 30,
-              offset: Offset(0, 20),
+              offset: const Offset(0, 20),
             ),
           ],
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.celebration, color: Colors.amber, size: 48),
+            Container(
+              width: 78,
+              height: 78,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.12),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+              ),
+              child: const Icon(
+                Icons.celebration_rounded,
+                color: Colors.amber,
+                size: 42,
+              ),
+            ),
             const SizedBox(height: 12),
             Text(
               l10n.game_over,
@@ -141,54 +157,74 @@ Dialog endGameDialog(BuildContext context, {required Game game}) {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(
+                  child: _ResultSummaryChip(
+                    label: l10n.activity_total_label,
+                    value: '${stats.totalTaps}',
+                    accent: PawPalette.lemon,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _ResultSummaryChip(
+                    label: l10n.activity_accuracy_label,
+                    value: '$accuracy%',
+                    accent: PawPalette.teal,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 20),
             _StatResultTile(
               icon: Icons.pest_control,
               label: l10n.bugtap_count,
               value: stats.bugTaps,
-              color: Colors.pinkAccent,
+              color: PawPalette.bubbleGum,
             ),
             _StatResultTile(
               icon: Icons.pets,
               label: l10n.micetap_count,
               value: stats.miceTaps,
-              color: Colors.lightBlueAccent,
+              color: PawPalette.teal,
             ),
             _StatResultTile(
               icon: Icons.cancel_outlined,
               label: l10n.wrongtap_count,
               value: wrongTaps,
-              color: Colors.orangeAccent,
+              color: const Color(0xFFFFB347),
             ),
             const SizedBox(height: 28),
-            Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 14,
-              runSpacing: 12,
+            Column(
               children: [
-                _DialogActionButton(
-                  color: PawPalette.bubbleGum,
-                  icon: Icons.refresh,
-                  label: l10n.tryagain_button,
-                  onPressed: () async {
-                    Navigator.pop(context);
-                    await game.restart();
-                  },
+                SizedBox(
+                  width: double.infinity,
+                  child: _DialogActionButton(
+                    color: PawPalette.bubbleGum,
+                    icon: Icons.refresh,
+                    label: l10n.tryagain_button,
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      await game.restart();
+                    },
+                  ),
                 ),
-                _DialogActionButton(
-                  color: const Color(0xFF63D471),
-                  foregroundColor: PawPalette.midnight,
-                  icon: Icons.ios_share_rounded,
-                  label: l10n.share_result_button,
-                  onPressed: () async => _shareResult(context, stats),
-                ),
-                _DialogActionButton(
-                  color: Colors.white,
-                  foregroundColor: PawPalette.midnight,
-                  icon: Icons.home,
-                  label: l10n.return_mainmenu_button,
-                  onPressed: () async =>
-                      await closeGame(game, context, routePath: AppRoutes.main),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: _DialogActionButton(
+                    color: Colors.white,
+                    foregroundColor: PawPalette.midnight,
+                    icon: Icons.home,
+                    label: l10n.return_mainmenu_button,
+                    onPressed: () async => await closeGame(
+                      game,
+                      context,
+                      routePath: AppRoutes.main,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -197,33 +233,6 @@ Dialog endGameDialog(BuildContext context, {required Game game}) {
       ),
     ),
   );
-}
-
-Future<void> _shareResult(BuildContext context, GameResult stats) async {
-  final l10n = AppLocalizations.of(context)!;
-  try {
-    await AppShareService.instance.shareText(
-      subject: l10n.share_result_subject,
-      text: l10n.share_result_text(
-        l10n.game_name,
-        stats.totalTaps,
-        stats.miceTaps,
-        stats.bugTaps,
-        stats.wrongTaps,
-      ),
-    );
-    AppAnalytics.track(
-      AnalyticsEvent.resultShared,
-      parameters: <String, Object?>{
-        'totalTaps': stats.totalTaps,
-        'miceTaps': stats.miceTaps,
-        'bugTaps': stats.bugTaps,
-        'wrongTaps': stats.wrongTaps,
-      },
-    );
-  } catch (error, stackTrace) {
-    AppLogger.error('Sharing game result failed', error, stackTrace);
-  }
 }
 
 //* Game Ended, After This Function Triggers
@@ -473,17 +482,18 @@ class _GameScreenState extends State<GameScreen> {
           0,
         );
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(26),
+            borderRadius: BorderRadius.circular(28),
             gradient: const LinearGradient(
-              colors: [Color(0xFF1F1C2C), Color(0xFF928DAB)],
+              colors: [Color(0xD9160F34), Color(0xD92E215B), Color(0xCCFF5D8F)],
             ),
-            boxShadow: const [
+            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            boxShadow: [
               BoxShadow(
-                color: Colors.black38,
+                color: PawPalette.midnight.withValues(alpha: 0.26),
                 blurRadius: 20,
-                offset: Offset(0, 12),
+                offset: const Offset(0, 12),
               ),
             ],
           ),
@@ -510,25 +520,32 @@ class _GameScreenState extends State<GameScreen> {
                 },
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _StatChip(
-                    icon: Icons.pets,
-                    label: l10n.micetap_count,
-                    value: clicksCounter.miceTaps,
-                    color: Colors.lightBlueAccent,
+                  Expanded(
+                    child: _StatChip(
+                      icon: Icons.pets,
+                      label: l10n.micetap_count,
+                      value: clicksCounter.miceTaps,
+                      color: PawPalette.teal,
+                    ),
                   ),
-                  _StatChip(
-                    icon: Icons.bug_report,
-                    label: l10n.bugtap_count,
-                    value: clicksCounter.bugTaps,
-                    color: Colors.pinkAccent,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _StatChip(
+                      icon: Icons.bug_report,
+                      label: l10n.bugtap_count,
+                      value: clicksCounter.bugTaps,
+                      color: PawPalette.bubbleGum,
+                    ),
                   ),
-                  _StatChip(
-                    icon: Icons.touch_app,
-                    label: l10n.wrongtap_count,
-                    value: wrongTaps,
-                    color: Colors.orangeAccent,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _StatChip(
+                      icon: Icons.touch_app,
+                      label: l10n.wrongtap_count,
+                      value: wrongTaps,
+                      color: PawPalette.lemon,
+                    ),
                   ),
                 ],
               ),
@@ -797,30 +814,88 @@ class _StatChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.15 * 255),
-            shape: BoxShape.circle,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.18),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 22),
           ),
-          child: Icon(icon, color: Colors.white),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          '$value',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+          const SizedBox(height: 8),
+          Text(
+            '$value',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+            ),
           ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white70, fontSize: 11),
-        ),
-      ],
+          const SizedBox(height: 2),
+          Text(
+            label,
+            maxLines: 2,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white70, fontSize: 11),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ResultSummaryChip extends StatelessWidget {
+  const _ResultSummaryChip({
+    required this.label,
+    required this.value,
+    required this.accent,
+  });
+
+  final String label;
+  final String value;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: TextStyle(
+              color: accent,
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -845,25 +920,40 @@ class _StatResultTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.05 * 255),
+          color: Colors.white.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
         ),
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: color.withValues(alpha: 0.2 * 255),
+              backgroundColor: color.withValues(alpha: 0.22),
               child: Icon(icon, color: color),
             ),
             const SizedBox(width: 14),
             Expanded(
-              child: Text(label, style: const TextStyle(color: Colors.white70)),
+              child: Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-            Text(
-              '$value',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                '$value',
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
               ),
             ),
           ],
@@ -890,20 +980,20 @@ class _DialogActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(minWidth: 160),
-      child: ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          foregroundColor: foregroundColor,
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-        ),
-        onPressed: onPressed,
-        icon: Icon(icon),
-        label: Text(label, textAlign: TextAlign.center),
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        foregroundColor: foregroundColor,
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
+      onPressed: onPressed,
+      icon: Icon(icon),
+      label: Text(
+        label,
+        textAlign: TextAlign.center,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

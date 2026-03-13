@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/services/connectivity_service.dart';
+import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:provider/provider.dart';
 
 class ConnectivityBanner extends StatelessWidget {
@@ -35,13 +36,20 @@ class ConnectivityBanner extends StatelessWidget {
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE85D04),
-                          borderRadius: BorderRadius.circular(18),
-                          boxShadow: const [
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFE85D04), Color(0xFFFF8C42)],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.16),
+                          ),
+                          boxShadow: [
                             BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 16,
-                              offset: Offset(0, 10),
+                              color: PawPalette.tangerine.withValues(
+                                alpha: 0.32,
+                              ),
+                              blurRadius: 20,
+                              offset: const Offset(0, 12),
                             ),
                           ],
                         ),

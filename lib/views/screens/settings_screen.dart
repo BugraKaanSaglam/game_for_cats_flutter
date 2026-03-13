@@ -185,20 +185,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppLocalizations.of(context)!.settings_button,
-          style: PawTextStyles.heading,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF20133C), Color(0xFF4B2E83), Color(0xFFFF5D8F)],
         ),
-        const SizedBox(height: 6),
-        Text(
-          AppLocalizations.of(context)!.settings_header_subtitle,
-          style: PawTextStyles.subheading,
-        ),
-        const SizedBox(height: 20),
-      ],
+        boxShadow: [
+          BoxShadow(
+            color: PawPalette.midnight.withValues(alpha: 0.2),
+            blurRadius: 24,
+            offset: const Offset(0, 16),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: 0.14),
+            ),
+            child: const Icon(
+              Icons.tune_rounded,
+              color: Colors.white,
+              size: 30,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.settings_button,
+                  style: PawTextStyles.heading.copyWith(fontSize: 28),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  AppLocalizations.of(context)!.settings_header_subtitle,
+                  style: PawTextStyles.subheading,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -312,7 +348,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Container(
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: PawPalette.midnight.withValues(alpha: 0.08 * 255),
+                  color: PawPalette.midnight.withValues(alpha: 0.08),
                 ),
               ),
               child: Image(image: image, fit: BoxFit.cover),
@@ -464,9 +500,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SliderTheme(
           data: SliderThemeData(
             activeTrackColor: activeColor,
-            inactiveTrackColor: activeColor.withValues(alpha: 0.3 * 255),
+            inactiveTrackColor: activeColor.withValues(alpha: 0.3),
             thumbColor: Colors.white,
-            overlayColor: activeColor.withValues(alpha: 0.15 * 255),
+            overlayColor: activeColor.withValues(alpha: 0.15),
           ),
           child: Slider(min: 0, max: 1, value: value, onChanged: onChanged),
         ),
@@ -517,7 +553,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               borderRadius: BorderRadius.circular(28),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15 * 255),
+                  color: Colors.black.withValues(alpha: 0.15),
                   blurRadius: 14,
                   offset: const Offset(0, 8),
                 ),
@@ -564,9 +600,7 @@ class _PillDropdown extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22),
         color: Colors.white,
-        border: Border.all(
-          color: PawPalette.midnight.withValues(alpha: 0.08 * 255),
-        ),
+        border: Border.all(color: PawPalette.midnight.withValues(alpha: 0.08)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<int>(

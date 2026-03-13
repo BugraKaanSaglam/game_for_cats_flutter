@@ -43,9 +43,11 @@ void main() {
       find.byWidgetPredicate(_richTextContains('3.5.0+35')),
       findsOneWidget,
     );
+    expect(find.text('Store Links'), findsOneWidget);
+    expect(find.text('Google Play'), findsOneWidget);
+    expect(find.text('App Store'), findsOneWidget);
     expect(find.text('Connectivity'), findsOneWidget);
     expect(find.text('Online'), findsOneWidget);
-    expect(find.text('Share App'), findsWidgets);
   });
 }
 

@@ -452,6 +452,30 @@ abstract class AppLocalizations {
   /// **'Platform'**
   String get about_platform_label;
 
+  /// No description provided for @store_links_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Store Links'**
+  String get store_links_title;
+
+  /// No description provided for @store_links_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the published listing for this game.'**
+  String get store_links_subtitle;
+
+  /// No description provided for @google_play_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Play'**
+  String get google_play_button;
+
+  /// No description provided for @app_store_button.
+  ///
+  /// In en, this message translates to:
+  /// **'App Store'**
+  String get app_store_button;
+
   /// No description provided for @connectivity_title.
   ///
   /// In en, this message translates to:
@@ -656,35 +680,11 @@ abstract class AppLocalizations {
   /// **'Share App'**
   String get share_app_button;
 
-  /// No description provided for @share_result_button.
-  ///
-  /// In en, this message translates to:
-  /// **'Share Result'**
-  String get share_result_button;
-
   /// No description provided for @share_app_text.
   ///
   /// In en, this message translates to:
   /// **'I am playing {gameName} on version {version}. Catch the mice, dodge the bugs, make kitty proud!'**
   String share_app_text(Object gameName, Object version);
-
-  /// No description provided for @share_result_subject.
-  ///
-  /// In en, this message translates to:
-  /// **'Our latest cat game result'**
-  String get share_result_subject;
-
-  /// No description provided for @share_result_text.
-  ///
-  /// In en, this message translates to:
-  /// **'We played {gameName} and landed {totalTaps} taps: {miceTaps} mice, {bugTaps} bugs, {wrongTaps} misses.'**
-  String share_result_text(
-    Object gameName,
-    Object totalTaps,
-    Object miceTaps,
-    Object bugTaps,
-    Object wrongTaps,
-  );
 }
 
 class _AppLocalizationsDelegate

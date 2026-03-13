@@ -28,11 +28,11 @@ void main() {
     await tester.pump(const Duration(milliseconds: 700));
 
     expect(find.text('Start The Game!'), findsOneWidget);
-    expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('Settings'), findsWidgets);
     expect(find.text('How To Play?'), findsOneWidget);
     expect(find.text('Credits'), findsOneWidget);
     expect(find.text('About App'), findsOneWidget);
-    expect(find.text('Activity Trend'), findsOneWidget);
+    expect(find.text('Activity Trend'), findsWidgets);
   });
 
   testWidgets('navigates to about route from menu', (tester) async {

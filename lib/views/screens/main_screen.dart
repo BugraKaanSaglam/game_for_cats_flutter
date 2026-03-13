@@ -9,6 +9,7 @@ import 'package:game_for_cats_2025/models/app_settings.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/routing/app_routes.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
+import 'package:game_for_cats_2025/services/connectivity_service.dart';
 import 'package:game_for_cats_2025/state/app_state.dart';
 import 'package:game_for_cats_2025/views/widgets/animated_gradient_background.dart';
 import 'package:game_for_cats_2025/views/widgets/cool_animated_buttons.dart';
@@ -126,31 +127,32 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     horizontalPadding,
                     32,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildGreeting(context),
-                      const SizedBox(height: 12),
-                      Expanded(
-                        child: Align(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildHeroPanel(context),
+                        const SizedBox(height: 24),
+                        Align(
                           alignment: Alignment.topCenter,
                           child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 520),
+                            constraints: const BoxConstraints(maxWidth: 560),
                             child: _buildMenuButtons(constraints, settings),
                           ),
                         ),
-                      ),
-                      _buildStaggeredAnimatedButton(
-                        delay: 0.6,
-                        child: CoolAnimatedButton(
-                          text: AppLocalizations.of(context)!.exit_button,
-                          icon: const Icon(Icons.exit_to_app_outlined),
-                          onPressed: () => exit(0),
-                          startColor: const Color(0xFFF9605F),
-                          endColor: const Color(0xFFEF5350),
+                        const SizedBox(height: 18),
+                        _buildStaggeredAnimatedButton(
+                          delay: 0.6,
+                          child: CoolAnimatedButton(
+                            text: AppLocalizations.of(context)!.exit_button,
+                            icon: const Icon(Icons.exit_to_app_outlined),
+                            onPressed: () => exit(0),
+                            startColor: const Color(0xFFEF476F),
+                            endColor: const Color(0xFFFF6B6B),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },
@@ -183,41 +185,103 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildGreeting(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(colors: PawPalette.pinkToOrange()),
-          ),
-          child: const Icon(Icons.pets, color: Colors.white, size: 30),
+  Widget _buildHeroPanel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final connectivity = context.watch<ConnectivityController>().status;
+    final isOnline = connectivity == ConnectionStateStatus.online;
+    final statusLabel = switch (connectivity) {
+      ConnectionStateStatus.online => l10n.connectivity_status_online,
+      ConnectionStateStatus.offline => l10n.connectivity_status_offline,
+      ConnectionStateStatus.unknown => l10n.connectivity_status_unknown,
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(34),
+        gradient: const LinearGradient(
+          colors: [Color(0x66FFFFFF), Color(0x1AFFFFFF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        boxShadow: [
+          BoxShadow(
+            color: PawPalette.midnight.withValues(alpha: 0.26),
+            blurRadius: 28,
+            offset: const Offset(0, 20),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Text(
-                AppLocalizations.of(context)!.game_name,
-                style: PawTextStyles.heading,
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFF8C42), Color(0xFFFF5D8F)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: PawPalette.bubbleGum.withValues(alpha: 0.35),
+                      blurRadius: 22,
+                      offset: const Offset(0, 12),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.pets_rounded,
+                  color: Colors.white,
+                  size: 34,
+                ),
               ),
-              const SizedBox(height: 6),
-              Text(
-                AppLocalizations.of(context)!.main_tagline,
-                style: PawTextStyles.subheading,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.game_name, style: PawTextStyles.heading),
+                    const SizedBox(height: 8),
+                    Text(l10n.main_tagline, style: PawTextStyles.subheading),
+                  ],
+                ),
               ),
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: 18),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              _HeroPill(
+                icon: isOnline ? Icons.wifi_rounded : Icons.wifi_off_rounded,
+                label: statusLabel,
+                color: isOnline ? PawPalette.teal : PawPalette.tangerine,
+              ),
+              _HeroPill(
+                icon: Icons.track_changes_rounded,
+                label: l10n.activity_button,
+                color: PawPalette.lemon,
+              ),
+              _HeroPill(
+                icon: Icons.tune_rounded,
+                label: l10n.settings_button,
+                color: PawPalette.grape,
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildMenuButtons(BoxConstraints constraints, AppSettings settings) {
-    final spacing = constraints.maxHeight * 0.02;
+    final spacing = math.max(constraints.maxHeight * 0.018, 14.0);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -323,7 +387,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        orb.color.withValues(alpha: 0.45 * 255),
+                        orb.color.withValues(alpha: 0.45),
                         orb.color.withValues(alpha: 0),
                       ],
                     ),
@@ -352,4 +416,50 @@ class _OrbConfig {
   final double size;
   final double travel;
   final double phase;
+}
+
+class _HeroPill extends StatelessWidget {
+  const _HeroPill({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: color.withValues(alpha: 0.18),
+            ),
+            child: Icon(icon, color: color, size: 16),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
