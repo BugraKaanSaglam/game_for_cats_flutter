@@ -17,29 +17,26 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBack;
 
   @override
-  Size get preferredSize => const Size.fromHeight(72);
+  Size get preferredSize => const Size.fromHeight(64);
 
   @override
   Widget build(BuildContext context) {
     final leading = hasBackButton
         ? IconButton(
-            style: IconButton.styleFrom(
-              backgroundColor: Colors.white.withValues(alpha: 0.14),
-              foregroundColor: Colors.white,
-            ),
+            color: Colors.white,
             icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
             onPressed: onBack ?? () => context.go(AppRoutes.main),
           )
         : null;
 
     return AppBar(
-      toolbarHeight: 72,
+      toolbarHeight: 64,
       title: Text(
         title,
         style: const TextStyle(
-          fontWeight: FontWeight.w900,
-          fontSize: 20,
-          letterSpacing: 0.3,
+          fontWeight: FontWeight.w800,
+          fontSize: 18,
+          letterSpacing: 0.2,
         ),
       ),
       centerTitle: true,
@@ -49,20 +46,21 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       surfaceTintColor: Colors.transparent,
       systemOverlayStyle: SystemUiOverlayStyle.light,
       shadowColor: Colors.black.withValues(alpha: 0.3),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
-      ),
       flexibleSpace: Container(
         decoration: BoxDecoration(
-          borderRadius: const BorderRadius.vertical(
-            bottom: Radius.circular(28),
+          gradient: LinearGradient(
+            colors: [
+              PawPalette.midnight,
+              PawPalette.ink.withValues(alpha: 0.96),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          gradient: PawPalette.shellGradient,
           boxShadow: [
             BoxShadow(
-              color: PawPalette.midnight.withValues(alpha: 0.28),
-              blurRadius: 24,
-              offset: const Offset(0, 14),
+              color: PawPalette.midnight.withValues(alpha: 0.22),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
             ),
           ],
         ),

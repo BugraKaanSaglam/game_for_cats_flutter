@@ -1,0 +1,25 @@
+name: Golden Tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  golden-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.38.5
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run golden tests
+        run: flutter test test/golden/app_golden_test.dart

@@ -71,26 +71,87 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
                   children: [
                     GlassyPanel(
-                      padding: const EdgeInsets.all(18),
+                      opacity: 0.14,
+                      gradient: LinearGradient(
+                        colors: [
+                          PawPalette.midnight.withValues(alpha: 0.86),
+                          PawPalette.ink.withValues(alpha: 0.72),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      padding: const EdgeInsets.all(22),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            l10n.activity_title,
-                            style: PawTextStyles.cardTitle.copyWith(
-                              fontSize: 20,
+                          Row(
+                            children: [
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF4FACFE),
+                                      Color(0xFFFF5D8F),
+                                    ],
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.insights_rounded,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      l10n.activity_title,
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      l10n.activity_subtitle,
+                                      style: const TextStyle(
+                                        color: Color(0xFFD8DCF4),
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 14,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(22),
+                              color: Colors.white.withValues(alpha: 0.06),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.08),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildLegend(l10n),
+                                const SizedBox(height: 14),
+                                _ActivityChart(buckets: aggregates),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            l10n.activity_subtitle,
-                            style: PawTextStyles.cardSubtitle,
-                          ),
-                          const SizedBox(height: 14),
-                          _buildLegend(l10n),
-                          const SizedBox(height: 10),
-                          _ActivityChart(buckets: aggregates),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           _buildStatsRow(l10n, aggregates),
                         ],
                       ),
@@ -106,12 +167,13 @@ class _ActivityScreenState extends State<ActivityScreen> {
   }
 
   Widget _buildLegend(AppLocalizations l10n) {
-    return Row(
+    return Wrap(
+      spacing: 14,
+      runSpacing: 8,
       children: const [
         _LegendDot(color: Color(0xFF4FACFE), labelKey: 'total'),
-        SizedBox(width: 12),
         _LegendDot(color: Color(0xFFFF6B6B), labelKey: 'miss'),
-      ].map((w) => w).toList(),
+      ],
     );
   }
 
@@ -126,13 +188,26 @@ class _ActivityScreenState extends State<ActivityScreen> {
         : (((totalTaps - wrongTaps) / totalTaps) * 100).clamp(0, 100);
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _StatPill(label: l10n.activity_total_label, value: '$totalTaps'),
-        _StatPill(label: l10n.activity_miss_label, value: '$wrongTaps'),
-        _StatPill(
-          label: l10n.activity_accuracy_label,
-          value: '${accuracy.toStringAsFixed(0)}%',
+        Expanded(
+          child: _StatPill(
+            label: l10n.activity_total_label,
+            value: '$totalTaps',
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _StatPill(
+            label: l10n.activity_miss_label,
+            value: '$wrongTaps',
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _StatPill(
+            label: l10n.activity_accuracy_label,
+            value: '${accuracy.toStringAsFixed(0)}%',
+          ),
         ),
       ],
     );
@@ -171,6 +246,13 @@ class _ActivityScreenState extends State<ActivityScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: GlassyPanel(
+            opacity: 0.12,
+            gradient: LinearGradient(
+              colors: [
+                PawPalette.midnight.withValues(alpha: 0.86),
+                PawPalette.ink.withValues(alpha: 0.72),
+              ],
+            ),
             padding: const EdgeInsets.all(18),
             child: Column(
               children: [
@@ -179,7 +261,11 @@ class _ActivityScreenState extends State<ActivityScreen> {
                 Text(
                   text,
                   textAlign: TextAlign.center,
-                  style: PawTextStyles.cardSubtitle,
+                  style: const TextStyle(
+                    color: Color(0xFFE8EBFF),
+                    fontSize: 15,
+                    height: 1.4,
+                  ),
                 ),
               ],
             ),
@@ -227,23 +313,40 @@ class _ActivityChart extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-          height: 180,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          height: 196,
+          child: Stack(
             children: [
-              for (int i = 0; i < buckets.length; i++)
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                    child: _AnimatedBar(
-                      total: buckets[i].total,
-                      wrong: buckets[i].wrong,
-                      maxTotal: safeMax,
-                      gradient: barGradient,
-                      delay: Duration(milliseconds: 120 * i),
+              Positioned.fill(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: List.generate(
+                    4,
+                    (index) => Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: Colors.white.withValues(alpha: 0.08),
                     ),
                   ),
                 ),
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  for (int i = 0; i < buckets.length; i++)
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                        child: _AnimatedBar(
+                          total: buckets[i].total,
+                          wrong: buckets[i].wrong,
+                          maxTotal: safeMax,
+                          gradient: barGradient,
+                          delay: Duration(milliseconds: 120 * i),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ],
           ),
         ),
@@ -255,7 +358,11 @@ class _ActivityChart extends StatelessWidget {
                   child: Text(
                     bucket.label,
                     textAlign: TextAlign.center,
-                    style: PawTextStyles.cardSubtitle.copyWith(fontSize: 12),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFFD8DCF4),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               )
@@ -364,9 +471,17 @@ class _AnimatedBarState extends State<_AnimatedBar>
                 alignment: Alignment.bottomCenter,
                 children: [
                   Container(
+                    width: 58,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      color: Colors.white.withValues(alpha: 0.06),
+                    ),
+                  ),
+                  Container(
+                    width: 58,
                     height: value,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                       gradient: LinearGradient(
                         colors: widget.gradient,
                         begin: Alignment.topCenter,
@@ -374,9 +489,7 @@ class _AnimatedBarState extends State<_AnimatedBar>
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: widget.gradient.last.withValues(
-                            alpha: 0.3 * 255,
-                          ),
+                          color: widget.gradient.last.withValues(alpha: 0.3),
                           blurRadius: 14,
                           offset: const Offset(0, 10),
                         ),
@@ -385,10 +498,11 @@ class _AnimatedBarState extends State<_AnimatedBar>
                   ),
                   if (wrongValue > 0)
                     Container(
+                      width: 58,
                       height: wrongValue.toDouble(),
                       decoration: BoxDecoration(
                         borderRadius: const BorderRadius.vertical(
-                          bottom: Radius.circular(12),
+                          bottom: Radius.circular(14),
                         ),
                         color: Colors.redAccent.withValues(alpha: 0.75),
                       ),
@@ -399,8 +513,10 @@ class _AnimatedBarState extends State<_AnimatedBar>
             const SizedBox(height: 8),
             Text(
               '${widget.total}',
-              style: PawTextStyles.cardSubtitle.copyWith(
-                fontWeight: FontWeight.bold,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                fontSize: 15,
               ),
             ),
           ],
@@ -441,8 +557,10 @@ class _LegendDot extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           label,
-          style: PawTextStyles.cardSubtitle.copyWith(
-            fontWeight: FontWeight.w600,
+          style: const TextStyle(
+            color: Color(0xFFE6E9FF),
+            fontWeight: FontWeight.w700,
+            fontSize: 13,
           ),
         ),
       ],
@@ -459,21 +577,28 @@ class _StatPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Colors.white.withValues(alpha: 0.1),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+        color: Colors.white.withValues(alpha: 0.08),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: PawTextStyles.cardSubtitle.copyWith(fontSize: 12)),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Color(0xFFD8DCF4),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 4),
           Text(
             value,
             style: PawTextStyles.cardTitle.copyWith(
-              fontSize: 18,
+              fontSize: 20,
               color: Colors.white,
             ),
           ),

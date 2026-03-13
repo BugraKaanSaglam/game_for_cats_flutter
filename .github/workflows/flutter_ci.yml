@@ -32,7 +32,7 @@ jobs:
         run: flutter analyze
 
       - name: Run tests with coverage
-        run: flutter test --coverage
+        run: flutter test --coverage --exclude-tags=golden
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4

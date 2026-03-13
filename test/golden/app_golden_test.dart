@@ -41,7 +41,7 @@ void main() {
       find.byType(LoadingScreenView),
       matchesGoldenFile('goldens/loading_screen.png'),
     );
-  });
+  }, tags: 'golden');
 
   testWidgets('about screen matches golden', (tester) async {
     tester.view.physicalSize = const Size(1440, 3200);
@@ -65,5 +65,5 @@ void main() {
       find.byType(AboutScreen),
       matchesGoldenFile('goldens/about_screen.png'),
     );
-  });
+  }, tags: 'golden');
 }

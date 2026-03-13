@@ -9,7 +9,6 @@ import 'package:game_for_cats_2025/models/app_settings.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/routing/app_routes.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
-import 'package:game_for_cats_2025/services/connectivity_service.dart';
 import 'package:game_for_cats_2025/state/app_state.dart';
 import 'package:game_for_cats_2025/views/widgets/animated_gradient_background.dart';
 import 'package:game_for_cats_2025/views/widgets/cool_animated_buttons.dart';
@@ -187,29 +186,24 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   Widget _buildHeroPanel(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final connectivity = context.watch<ConnectivityController>().status;
-    final isOnline = connectivity == ConnectionStateStatus.online;
-    final statusLabel = switch (connectivity) {
-      ConnectionStateStatus.online => l10n.connectivity_status_online,
-      ConnectionStateStatus.offline => l10n.connectivity_status_offline,
-      ConnectionStateStatus.unknown => l10n.connectivity_status_unknown,
-    };
-
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(34),
-        gradient: const LinearGradient(
-          colors: [Color(0x66FFFFFF), Color(0x1AFFFFFF)],
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withValues(alpha: 0.12),
+            Colors.white.withValues(alpha: 0.04),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         boxShadow: [
           BoxShadow(
-            color: PawPalette.midnight.withValues(alpha: 0.26),
-            blurRadius: 28,
-            offset: const Offset(0, 20),
+            color: PawPalette.midnight.withValues(alpha: 0.22),
+            blurRadius: 22,
+            offset: const Offset(0, 14),
           ),
         ],
       ),
@@ -250,28 +244,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     Text(l10n.main_tagline, style: PawTextStyles.subheading),
                   ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              _HeroPill(
-                icon: isOnline ? Icons.wifi_rounded : Icons.wifi_off_rounded,
-                label: statusLabel,
-                color: isOnline ? PawPalette.teal : PawPalette.tangerine,
-              ),
-              _HeroPill(
-                icon: Icons.track_changes_rounded,
-                label: l10n.activity_button,
-                color: PawPalette.lemon,
-              ),
-              _HeroPill(
-                icon: Icons.tune_rounded,
-                label: l10n.settings_button,
-                color: PawPalette.grape,
               ),
             ],
           ),
@@ -416,50 +388,4 @@ class _OrbConfig {
   final double size;
   final double travel;
   final double phase;
-}
-
-class _HeroPill extends StatelessWidget {
-  const _HeroPill({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
-
-  final IconData icon;
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color.withValues(alpha: 0.18),
-            ),
-            child: Icon(icon, color: color, size: 16),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
