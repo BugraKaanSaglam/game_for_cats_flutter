@@ -7,23 +7,30 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val keystoreProps = Properties()
+val keystorePropsFile = rootProject.file("key.properties")
+if (keystorePropsFile.exists()) {
+    keystoreProps.load(FileInputStream(keystorePropsFile))
+}
+
+val releaseStoreFile = keystoreProps.getProperty("storeFile")?.let { file(it) }
+val hasReleaseSigning =
+    releaseStoreFile?.exists() == true &&
+    !keystoreProps.getProperty("keyAlias").isNullOrBlank() &&
+    !keystoreProps.getProperty("keyPassword").isNullOrBlank() &&
+    !keystoreProps.getProperty("storePassword").isNullOrBlank()
+
 android {
     namespace = "com.mice_and_paws_cat_game"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
-          
-    // ① – signingConfigs tanımı
+    ndkVersion = "28.2.13676358"
+
     signingConfigs {
         create("release") {
-            // key.properties dosyasını oku
-            val keystorePropsFile = rootProject.file("key.properties")
-            if (keystorePropsFile.exists()) {
-                val keystoreProps = Properties().apply {
-                    load(FileInputStream(keystorePropsFile))
-                }
+            if (hasReleaseSigning) {
                 keyAlias = keystoreProps.getProperty("keyAlias")
                 keyPassword = keystoreProps.getProperty("keyPassword")
-                storeFile = file(keystoreProps.getProperty("storeFile"))
+                storeFile = releaseStoreFile
                 storePassword = keystoreProps.getProperty("storePassword")
             }
         }
@@ -47,12 +54,13 @@ android {
 
     buildTypes {
         getByName("release") {
-            // ② – release build’te oluşturduğumuz signingConfig’i ata
-            signingConfig = signingConfigs.getByName("release")
-            // proguard, minifyEnabled vb. ayarların buraya gelebilir
+            // Fallback to debug signing when the private release keystore is
+            // unavailable locally. This keeps public-repo builds reproducible.
+            signingConfig = signingConfigs.getByName(
+                if (hasReleaseSigning) "release" else "debug",
+            )
         }
         getByName("debug") {
-            // debug için default debug key
             signingConfig = signingConfigs.getByName("debug")
         }
     }
