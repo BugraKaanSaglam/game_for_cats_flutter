@@ -51,7 +51,7 @@ The CI workflow:
 - resolves packages
 - verifies formatting
 - runs static analysis
-- runs widget/unit/golden tests
+- runs widget/unit tests with coverage
 - runs integration smoke tests
 - uploads coverage artifact
 
@@ -66,10 +66,20 @@ Workflow file:
 3. `flutter analyze`
 4. `flutter test`
 5. `flutter test integration_test -d macos`
-6. `flutter test --coverage`
-7. verify `README.md` and docs are current
-8. verify version bump in `pubspec.yaml`
-9. build target artifacts
+6. `flutter test --coverage --exclude-tags=golden`
+7. `flutter test test/golden/app_golden_test.dart`
+8. verify `README.md` and docs are current
+9. verify version bump in `pubspec.yaml`
+10. build target artifacts
+
+## App Review Posture
+
+Current release posture is intentionally simple:
+
+- local-first experience with no backend dependency during review
+- game-first home screen and gameplay flow
+- no connectivity gating for core functionality
+- metadata and screenshots should focus on the hunt experience, not utility screens
 
 ## Configuration Surface
 

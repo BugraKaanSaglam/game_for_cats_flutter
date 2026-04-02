@@ -107,7 +107,7 @@ abstract class AppLocalizations {
   /// No description provided for @start_button.
   ///
   /// In en, this message translates to:
-  /// **'Start The Game!'**
+  /// **'Start Hunt'**
   String get start_button;
 
   /// No description provided for @settings_button.
@@ -119,7 +119,7 @@ abstract class AppLocalizations {
   /// No description provided for @howtoplay_button.
   ///
   /// In en, this message translates to:
-  /// **'How To Play?'**
+  /// **'How It Works'**
   String get howtoplay_button;
 
   /// No description provided for @credits_button.
@@ -131,7 +131,7 @@ abstract class AppLocalizations {
   /// No description provided for @about_button.
   ///
   /// In en, this message translates to:
-  /// **'About App'**
+  /// **'About the Game'**
   String get about_button;
 
   /// No description provided for @exit_button.
@@ -143,8 +143,74 @@ abstract class AppLocalizations {
   /// No description provided for @main_tagline.
   ///
   /// In en, this message translates to:
-  /// **'Catch the mice, dodge the bugs, make kitty proud!'**
+  /// **'Turn any screen into a playful indoor hunt.'**
   String get main_tagline;
+
+  /// No description provided for @home_kicker.
+  ///
+  /// In en, this message translates to:
+  /// **'Made for curious cats'**
+  String get home_kicker;
+
+  /// No description provided for @home_headline.
+  ///
+  /// In en, this message translates to:
+  /// **'A bright, fast indoor hunt built for paw taps.'**
+  String get home_headline;
+
+  /// No description provided for @home_subheadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Set the hunt, start the round, and track how your cat played today.'**
+  String get home_subheadline;
+
+  /// No description provided for @home_setup_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s hunt setup'**
+  String get home_setup_title;
+
+  /// No description provided for @home_setup_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A quick snapshot of the current timer, difficulty, sound, and play mat.'**
+  String get home_setup_subtitle;
+
+  /// No description provided for @home_customize_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tune difficulty, timer, sound, and play mat.'**
+  String get home_customize_subtitle;
+
+  /// No description provided for @home_journal_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review recent taps, misses, and accuracy.'**
+  String get home_journal_subtitle;
+
+  /// No description provided for @home_default_playmat.
+  ///
+  /// In en, this message translates to:
+  /// **'Default play mat'**
+  String get home_default_playmat;
+
+  /// No description provided for @home_custom_playmat_ready.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom play mat ready'**
+  String get home_custom_playmat_ready;
+
+  /// No description provided for @home_muted.
+  ///
+  /// In en, this message translates to:
+  /// **'Muted'**
+  String get home_muted;
+
+  /// No description provided for @home_sound_on.
+  ///
+  /// In en, this message translates to:
+  /// **'Sound on'**
+  String get home_sound_on;
 
   /// No description provided for @onboarding_title_welcome.
   ///
@@ -167,7 +233,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboarding_subtitle_play.
   ///
   /// In en, this message translates to:
-  /// **'Mice bring points, bugs steal time. Quick paws win.'**
+  /// **'Mice and bugs both count. Fast paws build a streak.'**
   String get onboarding_subtitle_play;
 
   /// No description provided for @onboarding_title_track.
@@ -179,7 +245,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboarding_subtitle_track.
   ///
   /// In en, this message translates to:
-  /// **'See daily taps and misses in the activity chart.'**
+  /// **'Review daily taps, misses, and accuracy in the hunt journal.'**
   String get onboarding_subtitle_track;
 
   /// No description provided for @onboarding_skip.
@@ -260,29 +326,53 @@ abstract class AppLocalizations {
   /// **'Return to MainMenu'**
   String get return_mainmenu_button;
 
+  /// No description provided for @howtoplay_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the hunt clear and exciting'**
+  String get howtoplay_title;
+
+  /// No description provided for @howtoplay_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Three quick tips to help your cat enjoy the round without extra setup.'**
+  String get howtoplay_subtitle;
+
   /// No description provided for @howtoplay_label_forhuman.
   ///
   /// In en, this message translates to:
-  /// **'How To Play? (For Humans)'**
+  /// **'Set up the round'**
   String get howtoplay_label_forhuman;
 
   /// No description provided for @howtoplay_text_forhuman.
   ///
   /// In en, this message translates to:
-  /// **'Game is soo simple!, Select time for play from settings, then press Start!, If you want no time limit, select sandbox from settings!'**
+  /// **'Choose a timer, adjust the difficulty, and pick a bright background if you want a custom play mat. Then start the round and hand the screen to your cat.'**
   String get howtoplay_text_forhuman;
 
   /// No description provided for @howtoplay_label_forcats.
   ///
   /// In en, this message translates to:
-  /// **'How To Play? (For Cats)'**
+  /// **'Tap the moving critters'**
   String get howtoplay_label_forcats;
 
   /// No description provided for @howtoplay_text_forcats.
   ///
   /// In en, this message translates to:
-  /// **'Meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow'**
+  /// **'Mice and bugs both count as successful taps. Misses are tracked separately, so keeping your paws on target leads to cleaner hunts.'**
   String get howtoplay_text_forcats;
+
+  /// No description provided for @howtoplay_label_forstreaks.
+  ///
+  /// In en, this message translates to:
+  /// **'Build a purr streak'**
+  String get howtoplay_label_forstreaks;
+
+  /// No description provided for @howtoplay_text_forstreaks.
+  ///
+  /// In en, this message translates to:
+  /// **'Every successful tap grows the streak. Misses reset it. The round summary shows accuracy, best streak, and your cat\'s overall mood.'**
+  String get howtoplay_text_forstreaks;
 
   /// No description provided for @micetap_count.
   ///
@@ -329,26 +419,50 @@ abstract class AppLocalizations {
   /// No description provided for @exit_validation.
   ///
   /// In en, this message translates to:
-  /// **'Who Wants to Exit? \nCat or Human?'**
+  /// **'Pause the hunt?'**
   String get exit_validation;
 
   /// No description provided for @this_will_close_automatically_in_seconds.
   ///
   /// In en, this message translates to:
-  /// **'This Will Close Automatically \nin 2 Seconds...'**
+  /// **'Return to the menu or keep the round going.'**
   String get this_will_close_automatically_in_seconds;
 
   /// No description provided for @i_am_cat.
   ///
   /// In en, this message translates to:
-  /// **'Meow??'**
+  /// **'Keep hunting'**
   String get i_am_cat;
 
   /// No description provided for @i_am_human.
   ///
   /// In en, this message translates to:
-  /// **'I am Human, Close the Game'**
+  /// **'End round'**
   String get i_am_human;
+
+  /// No description provided for @pause_hunt_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause the hunt?'**
+  String get pause_hunt_title;
+
+  /// No description provided for @pause_hunt_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Return to the menu or keep the round going.'**
+  String get pause_hunt_subtitle;
+
+  /// No description provided for @resume_hunt_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep hunting'**
+  String get resume_hunt_button;
+
+  /// No description provided for @end_round_button.
+  ///
+  /// In en, this message translates to:
+  /// **'End round'**
+  String get end_round_button;
 
   /// No description provided for @loading.
   ///
@@ -359,7 +473,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_header_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Adjust timers, languages and volumes for the purr-fect hunt.'**
+  /// **'Tune the timer, sound, difficulty, and play mat for the next hunt.'**
   String get settings_header_subtitle;
 
   /// No description provided for @settings_language_hint.
@@ -425,25 +539,73 @@ abstract class AppLocalizations {
   /// No description provided for @about_title.
   ///
   /// In en, this message translates to:
-  /// **'App Info'**
+  /// **'About the Game'**
   String get about_title;
 
   /// No description provided for @about_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Core app health, version details and connectivity status.'**
+  /// **'A small, colorful hunting toy built for cats and their humans.'**
   String get about_subtitle;
+
+  /// No description provided for @about_story_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Why this game exists'**
+  String get about_story_title;
+
+  /// No description provided for @about_story_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A simple idea shaped into a more polished experience over time.'**
+  String get about_story_subtitle;
+
+  /// No description provided for @about_story_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Mice and Paws was built as an original cat game focused on bright motion, quick rounds, and a setup flow that stays light. It started as a first app and grew into a more intentional product with local history, customization, and a clearer visual identity.'**
+  String get about_story_body;
+
+  /// No description provided for @about_highlights_title.
+  ///
+  /// In en, this message translates to:
+  /// **'What makes it distinct'**
+  String get about_highlights_title;
+
+  /// No description provided for @about_highlights_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A few things this build now emphasizes.'**
+  String get about_highlights_subtitle;
+
+  /// No description provided for @about_highlight_one.
+  ///
+  /// In en, this message translates to:
+  /// **'Game-first home screen with the hunt setup surfaced before utility screens.'**
+  String get about_highlight_one;
+
+  /// No description provided for @about_highlight_two.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom play mat backgrounds so each device can feel a little different.'**
+  String get about_highlight_two;
+
+  /// No description provided for @about_highlight_three.
+  ///
+  /// In en, this message translates to:
+  /// **'Round summaries with streaks, accuracy, and a playful cat mood grade.'**
+  String get about_highlight_three;
 
   /// No description provided for @about_info_title.
   ///
   /// In en, this message translates to:
-  /// **'Build Details'**
+  /// **'Build details'**
   String get about_info_title;
 
   /// No description provided for @about_info_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Quick snapshot of the installed app build.'**
+  /// **'Version and product notes for the installed build.'**
   String get about_info_subtitle;
 
   /// No description provided for @about_platform_label.
@@ -451,6 +613,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Platform'**
   String get about_platform_label;
+
+  /// No description provided for @about_release_model_label.
+  ///
+  /// In en, this message translates to:
+  /// **'App model'**
+  String get about_release_model_label;
+
+  /// No description provided for @about_release_model_value.
+  ///
+  /// In en, this message translates to:
+  /// **'Local-only, no backend required'**
+  String get about_release_model_value;
 
   /// No description provided for @store_links_title.
   ///
@@ -545,13 +719,13 @@ abstract class AppLocalizations {
   /// No description provided for @activity_title.
   ///
   /// In en, this message translates to:
-  /// **'Activity Trend'**
+  /// **'Hunt Journal'**
   String get activity_title;
 
   /// No description provided for @activity_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Daily taps and misses from recent play sessions.'**
+  /// **'Recent rounds, daily taps, and miss patterns from local play sessions.'**
   String get activity_subtitle;
 
   /// No description provided for @activity_empty.
@@ -563,7 +737,7 @@ abstract class AppLocalizations {
   /// No description provided for @activity_button.
   ///
   /// In en, this message translates to:
-  /// **'Activity Trend'**
+  /// **'Hunt Journal'**
   String get activity_button;
 
   /// No description provided for @activity_error.
@@ -601,6 +775,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Accuracy'**
   String get activity_accuracy_label;
+
+  /// No description provided for @current_streak_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Streak'**
+  String get current_streak_label;
+
+  /// No description provided for @best_streak_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Best streak'**
+  String get best_streak_label;
+
+  /// No description provided for @cat_mood_warming_up.
+  ///
+  /// In en, this message translates to:
+  /// **'Warming up'**
+  String get cat_mood_warming_up;
+
+  /// No description provided for @cat_mood_curious.
+  ///
+  /// In en, this message translates to:
+  /// **'Curious paws'**
+  String get cat_mood_curious;
+
+  /// No description provided for @cat_mood_playful.
+  ///
+  /// In en, this message translates to:
+  /// **'Playful hunter'**
+  String get cat_mood_playful;
+
+  /// No description provided for @cat_mood_hunt_legend.
+  ///
+  /// In en, this message translates to:
+  /// **'Hunt legend'**
+  String get cat_mood_hunt_legend;
 
   /// No description provided for @background_title.
   ///

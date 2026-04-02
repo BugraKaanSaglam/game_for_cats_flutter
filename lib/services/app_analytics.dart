@@ -8,8 +8,6 @@ enum AnalyticsEvent {
   onboardingCompleted,
   gameStarted,
   settingsSaved,
-  appShared,
-  storeOpened,
 }
 
 class AppAnalytics {

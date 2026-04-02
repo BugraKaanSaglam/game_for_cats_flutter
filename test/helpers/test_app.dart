@@ -2,39 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/models/app_settings.dart';
 import 'package:game_for_cats_2025/routing/app_routes.dart';
-import 'package:game_for_cats_2025/services/connectivity_service.dart';
 import 'package:game_for_cats_2025/state/app_state.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
-import 'package:game_for_cats_2025/views/widgets/connectivity_banner.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-Widget buildTestApp({
-  required Widget child,
-  AppState? appState,
-  ConnectivityController? connectivityController,
-}) {
-  return MultiProvider(
-    providers: [
-      ChangeNotifierProvider<AppState>.value(value: appState ?? FakeAppState()),
-      ChangeNotifierProvider<ConnectivityController>.value(
-        value: connectivityController ?? ConnectivityController(),
-      ),
-    ],
+Widget buildTestApp({required Widget child, AppState? appState}) {
+  return ChangeNotifierProvider<AppState>.value(
+    value: appState ?? FakeAppState(),
     child: MaterialApp(
       theme: PawTheme.light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: ConnectivityBanner(child: child),
+      home: child,
     ),
   );
 }
 
-Widget buildRouterTestApp({
-  required Widget home,
-  AppState? appState,
-  ConnectivityController? connectivityController,
-}) {
+Widget buildRouterTestApp({required Widget home, AppState? appState}) {
   final router = GoRouter(
     routes: [
       GoRoute(path: AppRoutes.main, builder: (context, state) => home),
@@ -54,11 +39,6 @@ Widget buildRouterTestApp({
             const Scaffold(body: Text('howto-destination')),
       ),
       GoRoute(
-        path: AppRoutes.credits,
-        builder: (context, state) =>
-            const Scaffold(body: Text('credits-destination')),
-      ),
-      GoRoute(
         path: AppRoutes.activity,
         builder: (context, state) =>
             const Scaffold(body: Text('activity-destination')),
@@ -71,20 +51,13 @@ Widget buildRouterTestApp({
     ],
   );
 
-  return MultiProvider(
-    providers: [
-      ChangeNotifierProvider<AppState>.value(value: appState ?? FakeAppState()),
-      ChangeNotifierProvider<ConnectivityController>.value(
-        value: connectivityController ?? ConnectivityController(),
-      ),
-    ],
+  return ChangeNotifierProvider<AppState>.value(
+    value: appState ?? FakeAppState(),
     child: MaterialApp.router(
       routerConfig: router,
       theme: PawTheme.light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      builder: (context, child) =>
-          ConnectivityBanner(child: child ?? const SizedBox.shrink()),
     ),
   );
 }
@@ -113,22 +86,4 @@ class FakeAppState extends AppState {
 
   @override
   Object? get initError => error;
-}
-
-class TestConnectivityController extends ConnectivityController {
-  TestConnectivityController(ConnectionStateStatus initialStatus)
-    : _status = initialStatus;
-
-  ConnectionStateStatus _status;
-
-  @override
-  ConnectionStateStatus get status => _status;
-
-  @override
-  bool get isOffline => _status == ConnectionStateStatus.offline;
-
-  void setStatus(ConnectionStateStatus value) {
-    _status = value;
-    notifyListeners();
-  }
 }

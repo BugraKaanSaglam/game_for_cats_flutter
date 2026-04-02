@@ -1,11 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
-import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/models/database/db_error.dart';
 import 'package:game_for_cats_2025/models/app_settings.dart';
+import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
+import 'package:game_for_cats_2025/models/enums/game_enums.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/routing/app_routes.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
@@ -131,6 +132,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         _buildHeroPanel(context),
+                        const SizedBox(height: 18),
+                        _buildSetupPanel(context, settings),
                         const SizedBox(height: 24),
                         Align(
                           alignment: Alignment.topCenter,
@@ -140,16 +143,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                           ),
                         ),
                         const SizedBox(height: 18),
-                        _buildStaggeredAnimatedButton(
-                          delay: 0.6,
-                          child: CoolAnimatedButton(
-                            text: AppLocalizations.of(context)!.exit_button,
-                            icon: const Icon(Icons.exit_to_app_outlined),
-                            onPressed: () => exit(0),
-                            startColor: const Color(0xFFEF476F),
-                            endColor: const Color(0xFFFF6B6B),
-                          ),
-                        ),
+                        _buildFooterLinks(context),
                       ],
                     ),
                   ),
@@ -211,39 +205,140 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFFF8C42), Color(0xFFFF5D8F)],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: PawPalette.bubbleGum.withValues(alpha: 0.35),
-                      blurRadius: 22,
-                      offset: const Offset(0, 12),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.pets_rounded,
-                  color: Colors.white,
-                  size: 34,
-                ),
-              ),
-              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(l10n.game_name, style: PawTextStyles.heading),
-                    const SizedBox(height: 8),
-                    Text(l10n.main_tagline, style: PawTextStyles.subheading),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(999),
+                        color: Colors.white.withValues(alpha: 0.12),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.1),
+                        ),
+                      ),
+                      child: Text(
+                        l10n.home_kicker,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(l10n.home_headline, style: PawTextStyles.heading),
+                    const SizedBox(height: 10),
+                    Text(
+                      l10n.home_subheadline,
+                      style: PawTextStyles.subheading,
+                    ),
                   ],
                 ),
+              ),
+              const SizedBox(width: 16),
+              Container(
+                width: 112,
+                height: 148,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  image: const DecorationImage(
+                    image: AssetImage('assets/images/mainscreenbg.png'),
+                    fit: BoxFit.cover,
+                  ),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.18),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.18),
+                      blurRadius: 24,
+                      offset: const Offset(0, 14),
+                    ),
+                  ],
+                ),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    margin: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: PawPalette.midnight.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: const Icon(
+                      Icons.pets_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSetupPanel(BuildContext context, AppSettings settings) {
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        color: Colors.white.withValues(alpha: 0.08),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.home_setup_title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.home_setup_subtitle,
+            style: const TextStyle(color: Color(0xFFD7D5F5), height: 1.35),
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              _SetupChip(
+                icon: Icons.timer_outlined,
+                label: _timeLabel(l10n, settings.time),
+              ),
+              _SetupChip(
+                icon: Icons.track_changes_rounded,
+                label: _difficultyLabel(l10n, settings.difficulty),
+              ),
+              _SetupChip(
+                icon: Icons.image_outlined,
+                label: settings.backgroundPath.isEmpty
+                    ? l10n.home_default_playmat
+                    : l10n.home_custom_playmat_ready,
+              ),
+              _SetupChip(
+                icon: settings.muted
+                    ? Icons.volume_off_rounded
+                    : Icons.volume_up_rounded,
+                label: settings.muted ? l10n.home_muted : l10n.home_sound_on,
               ),
             ],
           ),
@@ -277,61 +372,77 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           ),
         ),
         SizedBox(height: spacing),
-        //! Settings Button
-        _buildStaggeredAnimatedButton(
-          delay: 0.15,
-          child: CoolAnimatedButton(
-            text: AppLocalizations.of(context)!.settings_button,
-            icon: const Icon(Icons.settings),
-            onPressed: () => context.go(AppRoutes.settings),
-          ),
-        ),
-        SizedBox(height: spacing),
-        //! How to Play Button
-        _buildStaggeredAnimatedButton(
-          delay: 0.30,
-          child: CoolAnimatedButton(
-            text: AppLocalizations.of(context)!.howtoplay_button,
-            icon: const Icon(Icons.menu_book),
-            onPressed: () => context.go(AppRoutes.howToPlay),
-          ),
-        ),
-        SizedBox(height: spacing),
-        //! Credits Button
-        _buildStaggeredAnimatedButton(
-          delay: 0.45,
-          child: CoolAnimatedButton(
-            text: AppLocalizations.of(context)!.credits_button,
-            icon: const Icon(Icons.pest_control_rodent_sharp),
-            onPressed: () => context.go(AppRoutes.credits),
-          ),
-        ),
-        SizedBox(height: spacing),
-        //! About Button
-        _buildStaggeredAnimatedButton(
-          delay: 0.50,
-          child: CoolAnimatedButton(
-            text: AppLocalizations.of(context)!.about_button,
-            icon: const Icon(Icons.info_outline_rounded),
-            onPressed: () => context.go(AppRoutes.about),
-            startColor: const Color(0xFF6D597A),
-            endColor: const Color(0xFF355070),
-          ),
-        ),
-        SizedBox(height: spacing),
-        //! Activity Button
-        _buildStaggeredAnimatedButton(
-          delay: 0.55,
-          child: CoolAnimatedButton(
-            text: AppLocalizations.of(context)!.activity_button,
-            icon: const Icon(Icons.show_chart_rounded),
-            onPressed: () => context.go(AppRoutes.activity),
-            startColor: const Color(0xFF4FACFE),
-            endColor: const Color(0xFF00F2FE),
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: _buildStaggeredAnimatedButton(
+                delay: 0.18,
+                child: _SecondaryActionCard(
+                  title: AppLocalizations.of(context)!.settings_button,
+                  subtitle: AppLocalizations.of(
+                    context,
+                  )!.home_customize_subtitle,
+                  icon: Icons.tune_rounded,
+                  gradient: const [Color(0xFF4FACFE), Color(0xFF00C6A7)],
+                  onTap: () => context.go(AppRoutes.settings),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildStaggeredAnimatedButton(
+                delay: 0.3,
+                child: _SecondaryActionCard(
+                  title: AppLocalizations.of(context)!.activity_button,
+                  subtitle: AppLocalizations.of(context)!.home_journal_subtitle,
+                  icon: Icons.insights_rounded,
+                  gradient: const [Color(0xFFFF5D8F), Color(0xFFFF8C42)],
+                  onTap: () => context.go(AppRoutes.activity),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
+  }
+
+  Widget _buildFooterLinks(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 16,
+      runSpacing: 8,
+      children: [
+        TextButton.icon(
+          onPressed: () => context.go(AppRoutes.howToPlay),
+          icon: const Icon(Icons.menu_book_rounded),
+          label: Text(l10n.howtoplay_button),
+        ),
+        TextButton.icon(
+          onPressed: () => context.go(AppRoutes.about),
+          icon: const Icon(Icons.info_outline_rounded),
+          label: Text(l10n.about_button),
+        ),
+      ],
+    );
+  }
+
+  String _difficultyLabel(AppLocalizations l10n, int value) {
+    return switch (getDifficultyFromValue(value)) {
+      Difficulty.easy => l10n.difficulty_easy,
+      Difficulty.medium => l10n.difficulty_medium,
+      Difficulty.hard => l10n.difficulty_hard,
+      Difficulty.sandbox => l10n.difficulty_sandbox,
+    };
+  }
+
+  String _timeLabel(AppLocalizations l10n, int value) {
+    final current = getTimeFromValue(value);
+    if (current == Time.sandbox) {
+      return l10n.difficulty_sandbox;
+    }
+    return '${current.value}s';
   }
 
   Widget _buildAmbientOrbs() {
@@ -369,6 +480,108 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             }).toList(),
           );
         },
+      ),
+    );
+  }
+}
+
+class _SetupChip extends StatelessWidget {
+  const _SetupChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: Colors.white.withValues(alpha: 0.08),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 18),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SecondaryActionCard extends StatelessWidget {
+  const _SecondaryActionCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.gradient,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final List<Color> gradient;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(26),
+        onTap: onTap,
+        child: Ink(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(26),
+            gradient: LinearGradient(colors: gradient),
+            boxShadow: [
+              BoxShadow(
+                color: gradient.first.withValues(alpha: 0.28),
+                blurRadius: 18,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.16),
+                ),
+                child: Icon(icon, color: Colors.white),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 17,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: const TextStyle(color: Color(0xFFF6F4FF), height: 1.3),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

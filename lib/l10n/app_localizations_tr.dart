@@ -12,26 +12,62 @@ class AppLocalizationsTr extends AppLocalizations {
   String get game_name => 'Fareler ve Patiler: Kedi Oyunu';
 
   @override
-  String get start_button => 'Oyuna Başla!';
+  String get start_button => 'Avı Başlat';
 
   @override
   String get settings_button => 'Ayarlar';
 
   @override
-  String get howtoplay_button => 'Nasıl Oynanır?';
+  String get howtoplay_button => 'Nasıl İşler?';
 
   @override
   String get credits_button => 'Emeği Geçenler';
 
   @override
-  String get about_button => 'Uygulama Hakkında';
+  String get about_button => 'Oyun Hakkında';
 
   @override
   String get exit_button => 'Çıkış Yap';
 
   @override
-  String get main_tagline =>
-      'Fareleri yakala, böceklerden kaç, kedini gururlandır!';
+  String get main_tagline => 'Her ekranı renkli bir ev içi ava dönüştür.';
+
+  @override
+  String get home_kicker => 'Meraklı kediler için tasarlandı';
+
+  @override
+  String get home_headline =>
+      'Pati dokunuşları için hazırlanmış parlak ve hızlı bir ev içi av.';
+
+  @override
+  String get home_subheadline =>
+      'Avı ayarla, turu başlat ve kedinin bugün nasıl oynadığını takip et.';
+
+  @override
+  String get home_setup_title => 'Bugünkü av ayarı';
+
+  @override
+  String get home_setup_subtitle =>
+      'Süre, zorluk, ses ve oyun zemininin hızlı özeti.';
+
+  @override
+  String get home_customize_subtitle => 'Zorluk, süre, ses ve zemini ayarla.';
+
+  @override
+  String get home_journal_subtitle =>
+      'Son dokunuşları, kaçırmaları ve isabeti gör.';
+
+  @override
+  String get home_default_playmat => 'Varsayılan oyun zemini';
+
+  @override
+  String get home_custom_playmat_ready => 'Özel zemin hazır';
+
+  @override
+  String get home_muted => 'Sessiz';
+
+  @override
+  String get home_sound_on => 'Ses açık';
 
   @override
   String get onboarding_title_welcome => 'Kedi Oyun Alanına Hoş Geldin';
@@ -45,14 +81,14 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get onboarding_subtitle_play =>
-      'Fareler puan getirir, böcekler zaman çalar. Hızlı patiler kazanır.';
+      'Fareler ve böcekler başarılı dokunuş sayılır. Hızlı patiler seri oluşturur.';
 
   @override
   String get onboarding_title_track => 'Eğlenceyi Takip Et';
 
   @override
   String get onboarding_subtitle_track =>
-      'Günlük dokunuşları ve kaçırmaları etkinlik grafiğinde gör.';
+      'Günlük dokunuşları, kaçırmaları ve isabeti av günlüğünde incele.';
 
   @override
   String get onboarding_skip => 'Atla';
@@ -94,18 +130,32 @@ class AppLocalizationsTr extends AppLocalizations {
   String get return_mainmenu_button => 'Ana Menü\'ye Dön';
 
   @override
-  String get howtoplay_label_forhuman => 'Nasıl Oynanır? (İnsanlar İçin)';
+  String get howtoplay_title => 'Avı net ve eğlenceli tut';
+
+  @override
+  String get howtoplay_subtitle =>
+      'Kedinin turdan keyif alması için üç kısa ipucu.';
+
+  @override
+  String get howtoplay_label_forhuman => 'Turu hazırla';
 
   @override
   String get howtoplay_text_forhuman =>
-      'Oyun çok basit! Ayarlardan kedinizin oynaması için istediğiniz süreyi seçin, ardından oyunu başlatın! Kediniz yakaladığı her cisim başına puan kazanacak! Eğer bir süre olsun istemiyorsanız, direk oyunu kum havuzu modunda açabilirsiniz!';
+      'Bir süre seç, zorluğu ayarla ve istersen parlak bir görselle özel bir oyun zemini kur. Sonra turu başlatıp ekranı kedine bırak.';
 
   @override
-  String get howtoplay_label_forcats => 'Nasıl Oynanır? (Kediler İçin)';
+  String get howtoplay_label_forcats => 'Hareket eden canlılara dokun';
 
   @override
   String get howtoplay_text_forcats =>
-      'Miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav miyav';
+      'Fareler ve böcekler başarılı dokunuş olarak sayılır. Kaçırmalar ayrı tutulur; bu yüzden patileri hedefte tutmak daha temiz avlar çıkarır.';
+
+  @override
+  String get howtoplay_label_forstreaks => 'Pati serisi oluştur';
+
+  @override
+  String get howtoplay_text_forstreaks =>
+      'Her başarılı dokunuş seriyi büyütür. Kaçırmalar seriyi sıfırlar. Tur sonunda isabet, en iyi seri ve kedinin genel modu gösterilir.';
 
   @override
   String get micetap_count => 'Tıklanan Fareler:';
@@ -129,24 +179,37 @@ class AppLocalizationsTr extends AppLocalizations {
   String get credits_creators_text => 'Buğra Kaan Sağlam';
 
   @override
-  String get exit_validation => 'Kim Çıkmak İstiyor? \nKedi mi İnsan mı?';
+  String get exit_validation => 'Ava ara verilsin mi?';
 
   @override
   String get this_will_close_automatically_in_seconds =>
-      'Bu Ekran 2 Saniye İçerisinde \nOtomatik Kapanacak...';
+      'Menüye dönebilir ya da tura devam edebilirsin.';
 
   @override
-  String get i_am_cat => 'Miyav??';
+  String get i_am_cat => 'Avı sürdür';
 
   @override
-  String get i_am_human => 'Ben İnsanım, Oyunu Kapat';
+  String get i_am_human => 'Turu bitir';
+
+  @override
+  String get pause_hunt_title => 'Ava ara verilsin mi?';
+
+  @override
+  String get pause_hunt_subtitle =>
+      'Menüye dönebilir ya da tura devam edebilirsin.';
+
+  @override
+  String get resume_hunt_button => 'Avı sürdür';
+
+  @override
+  String get end_round_button => 'Turu bitir';
 
   @override
   String get loading => 'Yükleniyor...';
 
   @override
   String get settings_header_subtitle =>
-      'Mükemmel av için süreyi, dili ve sesleri ayarla.';
+      'Bir sonraki av için süreyi, sesi, zorluğu ve zemini ayarla.';
 
   @override
   String get settings_language_hint =>
@@ -181,20 +244,56 @@ class AppLocalizationsTr extends AppLocalizations {
   String get credits_share_subtitle => 'Oyunu başka bir kedi severle gönder.';
 
   @override
-  String get about_title => 'Uygulama Bilgisi';
+  String get about_title => 'Oyun Hakkında';
 
   @override
   String get about_subtitle =>
-      'Uygulama durumu, sürüm detayları ve bağlantı görünürlüğü.';
+      'Kediler ve onları eğlendiren insanlar için hazırlanmış küçük ama özenli bir av oyunu.';
 
   @override
-  String get about_info_title => 'Sürüm Detayları';
+  String get about_story_title => 'Bu oyun neden var?';
 
   @override
-  String get about_info_subtitle => 'Yüklü uygulama sürümünün hızlı özeti.';
+  String get about_story_subtitle =>
+      'Basit bir fikir, zamanla daha derli toplu bir deneyime dönüştü.';
+
+  @override
+  String get about_story_body =>
+      'Fareler ve Patiler; parlak hareket, kısa turlar ve hafif bir kurulum akışı üzerine kurulu özgün bir kedi oyunu olarak geliştirildi. İlk uygulama olarak başladı, sonra yerel geçmiş, özelleştirme ve daha güçlü bir görsel kimlikle daha bilinçli bir ürüne dönüştü.';
+
+  @override
+  String get about_highlights_title => 'Bu sürümü farklı yapan ne?';
+
+  @override
+  String get about_highlights_subtitle =>
+      'Bu yapının özellikle öne çıkardığı noktalar.';
+
+  @override
+  String get about_highlight_one =>
+      'Araç ekranlarından önce av düzenini öne çıkaran oyun-merkezli ana ekran.';
+
+  @override
+  String get about_highlight_two =>
+      'Her cihazı biraz daha kişisel hissettiren özel oyun zemini arka planları.';
+
+  @override
+  String get about_highlight_three =>
+      'Seri, isabet ve kedinin modunu gösteren tur özeti.';
+
+  @override
+  String get about_info_title => 'Sürüm detayları';
+
+  @override
+  String get about_info_subtitle => 'Yüklü yapıya ait sürüm ve ürün notları.';
 
   @override
   String get about_platform_label => 'Platform';
+
+  @override
+  String get about_release_model_label => 'Uygulama yapısı';
+
+  @override
+  String get about_release_model_value => 'Yerel çalışır, backend gerekmez';
 
   @override
   String get store_links_title => 'Mağaza Linkleri';
@@ -245,18 +344,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get difficulty_sandbox => 'Kum Havuzu / Serbest';
 
   @override
-  String get activity_title => 'Aktivite Trendi';
+  String get activity_title => 'Av Günlüğü';
 
   @override
   String get activity_subtitle =>
-      'Son oyunlarda günlük tıklamalar ve kaçırmalar.';
+      'Yerel oyun kayıtlarından son turlar, günlük dokunuşlar ve kaçırma düzeni.';
 
   @override
   String get activity_empty =>
       'Henüz kayıtlı oyun yok. Takip için bir tur başlat!';
 
   @override
-  String get activity_button => 'Aktivite Trendi';
+  String get activity_button => 'Av Günlüğü';
 
   @override
   String get activity_error =>
@@ -276,6 +375,24 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get activity_accuracy_label => 'İsabet';
+
+  @override
+  String get current_streak_label => 'Seri';
+
+  @override
+  String get best_streak_label => 'En iyi seri';
+
+  @override
+  String get cat_mood_warming_up => 'Isınıyor';
+
+  @override
+  String get cat_mood_curious => 'Meraklı patiler';
+
+  @override
+  String get cat_mood_playful => 'Oyuncu avcı';
+
+  @override
+  String get cat_mood_hunt_legend => 'Av efsanesi';
 
   @override
   String get background_title => 'Arka Plan';

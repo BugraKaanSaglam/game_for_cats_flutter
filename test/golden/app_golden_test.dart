@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:game_for_cats_2025/services/app_info_service.dart';
-import 'package:game_for_cats_2025/services/connectivity_service.dart';
 import 'package:game_for_cats_2025/views/components/loading_screen_view.dart';
 import 'package:game_for_cats_2025/views/screens/about_screen.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -51,14 +50,7 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    await tester.pumpWidget(
-      buildTestApp(
-        child: const AboutScreen(),
-        connectivityController: TestConnectivityController(
-          ConnectionStateStatus.online,
-        ),
-      ),
-    );
+    await tester.pumpWidget(buildTestApp(child: const AboutScreen()));
     await tester.pumpAndSettle();
 
     await expectLater(

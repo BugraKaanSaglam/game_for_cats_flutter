@@ -21,18 +21,25 @@ class HowToPlayScreen extends StatelessWidget {
   }
 
   Widget mainBody(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final sections = [
       _InstructionSection(
         emoji: '🧑‍🏫',
-        title: AppLocalizations.of(context)!.howtoplay_label_forhuman,
-        description: AppLocalizations.of(context)!.howtoplay_text_forhuman,
+        title: l10n.howtoplay_label_forhuman,
+        description: l10n.howtoplay_text_forhuman,
         gradient: PawPalette.pinkToOrange(),
       ),
       _InstructionSection(
         emoji: '🐱',
-        title: AppLocalizations.of(context)!.howtoplay_label_forcats,
-        description: AppLocalizations.of(context)!.howtoplay_text_forcats,
+        title: l10n.howtoplay_label_forcats,
+        description: l10n.howtoplay_text_forcats,
         gradient: PawPalette.tealToLemon(),
+      ),
+      _InstructionSection(
+        emoji: '✨',
+        title: l10n.howtoplay_label_forstreaks,
+        description: l10n.howtoplay_text_forstreaks,
+        gradient: const [Color(0xFF4FACFE), Color(0xFF7B61FF)],
       ),
     ];
 
@@ -40,6 +47,30 @@ class HowToPlayScreen extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         children: [
+          Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xFF20133C),
+                  Color(0xFF4B2E83),
+                  Color(0xFFFF5D8F),
+                ],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.howtoplay_title,
+                  style: PawTextStyles.heading.copyWith(fontSize: 28),
+                ),
+                const SizedBox(height: 8),
+                Text(l10n.howtoplay_subtitle, style: PawTextStyles.subheading),
+              ],
+            ),
+          ),
           const SizedBox(height: 20),
           ...List.generate(
             sections.length,

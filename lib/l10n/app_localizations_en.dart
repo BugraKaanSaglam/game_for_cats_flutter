@@ -12,26 +12,62 @@ class AppLocalizationsEn extends AppLocalizations {
   String get game_name => 'Mice and Paws: Cat Game';
 
   @override
-  String get start_button => 'Start The Game!';
+  String get start_button => 'Start Hunt';
 
   @override
   String get settings_button => 'Settings';
 
   @override
-  String get howtoplay_button => 'How To Play?';
+  String get howtoplay_button => 'How It Works';
 
   @override
   String get credits_button => 'Credits';
 
   @override
-  String get about_button => 'About App';
+  String get about_button => 'About the Game';
 
   @override
   String get exit_button => 'Exit';
 
   @override
-  String get main_tagline =>
-      'Catch the mice, dodge the bugs, make kitty proud!';
+  String get main_tagline => 'Turn any screen into a playful indoor hunt.';
+
+  @override
+  String get home_kicker => 'Made for curious cats';
+
+  @override
+  String get home_headline => 'A bright, fast indoor hunt built for paw taps.';
+
+  @override
+  String get home_subheadline =>
+      'Set the hunt, start the round, and track how your cat played today.';
+
+  @override
+  String get home_setup_title => 'Today\'s hunt setup';
+
+  @override
+  String get home_setup_subtitle =>
+      'A quick snapshot of the current timer, difficulty, sound, and play mat.';
+
+  @override
+  String get home_customize_subtitle =>
+      'Tune difficulty, timer, sound, and play mat.';
+
+  @override
+  String get home_journal_subtitle =>
+      'Review recent taps, misses, and accuracy.';
+
+  @override
+  String get home_default_playmat => 'Default play mat';
+
+  @override
+  String get home_custom_playmat_ready => 'Custom play mat ready';
+
+  @override
+  String get home_muted => 'Muted';
+
+  @override
+  String get home_sound_on => 'Sound on';
 
   @override
   String get onboarding_title_welcome => 'Welcome to the Cat Playground';
@@ -45,14 +81,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboarding_subtitle_play =>
-      'Mice bring points, bugs steal time. Quick paws win.';
+      'Mice and bugs both count. Fast paws build a streak.';
 
   @override
   String get onboarding_title_track => 'Track the Fun';
 
   @override
   String get onboarding_subtitle_track =>
-      'See daily taps and misses in the activity chart.';
+      'Review daily taps, misses, and accuracy in the hunt journal.';
 
   @override
   String get onboarding_skip => 'Skip';
@@ -94,18 +130,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get return_mainmenu_button => 'Return to MainMenu';
 
   @override
-  String get howtoplay_label_forhuman => 'How To Play? (For Humans)';
+  String get howtoplay_title => 'Keep the hunt clear and exciting';
+
+  @override
+  String get howtoplay_subtitle =>
+      'Three quick tips to help your cat enjoy the round without extra setup.';
+
+  @override
+  String get howtoplay_label_forhuman => 'Set up the round';
 
   @override
   String get howtoplay_text_forhuman =>
-      'Game is soo simple!, Select time for play from settings, then press Start!, If you want no time limit, select sandbox from settings!';
+      'Choose a timer, adjust the difficulty, and pick a bright background if you want a custom play mat. Then start the round and hand the screen to your cat.';
 
   @override
-  String get howtoplay_label_forcats => 'How To Play? (For Cats)';
+  String get howtoplay_label_forcats => 'Tap the moving critters';
 
   @override
   String get howtoplay_text_forcats =>
-      'Meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow meow';
+      'Mice and bugs both count as successful taps. Misses are tracked separately, so keeping your paws on target leads to cleaner hunts.';
+
+  @override
+  String get howtoplay_label_forstreaks => 'Build a purr streak';
+
+  @override
+  String get howtoplay_text_forstreaks =>
+      'Every successful tap grows the streak. Misses reset it. The round summary shows accuracy, best streak, and your cat\'s overall mood.';
 
   @override
   String get micetap_count => 'Tapped Mice:';
@@ -129,24 +179,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get credits_creators_text => 'Buğra Kaan Sağlam';
 
   @override
-  String get exit_validation => 'Who Wants to Exit? \nCat or Human?';
+  String get exit_validation => 'Pause the hunt?';
 
   @override
   String get this_will_close_automatically_in_seconds =>
-      'This Will Close Automatically \nin 2 Seconds...';
+      'Return to the menu or keep the round going.';
 
   @override
-  String get i_am_cat => 'Meow??';
+  String get i_am_cat => 'Keep hunting';
 
   @override
-  String get i_am_human => 'I am Human, Close the Game';
+  String get i_am_human => 'End round';
+
+  @override
+  String get pause_hunt_title => 'Pause the hunt?';
+
+  @override
+  String get pause_hunt_subtitle =>
+      'Return to the menu or keep the round going.';
+
+  @override
+  String get resume_hunt_button => 'Keep hunting';
+
+  @override
+  String get end_round_button => 'End round';
 
   @override
   String get loading => 'Loading...';
 
   @override
   String get settings_header_subtitle =>
-      'Adjust timers, languages and volumes for the purr-fect hunt.';
+      'Tune the timer, sound, difficulty, and play mat for the next hunt.';
 
   @override
   String get settings_language_hint =>
@@ -183,21 +246,57 @@ class AppLocalizationsEn extends AppLocalizations {
       'Send the game to another cat-loving human.';
 
   @override
-  String get about_title => 'App Info';
+  String get about_title => 'About the Game';
 
   @override
   String get about_subtitle =>
-      'Core app health, version details and connectivity status.';
+      'A small, colorful hunting toy built for cats and their humans.';
 
   @override
-  String get about_info_title => 'Build Details';
+  String get about_story_title => 'Why this game exists';
+
+  @override
+  String get about_story_subtitle =>
+      'A simple idea shaped into a more polished experience over time.';
+
+  @override
+  String get about_story_body =>
+      'Mice and Paws was built as an original cat game focused on bright motion, quick rounds, and a setup flow that stays light. It started as a first app and grew into a more intentional product with local history, customization, and a clearer visual identity.';
+
+  @override
+  String get about_highlights_title => 'What makes it distinct';
+
+  @override
+  String get about_highlights_subtitle =>
+      'A few things this build now emphasizes.';
+
+  @override
+  String get about_highlight_one =>
+      'Game-first home screen with the hunt setup surfaced before utility screens.';
+
+  @override
+  String get about_highlight_two =>
+      'Custom play mat backgrounds so each device can feel a little different.';
+
+  @override
+  String get about_highlight_three =>
+      'Round summaries with streaks, accuracy, and a playful cat mood grade.';
+
+  @override
+  String get about_info_title => 'Build details';
 
   @override
   String get about_info_subtitle =>
-      'Quick snapshot of the installed app build.';
+      'Version and product notes for the installed build.';
 
   @override
   String get about_platform_label => 'Platform';
+
+  @override
+  String get about_release_model_label => 'App model';
+
+  @override
+  String get about_release_model_value => 'Local-only, no backend required';
 
   @override
   String get store_links_title => 'Store Links';
@@ -249,18 +348,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get difficulty_sandbox => 'Sandbox / Free Play';
 
   @override
-  String get activity_title => 'Activity Trend';
+  String get activity_title => 'Hunt Journal';
 
   @override
   String get activity_subtitle =>
-      'Daily taps and misses from recent play sessions.';
+      'Recent rounds, daily taps, and miss patterns from local play sessions.';
 
   @override
   String get activity_empty =>
       'No play sessions logged yet. Start a round to track activity!';
 
   @override
-  String get activity_button => 'Activity Trend';
+  String get activity_button => 'Hunt Journal';
 
   @override
   String get activity_error => 'Could not load activity. Pull to refresh.';
@@ -279,6 +378,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get activity_accuracy_label => 'Accuracy';
+
+  @override
+  String get current_streak_label => 'Streak';
+
+  @override
+  String get best_streak_label => 'Best streak';
+
+  @override
+  String get cat_mood_warming_up => 'Warming up';
+
+  @override
+  String get cat_mood_curious => 'Curious paws';
+
+  @override
+  String get cat_mood_playful => 'Playful hunter';
+
+  @override
+  String get cat_mood_hunt_legend => 'Hunt legend';
 
   @override
   String get background_title => 'Background Image';

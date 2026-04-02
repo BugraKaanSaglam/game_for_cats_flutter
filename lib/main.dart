@@ -2,25 +2,22 @@ import 'dart:ui';
 
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
-import 'package:game_for_cats_2025/services/app_analytics.dart';
-import 'routing/app_routes.dart';
 import 'package:game_for_cats_2025/models/app_settings.dart';
+import 'package:game_for_cats_2025/routing/app_routes.dart';
+import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/services/app_logger.dart';
-import 'package:game_for_cats_2025/services/connectivity_service.dart';
 import 'package:game_for_cats_2025/state/app_state.dart';
 import 'package:game_for_cats_2025/views/components/loading_screen_view.dart';
 import 'package:game_for_cats_2025/views/screens/activity_screen.dart';
 import 'package:game_for_cats_2025/views/screens/about_screen.dart';
-import 'package:game_for_cats_2025/views/screens/credits_screen.dart';
 import 'package:game_for_cats_2025/views/screens/game_screen.dart';
 import 'package:game_for_cats_2025/views/screens/howtoplay_screen.dart';
 import 'package:game_for_cats_2025/views/screens/main_screen.dart';
 import 'package:game_for_cats_2025/views/screens/onboarding_screen.dart';
 import 'package:game_for_cats_2025/views/screens/settings_screen.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
-import 'package:game_for_cats_2025/views/widgets/connectivity_banner.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -44,9 +41,6 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppState()..initialize()),
-        ChangeNotifierProvider(
-          create: (_) => ConnectivityController()..initialize(),
-        ),
       ],
       child: const MainApp(),
     ),
@@ -103,10 +97,6 @@ class _MainAppState extends State<MainApp> {
           builder: (context, state) => const SettingsScreen(),
         ),
         GoRoute(
-          path: AppRoutes.credits,
-          builder: (context, state) => const CreditsScreen(),
-        ),
-        GoRoute(
           path: AppRoutes.howToPlay,
           builder: (context, state) => const HowToPlayScreen(),
         ),
@@ -142,8 +132,6 @@ class _MainAppState extends State<MainApp> {
       locale: appState.locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      builder: (context, child) =>
-          ConnectivityBanner(child: child ?? const SizedBox.shrink()),
     );
   }
 }

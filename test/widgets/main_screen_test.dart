@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:game_for_cats_2025/models/app_settings.dart';
-import 'package:game_for_cats_2025/services/connectivity_service.dart';
 import 'package:game_for_cats_2025/views/screens/main_screen.dart';
 
 import '../helpers/test_app.dart';
@@ -20,19 +19,16 @@ void main() {
       buildRouterTestApp(
         home: const MainScreen(),
         appState: FakeAppState(currentSettings: AppSettings.defaults()),
-        connectivityController: TestConnectivityController(
-          ConnectionStateStatus.online,
-        ),
       ),
     );
     await tester.pump(const Duration(milliseconds: 700));
 
-    expect(find.text('Start The Game!'), findsOneWidget);
-    expect(find.text('Settings'), findsWidgets);
-    expect(find.text('How To Play?'), findsOneWidget);
-    expect(find.text('Credits'), findsOneWidget);
-    expect(find.text('About App'), findsOneWidget);
-    expect(find.text('Activity Trend'), findsWidgets);
+    expect(find.text('Start Hunt'), findsOneWidget);
+    expect(find.text("Today's hunt setup"), findsOneWidget);
+    expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('Hunt Journal'), findsOneWidget);
+    expect(find.text('How It Works'), findsOneWidget);
+    expect(find.text('About the Game'), findsOneWidget);
   });
 
   testWidgets('navigates to about route from menu', (tester) async {
@@ -47,14 +43,11 @@ void main() {
       buildRouterTestApp(
         home: const MainScreen(),
         appState: FakeAppState(currentSettings: AppSettings.defaults()),
-        connectivityController: TestConnectivityController(
-          ConnectionStateStatus.online,
-        ),
       ),
     );
     await tester.pump(const Duration(milliseconds: 700));
 
-    await tester.tap(find.text('About App'));
+    await tester.tap(find.text('About the Game'));
     await tester.pump(const Duration(milliseconds: 200));
     await tester.pumpAndSettle();
 

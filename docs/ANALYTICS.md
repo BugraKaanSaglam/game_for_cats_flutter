@@ -17,8 +17,6 @@ The analytics layer in this repository is intentionally lightweight. It exists t
 - `onboardingCompleted`
 - `gameStarted`
 - `settingsSaved`
-- `appShared`
-- `resultShared`
 
 ## Current Instrumentation Points
 
@@ -26,8 +24,7 @@ The analytics layer in this repository is intentionally lightweight. It exists t
 - onboarding progression
 - settings persistence
 - game start
-- app sharing from About and Credits
-- result sharing from post-game dialog
+- major screen views across onboarding, home, game, settings, about, and hunt journal
 - selected screen views
 
 ## Why This Design

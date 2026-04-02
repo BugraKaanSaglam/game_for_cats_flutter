@@ -3,21 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/services/app_info_service.dart';
-import 'package:game_for_cats_2025/services/app_logger.dart';
-import 'package:game_for_cats_2025/services/connectivity_service.dart';
 import 'package:game_for_cats_2025/views/components/main_app_bar.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:game_for_cats_2025/views/widgets/playful_card.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-final _googlePlayUri = Uri.parse(
-  'https://play.google.com/store/apps/details?id=com.mice_and_paws_cat_game&hl=tr',
-);
-final _appStoreUri = Uri.parse(
-  'https://apps.apple.com/tr/app/mice-and-paws-cat-game/id6739187435',
-);
 
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
@@ -47,18 +36,33 @@ class _AboutScreenState extends State<AboutScreen> {
             return ListView(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               children: [
-                Text(
-                  l10n.about_title,
-                  style: PawTextStyles.heading.copyWith(color: Colors.black),
+                _AboutHero(packageInfo: packageInfo),
+                const SizedBox(height: 12),
+                PlayfulCard(
+                  emoji: '🐾',
+                  title: l10n.about_story_title,
+                  subtitle: l10n.about_story_subtitle,
+                  gradient: PawPalette.pinkToOrange(),
+                  child: Text(
+                    l10n.about_story_body,
+                    style: PawTextStyles.cardSubtitle,
+                  ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  l10n.about_subtitle,
-                  style: PawTextStyles.subheading.copyWith(color: Colors.black),
+                PlayfulCard(
+                  emoji: '🎯',
+                  title: l10n.about_highlights_title,
+                  subtitle: l10n.about_highlights_subtitle,
+                  gradient: PawPalette.tealToLemon(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _BulletLine(text: l10n.about_highlight_one),
+                      _BulletLine(text: l10n.about_highlight_two),
+                      _BulletLine(text: l10n.about_highlight_three),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 20),
                 _AppInfoCard(packageInfo: packageInfo),
-                const _ConnectivityCard(),
                 const SizedBox(height: 32),
               ],
             );
@@ -82,111 +86,131 @@ class _AppInfoCard extends StatelessWidget {
         : '${packageInfo!.version}+${packageInfo!.buildNumber}';
 
     return PlayfulCard(
-      emoji: 'ℹ️',
+      emoji: '🧶',
       title: l10n.about_info_title,
       subtitle: l10n.about_info_subtitle,
-      gradient: PawPalette.pinkToOrange(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _InfoLine(
+            label: l10n.credits_creators,
+            value: l10n.credits_creators_text,
+          ),
           _InfoLine(label: l10n.credits_version_label, value: versionText),
           _InfoLine(
             label: l10n.about_platform_label,
             value: defaultTargetPlatform.name,
           ),
-          const SizedBox(height: 12),
-          Text(
-            l10n.store_links_title,
-            style: PawTextStyles.cardTitle.copyWith(fontSize: 16),
-          ),
-          const SizedBox(height: 6),
-          Text(l10n.store_links_subtitle, style: PawTextStyles.cardSubtitle),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: () =>
-                      _openStore(context, _googlePlayUri, 'google_play'),
-                  icon: const Icon(Icons.shop_2_outlined),
-                  label: Text(l10n.google_play_button),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () =>
-                      _openStore(context, _appStoreUri, 'app_store'),
-                  icon: const Icon(Icons.apple),
-                  label: Text(l10n.app_store_button),
-                ),
-              ),
-            ],
+          _InfoLine(
+            label: l10n.about_release_model_label,
+            value: l10n.about_release_model_value,
           ),
         ],
       ),
     );
   }
-
-  Future<void> _openStore(BuildContext context, Uri uri, String store) async {
-    try {
-      final launched = await launchUrl(
-        uri,
-        mode: kIsWeb
-            ? LaunchMode.platformDefault
-            : LaunchMode.externalApplication,
-      );
-      if (!launched) {
-        throw StateError('Store link could not be opened: $uri');
-      }
-      AppAnalytics.track(
-        AnalyticsEvent.storeOpened,
-        parameters: <String, Object?>{'screen': 'about', 'store': store},
-      );
-    } catch (error, stackTrace) {
-      AppLogger.error('Opening store link failed', error, stackTrace);
-    }
-  }
 }
 
-class _ConnectivityCard extends StatelessWidget {
-  const _ConnectivityCard();
+class _AboutHero extends StatelessWidget {
+  const _AboutHero({required this.packageInfo});
+
+  final PackageInfo? packageInfo;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final status = context.watch<ConnectivityController>().status;
-    final label = switch (status) {
-      ConnectionStateStatus.online => l10n.connectivity_status_online,
-      ConnectionStateStatus.offline => l10n.connectivity_status_offline,
-      ConnectionStateStatus.unknown => l10n.connectivity_status_unknown,
-    };
+    final versionText = packageInfo == null
+        ? l10n.credits_version_loading
+        : '${packageInfo!.version}+${packageInfo!.buildNumber}';
 
-    final tone = switch (status) {
-      ConnectionStateStatus.online => Colors.green,
-      ConnectionStateStatus.offline => Colors.deepOrange,
-      ConnectionStateStatus.unknown => Colors.blueGrey,
-    };
-
-    return PlayfulCard(
-      emoji: '📶',
-      title: l10n.connectivity_title,
-      subtitle: l10n.connectivity_subtitle,
-      gradient: PawPalette.tealToLemon(),
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(32),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1A1238), Color(0xFF3A2A72), Color(0xFFFF5D8F)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: PawPalette.midnight.withValues(alpha: 0.18),
+            blurRadius: 24,
+            offset: const Offset(0, 16),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           Container(
-            width: 14,
-            height: 14,
-            decoration: BoxDecoration(color: tone, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              label,
-              style: PawTextStyles.cardTitle.copyWith(fontSize: 16),
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: 0.12),
+            ),
+            child: const Icon(
+              Icons.pets_rounded,
+              color: Colors.white,
+              size: 34,
             ),
           ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.about_title, style: PawTextStyles.heading),
+                const SizedBox(height: 6),
+                Text(l10n.about_subtitle, style: PawTextStyles.subheading),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(999),
+                    color: Colors.white.withValues(alpha: 0.12),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.18),
+                    ),
+                  ),
+                  child: Text(
+                    '${l10n.credits_version_label}: $versionText',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BulletLine extends StatelessWidget {
+  const _BulletLine({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 6),
+            child: Icon(Icons.circle, size: 8, color: PawPalette.bubbleGum),
+          ),
+          const SizedBox(width: 10),
+          Expanded(child: Text(text, style: PawTextStyles.cardSubtitle)),
         ],
       ),
     );

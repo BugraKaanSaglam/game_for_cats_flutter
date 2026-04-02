@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:game_for_cats_2025/models/app_settings.dart';
-import 'package:game_for_cats_2025/services/connectivity_service.dart';
 import 'package:game_for_cats_2025/views/screens/main_screen.dart';
 import 'package:integration_test/integration_test.dart';
 
@@ -23,16 +22,13 @@ void main() {
       buildRouterTestApp(
         home: const MainScreen(),
         appState: FakeAppState(currentSettings: AppSettings.defaults()),
-        connectivityController: TestConnectivityController(
-          ConnectionStateStatus.online,
-        ),
       ),
     );
     await tester.pump(const Duration(milliseconds: 700));
 
-    expect(find.text('About App'), findsOneWidget);
+    expect(find.text('About the Game'), findsOneWidget);
 
-    await tester.tap(find.text('About App'));
+    await tester.tap(find.text('About the Game'));
     await tester.pumpAndSettle();
 
     expect(find.text('about-destination'), findsOneWidget);

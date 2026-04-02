@@ -16,10 +16,10 @@ flowchart TD
     F --> G[SharedPreferences / SQLite]
     B --> H[Screens]
     H --> I[Widgets]
-    H --> J[Analytics / Sharing / App Info]
+    H --> J[Analytics / App Info]
     H --> K[Flame Game Screen]
     D --> L[Logging]
-    D --> M[Connectivity]
+    D --> M[Analytics]
 ```
 
 ## Layering
@@ -27,7 +27,7 @@ flowchart TD
 ### App Bootstrap
 
 - `lib/main.dart`
-- wires providers, routing, connectivity banner, localization, and theme
+- wires providers, routing, localization, and theme
 
 ### State
 
@@ -46,19 +46,17 @@ flowchart TD
 - contains cross-cutting runtime services:
   - `app_logger.dart`
   - `app_info_service.dart`
-  - `app_share_service.dart`
-  - `connectivity_service.dart`
   - `app_analytics.dart`
 
 ### UI Shell
 
 - `lib/views/screens/`
-- screens outside the Flame canvas handle onboarding, settings, activity trend, credits, and app info
+- screens outside the Flame canvas handle onboarding, settings, hunt journal, and game info
 
 ### Game Runtime
 
 - `lib/views/screens/game_screen.dart`
-- integrates `FlameGame`, overlays, session persistence, and post-game sharing
+- integrates `FlameGame`, overlays, streak tracking, and local session persistence
 
 ## State Management Choice
 
@@ -67,7 +65,6 @@ flowchart TD
 - app readiness
 - settings
 - onboarding completion
-- connectivity banner state
 
 This keeps code readable and migration cost low. If the project grows into remote config, auth, content feeds, or feature-package isolation, `riverpod` becomes the more scalable option.
 
@@ -86,14 +83,13 @@ The app includes a deliberately small but structured observability surface:
 
 - logging for boot and persistence flows
 - analytics event taxonomy for major user interactions
-- connectivity status surfaced through UI and state
 
 ## Testing Strategy
 
 The repository uses three layers of automated verification:
 
-- unit tests: models, state, connectivity logic
-- widget tests: key screens, banner behavior, navigation smoke
+- unit tests: models and state
+- widget tests: key screens and navigation smoke
 - golden tests: visual regressions for stable screens
 - integration tests: app-flow smoke over routed UI
 

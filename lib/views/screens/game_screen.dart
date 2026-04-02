@@ -56,12 +56,14 @@ class GameResult {
     required this.miceTaps,
     required this.bugTaps,
     required this.wrongTaps,
+    required this.bestStreak,
   });
 
   final int totalTaps;
   final int miceTaps;
   final int bugTaps;
   final int wrongTaps;
+  final int bestStreak;
 
   factory GameResult.fromCounter(GameClicksCounter counter) {
     final wrong = counter.totalTaps - (counter.bugTaps + counter.miceTaps);
@@ -70,6 +72,7 @@ class GameResult {
       miceTaps: counter.miceTaps,
       bugTaps: counter.bugTaps,
       wrongTaps: max(wrong, 0),
+      bestStreak: counter.bestStreak,
     );
   }
 }
@@ -107,6 +110,12 @@ Dialog endGameDialog(BuildContext context, {required Game game}) {
       ? 0
       : ((successfulTaps / stats.totalTaps) * 100).round();
   final l10n = AppLocalizations.of(context)!;
+  final mood = _resolveCatMood(
+    l10n,
+    accuracy: accuracy,
+    bestStreak: stats.bestStreak,
+    totalTaps: stats.totalTaps,
+  );
   final dialogWidth = min(MediaQuery.of(context).size.width * 0.92, 440.0);
   return Dialog(
     insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -153,27 +162,31 @@ Dialog endGameDialog(BuildContext context, {required Game game}) {
               l10n.game_over,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+                fontSize: 26,
+                fontWeight: FontWeight.w900,
               ),
             ),
-            const SizedBox(height: 14),
-            Row(
+            const SizedBox(height: 8),
+            _MoodBadge(mood: mood),
+            const SizedBox(height: 18),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
               children: [
-                Expanded(
-                  child: _ResultSummaryChip(
-                    label: l10n.activity_total_label,
-                    value: '${stats.totalTaps}',
-                    accent: PawPalette.lemon,
-                  ),
+                _ResultSummaryChip(
+                  label: l10n.activity_total_label,
+                  value: '${stats.totalTaps}',
+                  accent: PawPalette.lemon,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _ResultSummaryChip(
-                    label: l10n.activity_accuracy_label,
-                    value: '$accuracy%',
-                    accent: PawPalette.teal,
-                  ),
+                _ResultSummaryChip(
+                  label: l10n.activity_accuracy_label,
+                  value: '$accuracy%',
+                  accent: PawPalette.teal,
+                ),
+                _ResultSummaryChip(
+                  label: l10n.best_streak_label,
+                  value: '${stats.bestStreak}',
+                  accent: PawPalette.bubbleGum,
                 ),
               ],
             ),
@@ -265,6 +278,7 @@ Dialog backButtonDialog(Game game, BuildContext context) {
   isBackButtonDialogOpen = true;
   isOverlayBlocking = true;
   game.pauseEngine();
+  final l10n = AppLocalizations.of(context)!;
   final dialogWidth = min(MediaQuery.of(context).size.width * 0.92, 420.0);
   return Dialog(
     insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -282,10 +296,14 @@ Dialog backButtonDialog(Game game, BuildContext context) {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.logout, color: Colors.white, size: 46),
+            const Icon(
+              Icons.pause_circle_outline_rounded,
+              color: Colors.white,
+              size: 46,
+            ),
             const SizedBox(height: 12),
             Text(
-              AppLocalizations.of(context)!.exit_validation,
+              l10n.pause_hunt_title,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -295,9 +313,7 @@ Dialog backButtonDialog(Game game, BuildContext context) {
             ),
             const SizedBox(height: 8),
             Text(
-              AppLocalizations.of(
-                context,
-              )!.this_will_close_automatically_in_seconds,
+              l10n.pause_hunt_subtitle,
               style: const TextStyle(color: Colors.white70),
               textAlign: TextAlign.center,
             ),
@@ -320,7 +336,7 @@ Dialog backButtonDialog(Game game, BuildContext context) {
                       Navigator.pop(context);
                     },
                     child: Text(
-                      AppLocalizations.of(context)!.i_am_cat,
+                      l10n.resume_hunt_button,
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -347,7 +363,7 @@ Dialog backButtonDialog(Game game, BuildContext context) {
                       );
                     },
                     child: Text(
-                      AppLocalizations.of(context)!.i_am_human,
+                      l10n.end_round_button,
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -373,6 +389,7 @@ void closeDialogAutomatically(Game game, BuildContext context) {
 }
 
 PreferredSizeWidget gameAppBar(BuildContext context, Game game) {
+  final l10n = AppLocalizations.of(context)!;
   return AppBar(
     automaticallyImplyLeading: false,
     backgroundColor: Colors.transparent,
@@ -406,18 +423,30 @@ PreferredSizeWidget gameAppBar(BuildContext context, Game game) {
       builder: (context, elapsedTicks, _) {
         final remainingTime = max(gameTimer - elapsedTicks, 0);
         final label = remainingTime > 0
-            ? '${AppLocalizations.of(context)!.countdown} $remainingTime'
-            : AppLocalizations.of(context)!.game_over;
+            ? '${l10n.countdown} $remainingTime'
+            : l10n.game_over;
         return Text(
           label,
           style: const TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w800,
           ),
         );
       },
     ),
-    actions: const [],
+    actions: [
+      Padding(
+        padding: const EdgeInsets.only(right: 12),
+        child: AnimatedBuilder(
+          animation: clicksCounter,
+          builder: (context, _) => _StreakPill(
+            label: l10n.current_streak_label,
+            value: clicksCounter.currentStreak,
+            compact: true,
+          ),
+        ),
+      ),
+    ],
   );
 }
 
@@ -507,6 +536,25 @@ class _GameScreenState extends State<GameScreen> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _StreakPill(
+                              label: l10n.current_streak_label,
+                              value: clicksCounter.currentStreak,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _StreakPill(
+                              label: l10n.best_streak_label,
+                              value: clicksCounter.bestStreak,
+                              accent: PawPalette.teal,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
                       LinearProgressIndicator(
                         value: progress.isFinite ? progress : 0,
                         backgroundColor: Colors.white24,
@@ -869,6 +917,7 @@ class _ResultSummaryChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 118,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.08),
@@ -892,6 +941,87 @@ class _ResultSummaryChip extends StatelessWidget {
               color: accent,
               fontSize: 20,
               fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MoodBadge extends StatelessWidget {
+  const _MoodBadge({required this.mood});
+
+  final _CatMood mood;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: mood.color.withValues(alpha: 0.16),
+        border: Border.all(color: mood.color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(mood.icon, color: mood.color, size: 18),
+          const SizedBox(width: 8),
+          Text(
+            mood.label,
+            style: TextStyle(color: mood.color, fontWeight: FontWeight.w800),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StreakPill extends StatelessWidget {
+  const _StreakPill({
+    required this.label,
+    required this.value,
+    this.accent = PawPalette.bubbleGum,
+    this.compact = false,
+  });
+
+  final String label;
+  final int value;
+  final Color accent;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 12 : 14,
+        vertical: compact ? 8 : 10,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: Colors.white.withValues(alpha: 0.08),
+        border: Border.all(color: accent.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.auto_awesome_rounded,
+            color: accent,
+            size: compact ? 14 : 16,
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              '$label $value',
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: compact ? 12 : 13,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],
@@ -997,4 +1127,53 @@ class _DialogActionButton extends StatelessWidget {
       ),
     );
   }
+}
+
+class _CatMood {
+  const _CatMood({
+    required this.label,
+    required this.color,
+    required this.icon,
+  });
+
+  final String label;
+  final Color color;
+  final IconData icon;
+}
+
+_CatMood _resolveCatMood(
+  AppLocalizations l10n, {
+  required int accuracy,
+  required int bestStreak,
+  required int totalTaps,
+}) {
+  if (totalTaps == 0) {
+    return _CatMood(
+      label: l10n.cat_mood_warming_up,
+      color: const Color(0xFFFFB347),
+      icon: Icons.nights_stay_rounded,
+    );
+  }
+
+  if (accuracy >= 85 && bestStreak >= 5) {
+    return _CatMood(
+      label: l10n.cat_mood_hunt_legend,
+      color: PawPalette.lemon,
+      icon: Icons.workspace_premium_rounded,
+    );
+  }
+
+  if (accuracy >= 65) {
+    return _CatMood(
+      label: l10n.cat_mood_playful,
+      color: PawPalette.teal,
+      icon: Icons.pets_rounded,
+    );
+  }
+
+  return _CatMood(
+    label: l10n.cat_mood_curious,
+    color: PawPalette.bubbleGum,
+    icon: Icons.visibility_rounded,
+  );
 }

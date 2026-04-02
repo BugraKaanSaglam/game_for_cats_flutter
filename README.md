@@ -11,9 +11,9 @@ Colorful Flutter + Flame cat game built as a polished public portfolio project. 
 - Fast arcade loop built with `Flame`
 - Localized UI in English and Turkish
 - Persisted settings, onboarding, and play activity history
-- Connectivity status layer with offline banner
 - Typed internal analytics layer with event taxonomy
-- Share flow for app info and game results
+- Game-first home screen with hunt setup summary
+- Round summaries with streaks and cat mood feedback
 - Unit, widget, golden, and integration coverage
 - GitHub Actions CI with coverage artifact output
 
@@ -25,7 +25,7 @@ This repo is deliberately built to read well for hiring managers and senior engi
 - clear growth from a first app into a maintainable codebase
 - visible architecture boundaries
 - explicit engineering decisions and tradeoffs
-- offline-first observability and release posture
+- local-first product posture without backend coupling
 - automated regression safety
 
 ## Architecture Snapshot
@@ -40,17 +40,15 @@ flowchart LR
     Routes --> Screens[Screens]
     Screens --> Flame[Flame Game]
     Services --> Analytics[Analytics]
-    Services --> Connectivity[Connectivity]
 ```
 
 ## Feature Set
 
 - Adjustable game timer, difficulty, audio, background image, mute, and low-power mode
 - Onboarding flow with guarded initial navigation
-- Activity trend screen backed by local session logs
-- Credits and About screens with version/build metadata
-- Connectivity banner for offline state awareness
-- Share entry points for both app metadata and round results
+- Hunt Journal screen backed by local session logs
+- About screen with product story and build metadata
+- Round summary with streak and cat mood feedback
 - Cross-platform Flutter targets: Android, iOS, web, desktop shells
 
 ## Architecture
@@ -60,7 +58,7 @@ This project intentionally stays pragmatic.
 - `lib/main.dart`: app bootstrap, routing, global error capture, providers
 - `lib/state/`: application-level state via `provider`
 - `lib/data/`: repository layer for settings and onboarding persistence
-- `lib/services/`: app info, logging, sharing, connectivity, analytics
+- `lib/services/`: app info, logging, and analytics
 - `lib/views/screens/`: game-adjacent screens and product UI
 - `lib/views/widgets/`: reusable presentation widgets
 - `lib/models/`: entities, enums, DB models, global game variables
@@ -74,6 +72,7 @@ Deep-dive docs:
 - [Engineering Decisions](docs/DECISIONS.md)
 - [Analytics](docs/ANALYTICS.md)
 - [Release And Config](docs/RELEASE_AND_CONFIG.md)
+- [App Store Resubmission](docs/APP_STORE_RESUBMISSION.md)
 
 ## Why `provider` Here?
 
@@ -87,7 +86,7 @@ Local checks:
 flutter pub get
 flutter analyze
 flutter test
-flutter test --coverage
+flutter test --coverage --exclude-tags=golden
 ```
 
 Integration smoke test on macOS:
@@ -122,7 +121,7 @@ Pipeline steps:
 1. `flutter pub get`
 2. `dart format --set-exit-if-changed`
 3. `flutter analyze`
-4. `flutter test --coverage`
+4. `flutter test --coverage --exclude-tags=golden`
 5. `flutter test integration_test -d macos`
 6. upload `coverage/lcov.info` as an artifact
 
@@ -141,8 +140,7 @@ Current automated coverage includes:
 
 - model tests for `AppSettings`
 - state tests for `AppState`
-- service tests for connectivity handling
-- widget tests for loading, credits, about, connectivity banner, and main menu navigation
+- widget tests for loading, about, and main menu navigation
 - golden tests for stable UI snapshots
 - integration smoke coverage for routed app flow
 
@@ -154,7 +152,7 @@ This repository is meant to present more than a toy app. It demonstrates:
 - game loop integration
 - product-focused UI layers outside the game canvas
 - local persistence and settings design
-- offline-first app observability basics
+- local-only product design without backend requirements
 - CI and automated testing discipline
 
 ## Tradeoffs And Next Steps
