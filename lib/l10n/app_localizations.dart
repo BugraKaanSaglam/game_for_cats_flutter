@@ -212,6 +212,30 @@ abstract class AppLocalizations {
   /// **'Sound on'**
   String get home_sound_on;
 
+  /// No description provided for @home_live_badge.
+  ///
+  /// In en, this message translates to:
+  /// **'Live'**
+  String get home_live_badge;
+
+  /// No description provided for @home_feature_quick_rounds.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick rounds'**
+  String get home_feature_quick_rounds;
+
+  /// No description provided for @home_feature_moving_targets.
+  ///
+  /// In en, this message translates to:
+  /// **'Moving targets'**
+  String get home_feature_moving_targets;
+
+  /// No description provided for @home_feature_paw_first.
+  ///
+  /// In en, this message translates to:
+  /// **'Paw-first play'**
+  String get home_feature_paw_first;
+
   /// No description provided for @onboarding_title_welcome.
   ///
   /// In en, this message translates to:

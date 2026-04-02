@@ -53,4 +53,26 @@ void main() {
 
     expect(find.text('about-destination'), findsOneWidget);
   });
+
+  testWidgets('renders without overflow on compact phone width', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(750, 1334);
+    tester.view.devicePixelRatio = 2.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(
+      buildRouterTestApp(
+        home: const MainScreen(),
+        appState: FakeAppState(currentSettings: AppSettings.defaults()),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 700));
+
+    expect(find.text('Start Hunt'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

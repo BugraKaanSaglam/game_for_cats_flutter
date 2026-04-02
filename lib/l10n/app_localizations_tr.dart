@@ -70,6 +70,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get home_sound_on => 'Ses açık';
 
   @override
+  String get home_live_badge => 'Canlı';
+
+  @override
+  String get home_feature_quick_rounds => 'Hızlı turlar';
+
+  @override
+  String get home_feature_moving_targets => 'Hareketli hedefler';
+
+  @override
+  String get home_feature_paw_first => 'Pati odaklı oyun';
+
+  @override
   String get onboarding_title_welcome => 'Kedi Oyun Alanına Hoş Geldin';
 
   @override

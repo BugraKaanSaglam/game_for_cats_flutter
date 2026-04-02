@@ -70,6 +70,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home_sound_on => 'Sound on';
 
   @override
+  String get home_live_badge => 'Live';
+
+  @override
+  String get home_feature_quick_rounds => 'Quick rounds';
+
+  @override
+  String get home_feature_moving_targets => 'Moving targets';
+
+  @override
+  String get home_feature_paw_first => 'Paw-first play';
+
+  @override
   String get onboarding_title_welcome => 'Welcome to the Cat Playground';
 
   @override
