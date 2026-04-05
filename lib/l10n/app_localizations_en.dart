@@ -58,6 +58,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'Review recent taps, misses, and accuracy.';
 
   @override
+  String get home_guide_subtitle => 'Quick rules before the hunt starts.';
+
+  @override
+  String get home_onboarding_button => 'Paw Tour';
+
+  @override
+  String get home_onboarding_subtitle =>
+      'See the playground before your cat jumps in.';
+
+  @override
+  String get home_play_chip => 'Open';
+
+  @override
   String get home_default_playmat => 'Default play mat';
 
   @override

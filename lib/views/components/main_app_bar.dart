@@ -4,6 +4,7 @@ import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:game_for_cats_2025/routing/app_routes.dart';
 
+//* Shared top app bar for Flutter pages outside the live Flame game HUD.
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({
     super.key,
@@ -21,6 +22,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    //? Default back behavior always returns to main so secondary screens cannot strand the user.
     final leading = hasBackButton
         ? IconButton(
             color: Colors.white,
@@ -30,6 +32,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
         : null;
 
     return AppBar(
+      //! The background is custom-drawn because the stock AppBar surface looked too plain for the game.
       toolbarHeight: 64,
       title: Text(
         title,

@@ -20,8 +20,13 @@ import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+//* App bootstrap:
+//* - crash/log hooks are registered first
+//* - app state is created once at the root
+//* - router decides whether the player sees loading, onboarding, or the main flow
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  //! Framework-side exceptions still need to surface in debug, so we both log and present them.
   FlutterError.onError = (details) {
     AppLogger.error(
       'Unhandled Flutter framework error',
@@ -30,6 +35,7 @@ void main() async {
     );
     FlutterError.presentError(details);
   };
+  //! PlatformDispatcher catches async / platform boundary errors that FlutterError misses.
   PlatformDispatcher.instance.onError = (error, stack) {
     AppLogger.error('Unhandled platform error', error, stack);
     return true;
@@ -61,10 +67,13 @@ class _MainAppState extends State<MainApp> {
   void initState() {
     super.initState();
     final appState = context.read<AppState>();
+    //* Navigation shell:
+    //* go_router listens to AppState so onboarding / loading redirects stay declarative.
     _router = GoRouter(
       initialLocation: AppRoutes.loading,
       refreshListenable: appState,
       redirect: (context, state) {
+        //? The loading route is the temporary holding screen while repositories hydrate.
         if (!appState.isReady) return AppRoutes.loading;
 
         final isOnboarding = state.matchedLocation == AppRoutes.onboarding;
@@ -124,6 +133,7 @@ class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
+    //! Locale is derived from persisted settings, so MaterialApp must rebuild when AppState changes.
     return MaterialApp.router(
       routerConfig: _router,
       themeMode: ThemeMode.light,

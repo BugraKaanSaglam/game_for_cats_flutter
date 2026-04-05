@@ -1,5 +1,7 @@
 import 'package:game_for_cats_2025/services/app_logger.dart';
 
+//* Lightweight analytics abstraction:
+//* currently logs locally, but keeps event names typed and centralized.
 enum AnalyticsEvent {
   appLaunched,
   screenViewed,
@@ -13,6 +15,7 @@ enum AnalyticsEvent {
 class AppAnalytics {
   AppAnalytics._();
 
+  //? Keeping this API stable means a real analytics SDK could replace the logger later without touching screens.
   static void track(
     AnalyticsEvent event, {
     Map<String, Object?> parameters = const {},
@@ -22,6 +25,7 @@ class AppAnalytics {
   }
 
   static void screenView(String screenName) {
+    //! Screen views are normalized through one helper so naming stays consistent.
     track(
       AnalyticsEvent.screenViewed,
       parameters: <String, Object?>{'screen': screenName},

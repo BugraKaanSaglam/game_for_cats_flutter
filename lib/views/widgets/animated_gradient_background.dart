@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 
-/// Reusable animated gradient background with a subtle dark overlay so that
-/// foreground widgets stay readable regardless of the palette that is active.
+//* Shared animated background used by non-game screens.
+//! The dark overlay is not decorative only; it keeps text readable while the gradient cycles.
 class AnimatedGradientBackground extends StatefulWidget {
   const AnimatedGradientBackground({
     super.key,
@@ -58,6 +58,7 @@ class _AnimatedGradientBackgroundState
   }
 
   void _startCycling() {
+    //? Static backgrounds are allowed by simply passing a single palette.
     if (_palettes.length <= 1) return;
     _timer = Timer.periodic(widget.switchDuration, (_) {
       if (!mounted) return;

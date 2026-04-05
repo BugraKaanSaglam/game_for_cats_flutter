@@ -2,7 +2,7 @@
 
 import 'dart:ui';
 
-//Objects
+//* Late-bound images loaded once by game_functions.dart and consumed by Flame entities.
 late Image globalMiceImage;
 late Image globalBugImage;
 

@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-/// Lightweight glassmorphism inspired container used across the non-game screens.
+//* Small reusable frosted panel for stats / information overlays.
 class GlassyPanel extends StatelessWidget {
   const GlassyPanel({
     super.key,
@@ -25,6 +25,7 @@ class GlassyPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //! BackdropFilter is intentionally wrapped inside ClipRRect to keep the blur bounded.
     final decoration = BoxDecoration(
       borderRadius: BorderRadius.circular(borderRadius),
       gradient:

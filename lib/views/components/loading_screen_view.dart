@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 
+//* Temporary loading route shown while AppState initializes repositories and locale.
 class LoadingScreenView extends StatelessWidget {
   const LoadingScreenView({super.key});
 
@@ -16,6 +17,7 @@ class LoadingScreenView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
+                //? A branded loading mark feels better than a blank spinner-only page during cold start.
                 width: 112,
                 height: 112,
                 decoration: BoxDecoration(
@@ -75,4 +77,5 @@ class LoadingScreenView extends StatelessWidget {
   }
 }
 
+//! Convenience builder used by the Flame GameWidget loadingBuilder callback.
 Widget loadingScreen(BuildContext context) => const LoadingScreenView();

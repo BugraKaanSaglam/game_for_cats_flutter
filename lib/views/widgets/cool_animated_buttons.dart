@@ -2,7 +2,12 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
+import 'package:game_for_cats_2025/views/widgets/paw_print.dart';
 
+//* Primary game CTA button:
+//* - custom gradient shell
+//* - subtle sheen pass
+//* - paw decoration so the app does not feel like stock Material buttons
 class CoolAnimatedButton extends StatefulWidget {
   const CoolAnimatedButton({
     super.key,
@@ -33,6 +38,7 @@ class CoolAnimatedButtonState extends State<CoolAnimatedButton>
   @override
   void initState() {
     super.initState();
+    //! Repeating sheen keeps the button alive even when the screen is otherwise static.
     _sheenController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2400),
@@ -63,13 +69,14 @@ class CoolAnimatedButtonState extends State<CoolAnimatedButton>
     final scale = _isPressed ? 0.985 : 1.0;
     final elevation = _isPressed ? 10.0 : 18.0;
     final glowColor = Color.lerp(widget.startColor, widget.endColor, 0.5)!;
-    final iconSize = widget.compact ? 38.0 : 42.0;
-    final iconInnerSize = widget.compact ? 20.0 : 22.0;
-    final labelFontSize = widget.compact ? 17.0 : 18.0;
-    final horizontalPadding = widget.compact ? 16.0 : 18.0;
-    final verticalPadding = widget.compact ? 14.0 : 16.0;
+    final iconSize = widget.compact ? 36.0 : 40.0;
+    final iconInnerSize = widget.compact ? 19.0 : 21.0;
+    final labelFontSize = widget.compact ? 16.0 : 17.5;
+    final horizontalPadding = widget.compact ? 14.0 : 18.0;
+    final verticalPadding = widget.compact ? 13.0 : 15.0;
 
     return GestureDetector(
+      //? GestureDetector gives tighter control over press feedback timing than a stock ElevatedButton.
       onTapDown: _onTapDown,
       onTapUp: _onTapUp,
       onTapCancel: _onTapCancel,
@@ -113,17 +120,19 @@ class CoolAnimatedButtonState extends State<CoolAnimatedButton>
                             Positioned(
                               left: 18 + (wave * 8),
                               top: 10,
-                              child: _PawGlyph(
+                              child: PawPrint(
                                 size: 18,
                                 color: Colors.white.withValues(alpha: 0.12),
+                                rotation: -0.12,
                               ),
                             ),
                             Positioned(
                               right: 82 - (wave * 10),
                               bottom: 10,
-                              child: _PawGlyph(
+                              child: PawPrint(
                                 size: 16,
                                 color: Colors.white.withValues(alpha: 0.1),
+                                rotation: 0.18,
                               ),
                             ),
                             Positioned(
@@ -131,7 +140,7 @@ class CoolAnimatedButtonState extends State<CoolAnimatedButton>
                               bottom: 18 + (wave * 4),
                               child: Transform.rotate(
                                 angle: -0.3,
-                                child: _PawGlyph(
+                                child: PawPrint(
                                   size: 14,
                                   color: Colors.white.withValues(alpha: 0.08),
                                 ),
@@ -217,9 +226,10 @@ class CoolAnimatedButtonState extends State<CoolAnimatedButton>
                             child: Stack(
                               alignment: Alignment.center,
                               children: [
-                                _PawGlyph(
+                                PawPrint(
                                   size: iconSize * 0.62,
                                   color: Colors.white.withValues(alpha: 0.14),
+                                  rotation: -0.12,
                                 ),
                                 IconTheme(
                                   data: IconThemeData(
@@ -249,8 +259,8 @@ class CoolAnimatedButtonState extends State<CoolAnimatedButton>
                       ),
                     ),
                     Container(
-                      width: widget.compact ? 34 : 38,
-                      height: widget.compact ? 34 : 38,
+                      width: widget.compact ? 32 : 36,
+                      height: widget.compact ? 32 : 36,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white.withValues(alpha: 0.12),
@@ -261,7 +271,7 @@ class CoolAnimatedButtonState extends State<CoolAnimatedButton>
                       child: const Icon(
                         Icons.arrow_forward_rounded,
                         color: Colors.white,
-                        size: 20,
+                        size: 18,
                       ),
                     ),
                   ],
@@ -271,79 +281,6 @@ class CoolAnimatedButtonState extends State<CoolAnimatedButton>
           ),
         ),
       ),
-    );
-  }
-}
-
-class _PawGlyph extends StatelessWidget {
-  const _PawGlyph({required this.size, required this.color});
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final toe = size * 0.2;
-    final padWidth = size * 0.5;
-    final padHeight = size * 0.34;
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        children: [
-          Positioned(
-            left: size * 0.14,
-            top: size * 0.06,
-            child: _PawDot(size: toe, color: color),
-          ),
-          Positioned(
-            left: size * 0.38,
-            top: 0,
-            child: _PawDot(size: toe, color: color),
-          ),
-          Positioned(
-            right: size * 0.14,
-            top: size * 0.06,
-            child: _PawDot(size: toe, color: color),
-          ),
-          Positioned(
-            left: size * 0.3,
-            top: size * 0.2,
-            child: _PawDot(size: toe * 0.92, color: color),
-          ),
-          Positioned(
-            left: (size - padWidth) / 2,
-            bottom: size * 0.1,
-            child: Container(
-              width: padWidth,
-              height: padHeight,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(size * 0.22),
-                  bottom: Radius.circular(size * 0.18),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PawDot extends StatelessWidget {
-  const _PawDot({required this.size, required this.color});
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }

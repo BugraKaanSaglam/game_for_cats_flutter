@@ -13,12 +13,15 @@ import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/state/app_state.dart';
 import 'package:game_for_cats_2025/views/widgets/animated_gradient_background.dart';
 import 'package:game_for_cats_2025/views/widgets/cool_animated_buttons.dart';
+import 'package:game_for_cats_2025/views/widgets/paw_print.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../components/main_app_bar.dart';
 
+//* Main menu / first impression screen.
+//! This screen carries a lot of App Review weight, so it is intentionally game-first and not utility-first.
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -113,37 +116,32 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     return AnimatedGradientBackground(
       child: Stack(
         children: [
+          //* Ambient orbs keep the menu from feeling like a flat settings shell.
           _buildAmbientOrbs(),
           SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final horizontalPadding = constraints.maxWidth > 800
                     ? constraints.maxWidth * 0.25
-                    : 24.0;
+                    : 20.0;
+                final topPadding = constraints.maxHeight < 780 ? 12.0 : 16.0;
+                final bottomPadding = constraints.maxHeight < 780 ? 20.0 : 28.0;
                 return Padding(
                   padding: EdgeInsets.fromLTRB(
                     horizontalPadding,
-                    20,
+                    topPadding,
                     horizontalPadding,
-                    32,
+                    bottomPadding,
                   ),
                   child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _buildTopStrip(context, constraints.maxWidth),
-                        const SizedBox(height: 14),
-                        _buildSetupPanel(
-                          context,
-                          settings,
-                          constraints.maxWidth,
-                        ),
-                        const SizedBox(height: 18),
                         Align(
                           alignment: Alignment.topCenter,
                           child: ConstrainedBox(
                             constraints: const BoxConstraints(maxWidth: 560),
-                            child: _buildMenuButtons(constraints, settings),
+                            child: _buildMenuStage(constraints, settings),
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -182,196 +180,142 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildTopStrip(BuildContext context, double availableWidth) {
-    final isCompact = availableWidth < 430;
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: isCompact ? 16 : 18,
-        vertical: isCompact ? 14 : 16,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        gradient: LinearGradient(
-          colors: [
-            Colors.white.withValues(alpha: 0.1),
-            Colors.white.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+  Widget _buildMenuStage(BoxConstraints constraints, AppSettings settings) {
+    final isCompact = constraints.maxWidth < 470;
+    //! The first fold is intentionally sparse now: no bulky hero card, only setup chips, paws, and actions.
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned(
+          left: 6,
+          top: 10,
+          child: PawPrint(
+            size: isCompact ? 14 : 16,
+            color: Colors.white.withValues(alpha: 0.16),
+            rotation: -0.14,
+          ),
         ),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-        boxShadow: [
-          BoxShadow(
-            color: PawPalette.midnight.withValues(alpha: 0.22),
-            blurRadius: 22,
-            offset: const Offset(0, 14),
+        Positioned(
+          left: 34,
+          top: 24,
+          child: PawPrint(
+            size: isCompact ? 10 : 12,
+            color: Colors.white.withValues(alpha: 0.1),
+            rotation: 0.08,
           ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: IgnorePointer(
-              child: AnimatedBuilder(
-                animation: _ambientController,
-                builder: (context, _) {
-                  final wave = math.sin(_ambientController.value * math.pi * 2);
-                  return Stack(
-                    children: [
-                      Positioned(
-                        right: 16 + (wave * 8),
-                        top: 14,
-                        child: _MiniPawStamp(
-                          size: 16,
-                          color: Colors.white.withValues(alpha: 0.12),
-                        ),
-                      ),
-                      Positioned(
-                        right: 44 - (wave * 6),
-                        top: 34,
-                        child: _MiniPawStamp(
-                          size: 12,
-                          color: Colors.white.withValues(alpha: 0.09),
-                        ),
-                      ),
-                      Positioned(
-                        left: 14,
-                        bottom: 12 + (wave * 6),
-                        child: _MiniPawStamp(
-                          size: 14,
-                          color: Colors.white.withValues(alpha: 0.07),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
+        ),
+        Positioned(
+          right: 18,
+          top: 6,
+          child: PawPrint(
+            size: isCompact ? 15 : 17,
+            color: Colors.white.withValues(alpha: 0.14),
+            rotation: 0.12,
           ),
-          isCompact
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: _PlayfieldPreviewCard(compact: true),
-                    ),
-                    const SizedBox(height: 10),
-                    _TopStripCopy(compact: true),
-                  ],
-                )
-              : Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Expanded(child: _TopStripCopy(compact: false)),
-                    const SizedBox(width: 16),
-                    _PlayfieldPreviewCard(compact: true),
-                  ],
-                ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSetupPanel(
-    BuildContext context,
-    AppSettings settings,
-    double availableWidth,
-  ) {
-    final l10n = AppLocalizations.of(context)!;
-    final isCompact = availableWidth < 430;
-    return Container(
-      padding: EdgeInsets.all(isCompact ? 16 : 18),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        color: Colors.white.withValues(alpha: 0.08),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (isCompact) ...[
+        ),
+        Positioned(
+          right: 44,
+          top: 32,
+          child: PawPrint(
+            size: isCompact ? 11 : 13,
+            color: Colors.white.withValues(alpha: 0.09),
+            rotation: -0.1,
+          ),
+        ),
+        Positioned(
+          left: -2,
+          bottom: 112,
+          child: PawPrint(
+            size: isCompact ? 13 : 15,
+            color: Colors.white.withValues(alpha: 0.1),
+            rotation: -0.16,
+          ),
+        ),
+        Positioned(
+          right: 4,
+          bottom: 138,
+          child: PawPrint(
+            size: isCompact ? 13 : 15,
+            color: Colors.white.withValues(alpha: 0.1),
+            rotation: 0.2,
+          ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 6),
             Text(
-              l10n.home_setup_title,
-              style: const TextStyle(
+              AppLocalizations.of(context)!.home_setup_title,
+              textAlign: TextAlign.center,
+              style: PawTextStyles.heading.copyWith(
                 color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
+                fontSize: isCompact ? 17 : 20,
+                height: 1.1,
               ),
             ),
             const SizedBox(height: 8),
-            const _LiveBadge(),
-          ] else
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    l10n.home_setup_title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 440),
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _DeckInfoChip(
+                      compact: isCompact,
+                      icon: Icons.timer_outlined,
+                      label: describeTimeLabel(
+                        AppLocalizations.of(context)!,
+                        settings.time,
+                      ),
                     ),
-                  ),
+                    _DeckInfoChip(
+                      compact: isCompact,
+                      icon: Icons.track_changes_rounded,
+                      label: describeDifficultyLabel(
+                        AppLocalizations.of(context)!,
+                        settings.difficulty,
+                      ),
+                    ),
+                    _DeckInfoChip(
+                      compact: isCompact,
+                      icon: settings.muted
+                          ? Icons.volume_off_rounded
+                          : Icons.volume_up_rounded,
+                      label: settings.muted
+                          ? AppLocalizations.of(context)!.home_muted
+                          : AppLocalizations.of(context)!.home_sound_on,
+                    ),
+                    _DeckInfoChip(
+                      compact: isCompact,
+                      icon: Icons.image_outlined,
+                      label: settings.backgroundPath.isEmpty
+                          ? AppLocalizations.of(context)!.home_default_playmat
+                          : AppLocalizations.of(
+                              context,
+                            )!.home_custom_playmat_ready,
+                    ),
+                  ],
                 ),
-                const _LiveBadge(),
-              ],
+              ),
             ),
-          const SizedBox(height: 6),
-          Text(
-            l10n.home_setup_subtitle,
-            maxLines: isCompact ? 3 : 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: const Color(0xFFD7D5F5),
-              height: 1.35,
-              fontSize: isCompact ? 14 : 15,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              _SetupChip(
-                compact: isCompact,
-                icon: Icons.timer_outlined,
-                label: _timeLabel(l10n, settings.time),
-              ),
-              _SetupChip(
-                compact: isCompact,
-                icon: Icons.track_changes_rounded,
-                label: _difficultyLabel(l10n, settings.difficulty),
-              ),
-              _SetupChip(
-                compact: isCompact,
-                icon: Icons.image_outlined,
-                label: settings.backgroundPath.isEmpty
-                    ? l10n.home_default_playmat
-                    : l10n.home_custom_playmat_ready,
-              ),
-              _SetupChip(
-                compact: isCompact,
-                icon: settings.muted
-                    ? Icons.volume_off_rounded
-                    : Icons.volume_up_rounded,
-                label: settings.muted ? l10n.home_muted : l10n.home_sound_on,
-              ),
-            ],
-          ),
-        ],
-      ),
+            const SizedBox(height: 14),
+            _buildMenuButtons(constraints, settings),
+          ],
+        ),
+      ],
     );
   }
 
   Widget _buildMenuButtons(BoxConstraints constraints, AppSettings settings) {
-    final spacing = math.max(constraints.maxHeight * 0.014, 12.0);
-    final isCompact = constraints.maxWidth < 430;
+    final spacing = math.max(constraints.maxHeight * 0.012, 10.0);
+    final isCompact = constraints.maxWidth < 470;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        //! Game Start Button
+        //! Primary CTA comes first on purpose; secondary destinations should never outrank the hunt itself.
         _buildStaggeredAnimatedButton(
           delay: 0.0,
           child: CoolAnimatedButton(
@@ -391,35 +335,70 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           ),
         ),
         SizedBox(height: spacing),
-        Row(
+        GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          childAspectRatio: isCompact ? 0.92 : 1.0,
           children: [
-            Expanded(
-              child: _buildStaggeredAnimatedButton(
-                delay: 0.18,
-                child: _SecondaryActionCard(
-                  compact: isCompact,
-                  title: AppLocalizations.of(context)!.settings_button,
-                  subtitle: AppLocalizations.of(
-                    context,
-                  )!.home_customize_subtitle,
-                  icon: Icons.tune_rounded,
-                  gradient: const [Color(0xFF4FACFE), Color(0xFF00C6A7)],
-                  onTap: () => context.go(AppRoutes.settings),
-                ),
+            _buildStaggeredAnimatedButton(
+              delay: 0.18,
+              child: _SecondaryActionCard(
+                motion: _ambientController,
+                motionPhase: 0.0,
+                compact: isCompact,
+                title: AppLocalizations.of(context)!.settings_button,
+                subtitle: AppLocalizations.of(context)!.home_customize_subtitle,
+                icon: Icons.tune_rounded,
+                gradient: const [Color(0xFF54A6FF), Color(0xFF00D1A7)],
+                pawColor: const Color(0xFFB8F3FF),
+                onTap: () => context.go(AppRoutes.settings),
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildStaggeredAnimatedButton(
-                delay: 0.3,
-                child: _SecondaryActionCard(
-                  compact: isCompact,
-                  title: AppLocalizations.of(context)!.activity_button,
-                  subtitle: AppLocalizations.of(context)!.home_journal_subtitle,
-                  icon: Icons.insights_rounded,
-                  gradient: const [Color(0xFFFF5D8F), Color(0xFFFF8C42)],
-                  onTap: () => context.go(AppRoutes.activity),
-                ),
+            _buildStaggeredAnimatedButton(
+              delay: 0.26,
+              child: _SecondaryActionCard(
+                motion: _ambientController,
+                motionPhase: 0.9,
+                compact: isCompact,
+                title: AppLocalizations.of(context)!.activity_button,
+                subtitle: AppLocalizations.of(context)!.home_journal_subtitle,
+                icon: Icons.auto_graph_rounded,
+                gradient: const [Color(0xFFFF5D8F), Color(0xFFFF974A)],
+                pawColor: const Color(0xFFFFD3E2),
+                onTap: () => context.go(AppRoutes.activity),
+              ),
+            ),
+            _buildStaggeredAnimatedButton(
+              delay: 0.34,
+              child: _SecondaryActionCard(
+                motion: _ambientController,
+                motionPhase: 1.7,
+                compact: isCompact,
+                title: AppLocalizations.of(context)!.howtoplay_button,
+                subtitle: AppLocalizations.of(context)!.home_guide_subtitle,
+                icon: Icons.menu_book_rounded,
+                gradient: const [Color(0xFF8A6BFF), Color(0xFF4C8DFF)],
+                pawColor: const Color(0xFFD9D2FF),
+                onTap: () => context.go(AppRoutes.howToPlay),
+              ),
+            ),
+            _buildStaggeredAnimatedButton(
+              delay: 0.42,
+              child: _SecondaryActionCard(
+                motion: _ambientController,
+                motionPhase: 2.3,
+                compact: isCompact,
+                title: AppLocalizations.of(context)!.home_onboarding_button,
+                subtitle: AppLocalizations.of(
+                  context,
+                )!.home_onboarding_subtitle,
+                icon: Icons.celebration_rounded,
+                gradient: const [Color(0xFFFFA63D), Color(0xFFFF5DB1)],
+                pawColor: const Color(0xFFFFE0AE),
+                onTap: () => context.go(AppRoutes.onboarding),
               ),
             ),
           ],
@@ -429,6 +408,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildFooterLinks(BuildContext context) {
+    //? Informational routes are visually demoted to footer chips so the menu still reads as a game menu.
     final l10n = AppLocalizations.of(context)!;
     return Wrap(
       alignment: WrapAlignment.center,
@@ -436,34 +416,12 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       runSpacing: 10,
       children: [
         _FooterChipButton(
-          icon: Icons.menu_book_rounded,
-          label: l10n.howtoplay_button,
-          onTap: () => context.go(AppRoutes.howToPlay),
-        ),
-        _FooterChipButton(
           icon: Icons.info_outline_rounded,
           label: l10n.about_button,
           onTap: () => context.go(AppRoutes.about),
         ),
       ],
     );
-  }
-
-  String _difficultyLabel(AppLocalizations l10n, int value) {
-    return switch (getDifficultyFromValue(value)) {
-      Difficulty.easy => l10n.difficulty_easy,
-      Difficulty.medium => l10n.difficulty_medium,
-      Difficulty.hard => l10n.difficulty_hard,
-      Difficulty.sandbox => l10n.difficulty_sandbox,
-    };
-  }
-
-  String _timeLabel(AppLocalizations l10n, int value) {
-    final current = getTimeFromValue(value);
-    if (current == Time.sandbox) {
-      return l10n.difficulty_sandbox;
-    }
-    return '${current.value}s';
   }
 
   Widget _buildAmbientOrbs() {
@@ -506,11 +464,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 }
 
-class _SetupChip extends StatelessWidget {
-  const _SetupChip({
+class _DeckInfoChip extends StatelessWidget {
+  const _DeckInfoChip({
     required this.icon,
     required this.label,
-    this.compact = false,
+    required this.compact,
   });
 
   final IconData icon;
@@ -519,204 +477,244 @@ class _SetupChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: compact ? 11 : 12,
-        vertical: compact ? 9 : 10,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withValues(alpha: 0.08),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white, size: compact ? 16 : 18),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: compact ? 13 : 14,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TopStripCopy extends StatelessWidget {
-  const _TopStripCopy({required this.compact});
-
-  final bool compact;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(999),
-            color: Colors.white.withValues(alpha: 0.1),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-          ),
-          child: Text(
-            l10n.home_kicker,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-              fontSize: compact ? 12 : 13,
-            ),
-          ),
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: compact ? 138 : 180),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 10 : 11,
+          vertical: compact ? 7 : 8,
         ),
-        SizedBox(height: compact ? 10 : 12),
-        Text(
-          l10n.home_subheadline,
-          maxLines: compact ? 3 : 2,
-          overflow: TextOverflow.ellipsis,
-          style: PawTextStyles.subheading.copyWith(
-            fontSize: compact ? 15 : 16,
-            height: 1.3,
-            color: Colors.white,
-          ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.white.withValues(alpha: 0.08),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         ),
-        const SizedBox(height: 10),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            _TinyFeaturePill(
-              icon: Icons.pets_rounded,
-              label: l10n.home_feature_paw_first,
-            ),
-            _TinyFeaturePill(
-              icon: Icons.bolt_rounded,
-              label: l10n.home_feature_quick_rounds,
+            Icon(icon, color: Colors.white, size: compact ? 15 : 16),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: compact ? 11.5 : 12.5,
+                ),
+              ),
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 }
 
 class _SecondaryActionCard extends StatelessWidget {
   const _SecondaryActionCard({
+    required this.motion,
+    required this.motionPhase,
     required this.title,
     required this.subtitle,
     required this.icon,
     required this.gradient,
+    required this.pawColor,
     required this.onTap,
     this.compact = false,
   });
 
+  final Animation<double> motion;
+  final double motionPhase;
   final String title;
   final String subtitle;
   final IconData icon;
   final List<Color> gradient;
+  final Color pawColor;
   final VoidCallback onTap;
   final bool compact;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(26),
-        onTap: onTap,
-        child: Ink(
-          padding: EdgeInsets.all(compact ? 16 : 18),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(26),
-            gradient: LinearGradient(colors: gradient),
-            boxShadow: [
-              BoxShadow(
-                color: gradient.first.withValues(alpha: 0.28),
-                blurRadius: 18,
-                offset: const Offset(0, 12),
-              ),
-            ],
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                right: 0,
-                top: 0,
-                child: _MiniPawStamp(
-                  size: compact ? 18 : 20,
-                  color: Colors.white.withValues(alpha: 0.18),
+    //? Asymmetric corners and overlays help these cards feel custom instead of dashboard-like.
+    return ConstrainedBox(
+      constraints: BoxConstraints(minHeight: compact ? 150 : 164),
+      child: AnimatedBuilder(
+        animation: motion,
+        builder: (context, child) {
+          final wave = math.sin((motion.value * math.pi * 2) + motionPhase);
+          return Transform.translate(
+            offset: Offset(0, wave * 4),
+            child: Transform.rotate(angle: wave * 0.01, child: child),
+          );
+        },
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(32),
+            onTap: onTap,
+            child: Ink(
+              padding: EdgeInsets.all(compact ? 14 : 16),
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(38),
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(46),
                 ),
-              ),
-              Positioned(
-                left: -10,
-                bottom: -16,
-                child: Transform.rotate(
-                  angle: -0.22,
-                  child: Container(
-                    width: 92,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      color: Colors.white.withValues(alpha: 0.08),
-                    ),
-                  ),
+                gradient: LinearGradient(
+                  colors: [
+                    gradient.first.withValues(alpha: 0.94),
+                    gradient.last.withValues(alpha: 0.98),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: compact ? 40 : 42,
-                    height: compact ? 40 : 42,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.16),
-                    ),
-                    child: Icon(
-                      icon,
-                      color: Colors.white,
-                      size: compact ? 20 : 22,
-                    ),
-                  ),
-                  SizedBox(height: compact ? 12 : 16),
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w900,
-                      fontSize: compact ? 16 : 17,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    maxLines: compact ? 3 : 4,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: const Color(0xFFF6F4FF),
-                      height: 1.3,
-                      fontSize: compact ? 12.5 : 14,
-                    ),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+                boxShadow: [
+                  BoxShadow(
+                    color: gradient.first.withValues(alpha: 0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 14),
                   ),
                 ],
               ),
-            ],
+              child: Stack(
+                children: [
+                  Positioned(
+                    right: -14,
+                    top: -10,
+                    child: Container(
+                      width: compact ? 52 : 58,
+                      height: compact ? 52 : 58,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: pawColor.withValues(alpha: 0.2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: pawColor.withValues(alpha: 0.26),
+                            blurRadius: 18,
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: PawPrint(
+                          size: compact ? 18 : 20,
+                          color: pawColor.withValues(alpha: 0.94),
+                          rotation: -0.16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: -12,
+                    bottom: -20,
+                    child: Transform.rotate(
+                      angle: -0.22,
+                      child: Container(
+                        width: 110,
+                        height: 74,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(32),
+                          color: Colors.white.withValues(alpha: 0.08),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 18,
+                    bottom: 18,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 7,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(999),
+                        color: Colors.white.withValues(alpha: 0.14),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.16),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          PawPrint(
+                            size: compact ? 13 : 15,
+                            color: pawColor.withValues(alpha: 0.98),
+                            rotation: -0.12,
+                          ),
+                          const SizedBox(width: 7),
+                          Text(
+                            AppLocalizations.of(context)!.home_play_chip,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.96),
+                              fontWeight: FontWeight.w800,
+                              fontSize: compact ? 11.5 : 12.5,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: compact ? 40 : 44,
+                        height: compact ? 40 : 44,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.white.withValues(alpha: 0.32),
+                              Colors.white.withValues(alpha: 0.14),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.18),
+                          ),
+                        ),
+                        child: Icon(
+                          icon,
+                          color: Colors.white,
+                          size: compact ? 20 : 22,
+                        ),
+                      ),
+                      SizedBox(height: compact ? 12 : 16),
+                      Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: compact ? 16 : 17,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: const Color(0xFFF6F4FF),
+                          height: 1.25,
+                          fontSize: compact ? 12.0 : 13.0,
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -769,195 +767,6 @@ class _FooterChipButton extends StatelessWidget {
   }
 }
 
-class _PlayfieldPreviewCard extends StatelessWidget {
-  const _PlayfieldPreviewCard({required this.compact});
-
-  final bool compact;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          width: compact ? 84 : 112,
-          height: compact ? 108 : 148,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(28),
-            image: const DecorationImage(
-              image: AssetImage('assets/images/mainscreenbg.png'),
-              fit: BoxFit.cover,
-            ),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.18),
-                blurRadius: 24,
-                offset: const Offset(0, 14),
-              ),
-            ],
-          ),
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              margin: const EdgeInsets.all(8),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-              decoration: BoxDecoration(
-                color: PawPalette.midnight.withValues(alpha: 0.7),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: const Icon(
-                Icons.pets_rounded,
-                color: Colors.white,
-                size: 22,
-              ),
-            ),
-          ),
-        ),
-        const Positioned(top: -8, left: 6, child: _MiniPawStamp(size: 12)),
-        const Positioned(top: -10, left: 26, child: _MiniPawStamp(size: 10)),
-        const Positioned(top: -8, left: 44, child: _MiniPawStamp(size: 12)),
-      ],
-    );
-  }
-}
-
-class _TinyFeaturePill extends StatelessWidget {
-  const _TinyFeaturePill({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withValues(alpha: 0.08),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white70, size: 14),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _LiveBadge extends StatelessWidget {
-  const _LiveBadge();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withValues(alpha: 0.08),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const _MiniPawStamp(size: 12, color: Colors.white70),
-          const SizedBox(width: 6),
-          Text(
-            AppLocalizations.of(context)!.home_live_badge,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MiniPawStamp extends StatelessWidget {
-  const _MiniPawStamp({required this.size, this.color = Colors.white});
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final toe = size * 0.2;
-    final padWidth = size * 0.5;
-    final padHeight = size * 0.34;
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        children: [
-          Positioned(
-            left: size * 0.14,
-            top: size * 0.06,
-            child: _PawDot(size: toe, color: color),
-          ),
-          Positioned(
-            left: size * 0.38,
-            top: 0,
-            child: _PawDot(size: toe, color: color),
-          ),
-          Positioned(
-            right: size * 0.14,
-            top: size * 0.06,
-            child: _PawDot(size: toe, color: color),
-          ),
-          Positioned(
-            left: size * 0.3,
-            top: size * 0.2,
-            child: _PawDot(size: toe * 0.92, color: color),
-          ),
-          Positioned(
-            left: (size - padWidth) / 2,
-            bottom: size * 0.1,
-            child: Container(
-              width: padWidth,
-              height: padHeight,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(size * 0.22),
-                  bottom: Radius.circular(size * 0.18),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PawDot extends StatelessWidget {
-  const _PawDot({required this.size, required this.color});
-
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-    );
-  }
-}
-
 class _OrbConfig {
   const _OrbConfig({
     required this.alignment,
@@ -972,4 +781,21 @@ class _OrbConfig {
   final double size;
   final double travel;
   final double phase;
+}
+
+String describeDifficultyLabel(AppLocalizations l10n, int value) {
+  return switch (getDifficultyFromValue(value)) {
+    Difficulty.easy => l10n.difficulty_easy,
+    Difficulty.medium => l10n.difficulty_medium,
+    Difficulty.hard => l10n.difficulty_hard,
+    Difficulty.sandbox => l10n.difficulty_sandbox,
+  };
+}
+
+String describeTimeLabel(AppLocalizations l10n, int value) {
+  final current = getTimeFromValue(value);
+  if (current == Time.sandbox) {
+    return l10n.difficulty_sandbox;
+  }
+  return '${current.value}s';
 }

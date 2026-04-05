@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Central palette + small helpers that keep the non-game screens consistent.
+//* Shared visual language for Flutter-side screens.
+//! Flame gameplay renders its own scene, but menus / settings / info screens still need a consistent brand layer.
 class PawPalette {
   static const List<List<Color>> playfulBackgrounds = [
     [Color(0xFF140F2D), Color(0xFF372D74), Color(0xFFFF5D8F)],
@@ -55,6 +56,7 @@ class PawPalette {
 }
 
 class PawTextStyles {
+  //* Canonical text presets so headings / cards stay visually related across screens.
   static const TextStyle heading = TextStyle(
     fontSize: 30,
     fontWeight: FontWeight.w900,
@@ -83,6 +85,7 @@ class PawTextStyles {
 }
 
 class PawTheme {
+  //? Material theme intentionally stays minimal because most major surfaces are custom-painted / custom-composed.
   static ThemeData light = ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.fromSeed(

@@ -10,6 +10,8 @@ import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:game_for_cats_2025/views/widgets/animated_gradient_background.dart';
 import 'package:game_for_cats_2025/views/widgets/glassy_panel.dart';
 
+//* Hunt Journal screen:
+//* visualizes locally stored round summaries so the product feels maintained beyond one tap loop.
 class ActivityScreen extends StatefulWidget {
   const ActivityScreen({super.key});
 
@@ -66,6 +68,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                 final history = snapshot.data ?? [];
                 if (history.isEmpty) return _buildMessage(l10n.activity_empty);
 
+                //* Raw logs are collapsed into seven daily buckets for a quick trend view.
                 final aggregates = _aggregate(history);
                 return ListView(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -228,6 +231,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
     }
 
     final List<_DailyAggregate> ordered = [];
+    //! Missing days are backfilled so the chart shape stays stable.
     for (int i = _daysWindow - 1; i >= 0; i--) {
       final date = now.subtract(Duration(days: i));
       final key = _dateKey(date);

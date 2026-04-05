@@ -5,6 +5,7 @@ import 'package:game_for_cats_2025/models/global/global_variables.dart';
 
 part 'app_settings.freezed.dart';
 
+//* Immutable settings model persisted locally and fanned out through AppState.
 @freezed
 class AppSettings with _$AppSettings {
   const AppSettings._();
@@ -21,6 +22,7 @@ class AppSettings with _$AppSettings {
     required bool lowPower,
   }) = _AppSettings;
 
+  //! Defaults define the first-run experience and must stay aligned with the DB schema.
   factory AppSettings.defaults() => AppSettings(
     version: databaseVersion,
     languageCode: Language.english.value,
@@ -59,5 +61,6 @@ class AppSettings with _$AppSettings {
     'LowPower': lowPower ? 1 : 0,
   };
 
+  //? UI code can ask for the semantic enum instead of manually decoding the stored int.
   Language get language => getLanguageFromValue(languageCode);
 }

@@ -26,6 +26,10 @@ import 'package:game_for_cats_2025/models/database/session_log.dart';
 import 'package:game_for_cats_2025/routing/app_routes.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
 
+//* Gameplay bridge file:
+//* - hosts the Flame game instance
+//* - renders Flutter HUD / dialogs around it
+//* - translates taps + timers into a round summary
 bool isBackButtonClicked = false;
 int elapsedTicks = 0; // Seconds
 ValueNotifier<int> elapsedTicksNotifier = ValueNotifier<int>(0);
@@ -36,6 +40,7 @@ bool isGameOverTriggered = false;
 GameResult? lastGameResult;
 bool hasSessionLogged = false;
 
+//! This reset method must clear every global round flag because Flame and Flutter overlays share these globals.
 void resetRoundState({bool clearResult = true}) {
   clicksCounter.reset();
   elapsedTicks = 0;
@@ -66,6 +71,7 @@ class GameResult {
   final int bestStreak;
 
   factory GameResult.fromCounter(GameClicksCounter counter) {
+    //? wrong taps are derived so the notifier only needs to track the raw categories.
     final wrong = counter.totalTaps - (counter.bugTaps + counter.miceTaps);
     return GameResult(
       totalTaps: counter.totalTaps,
@@ -99,7 +105,8 @@ class GameScreen extends StatefulWidget {
   State<GameScreen> createState() => _GameScreenState();
 }
 
-//* Alert for End Game
+//* End-of-round dialog:
+//* this is one of the key "signature" surfaces reviewers see in screenshots.
 Dialog endGameDialog(BuildContext context, {required Game game}) {
   isOverlayBlocking = true;
   game.pauseEngine();
@@ -112,6 +119,11 @@ Dialog endGameDialog(BuildContext context, {required Game game}) {
   final l10n = AppLocalizations.of(context)!;
   final mood = _resolveCatMood(
     l10n,
+    accuracy: accuracy,
+    bestStreak: stats.bestStreak,
+    totalTaps: stats.totalTaps,
+  );
+  final grade = _resolveHuntGrade(
     accuracy: accuracy,
     bestStreak: stats.bestStreak,
     totalTaps: stats.totalTaps,
@@ -143,50 +155,37 @@ Dialog endGameDialog(BuildContext context, {required Game game}) {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 78,
-              height: 78,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.12),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
-              ),
-              child: const Icon(
-                Icons.celebration_rounded,
-                color: Colors.amber,
-                size: 42,
-              ),
+            _ResultHeroBurst(
+              title: l10n.game_over,
+              accuracy: accuracy,
+              grade: grade,
+              mood: mood,
             ),
-            const SizedBox(height: 12),
-            Text(
-              l10n.game_over,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 26,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(height: 8),
-            _MoodBadge(mood: mood),
             const SizedBox(height: 18),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
+            Row(
               children: [
-                _ResultSummaryChip(
-                  label: l10n.activity_total_label,
-                  value: '${stats.totalTaps}',
-                  accent: PawPalette.lemon,
+                Expanded(
+                  child: _ResultSummaryChip(
+                    label: l10n.activity_total_label,
+                    value: '${stats.totalTaps}',
+                    accent: PawPalette.lemon,
+                  ),
                 ),
-                _ResultSummaryChip(
-                  label: l10n.activity_accuracy_label,
-                  value: '$accuracy%',
-                  accent: PawPalette.teal,
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _ResultSummaryChip(
+                    label: l10n.activity_accuracy_label,
+                    value: '$accuracy%',
+                    accent: PawPalette.teal,
+                  ),
                 ),
-                _ResultSummaryChip(
-                  label: l10n.best_streak_label,
-                  value: '${stats.bestStreak}',
-                  accent: PawPalette.bubbleGum,
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _ResultSummaryChip(
+                    label: l10n.best_streak_label,
+                    value: '${stats.bestStreak}',
+                    accent: PawPalette.bubbleGum,
+                  ),
                 ),
               ],
             ),
@@ -248,7 +247,7 @@ Dialog endGameDialog(BuildContext context, {required Game game}) {
   );
 }
 
-//* Game Ended, After This Function Triggers
+//* Shared exit path used by both pause flow and normal game-over flow.
 Future<void> closeGame(
   Game game,
   BuildContext context, {
@@ -273,7 +272,7 @@ Future<void> closeGame(
   isBackButtonClicked = false;
 }
 
-//* Alert for BackButtonClicked
+//* Pause / leave-round dialog.
 Dialog backButtonDialog(Game game, BuildContext context) {
   isBackButtonDialogOpen = true;
   isOverlayBlocking = true;
@@ -377,7 +376,7 @@ Dialog backButtonDialog(Game game, BuildContext context) {
   );
 }
 
-//* Function to close the dialog
+//* Auto-close helper used when the player briefly opens the pause dialog and does nothing.
 void closeDialogAutomatically(Game game, BuildContext context) {
   if (!isBackButtonDialogOpen) return;
   if (context.mounted == true) {
@@ -386,68 +385,6 @@ void closeDialogAutomatically(Game game, BuildContext context) {
   isBackButtonDialogOpen = false;
   isOverlayBlocking = false;
   game.resumeEngine();
-}
-
-PreferredSizeWidget gameAppBar(BuildContext context, Game game) {
-  final l10n = AppLocalizations.of(context)!;
-  return AppBar(
-    automaticallyImplyLeading: false,
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-    flexibleSpace: Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF1E1F29), Color(0xFF3B1D60)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-    ),
-    leading: IconButton(
-      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-      onPressed: () => showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          isBackButtonClicked = true;
-          Future.delayed(
-            const Duration(seconds: 2),
-            () => closeDialogAutomatically(game, context),
-          );
-          return backButtonDialog(game, context);
-        },
-      ),
-    ),
-    title: ValueListenableBuilder<int>(
-      valueListenable: elapsedTicksNotifier,
-      builder: (context, elapsedTicks, _) {
-        final remainingTime = max(gameTimer - elapsedTicks, 0);
-        final label = remainingTime > 0
-            ? '${l10n.countdown} $remainingTime'
-            : l10n.game_over;
-        return Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w800,
-          ),
-        );
-      },
-    ),
-    actions: [
-      Padding(
-        padding: const EdgeInsets.only(right: 12),
-        child: AnimatedBuilder(
-          animation: clicksCounter,
-          builder: (context, _) => _StreakPill(
-            label: l10n.current_streak_label,
-            value: clicksCounter.currentStreak,
-            compact: true,
-          ),
-        ),
-      ),
-    ],
-  );
 }
 
 class _GameScreenState extends State<GameScreen> {
@@ -473,9 +410,10 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: gameAppBar(context, _gameInstance),
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
+          //* Flame owns the actual moving targets; Flutter only frames the experience around it.
           Positioned.fill(
             child: GameWidget(
               game: _gameInstance,
@@ -483,9 +421,21 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
           Positioned(
-            left: 16,
-            right: 16,
-            bottom: 24,
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
+                child: _buildTopHud(context),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 12,
+            right: 12,
+            bottom: 20,
             child: _buildStatsBar(context),
           ),
           if (isOverlayBlocking)
@@ -500,8 +450,58 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
+  Widget _buildTopHud(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    //! This replaced the stock AppBar so gameplay feels like a bespoke toy, not a standard app page.
+    return Row(
+      children: [
+        _HudRoundButton(
+          icon: Icons.arrow_back_ios_new_rounded,
+          onTap: () => showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (context) {
+              isBackButtonClicked = true;
+              Future.delayed(
+                const Duration(seconds: 2),
+                () => closeDialogAutomatically(_gameInstance, context),
+              );
+              return backButtonDialog(_gameInstance, context);
+            },
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: ValueListenableBuilder<int>(
+            valueListenable: elapsedTicksNotifier,
+            builder: (context, elapsed, _) {
+              final remainingTime = max(gameTimer - elapsed, 0);
+              final progress = 1 - ((elapsed / gameTimer).clamp(0.0, 1.0));
+              return _TimerNestCard(
+                label: l10n.countdown.trim(),
+                remainingTime: remainingTime,
+                progress: progress.isFinite ? progress : 0,
+              );
+            },
+          ),
+        ),
+        const SizedBox(width: 10),
+        AnimatedBuilder(
+          animation: clicksCounter,
+          builder: (context, _) => _TopComboDock(
+            current: clicksCounter.currentStreak,
+            best: clicksCounter.bestStreak,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildStatsBar(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final settings = _gameSettings;
+    //* Bottom deck:
+    //* quick round config + live counters + progress, all visible without opening a menu.
     return AnimatedBuilder(
       animation: clicksCounter,
       builder: (context, _) {
@@ -513,9 +513,11 @@ class _GameScreenState extends State<GameScreen> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(30),
             gradient: const LinearGradient(
-              colors: [Color(0xD9160F34), Color(0xD92E215B), Color(0xCCFF5D8F)],
+              colors: [Color(0xE0120B2E), Color(0xE01F3F63), Color(0xD900C6A7)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
             border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
             boxShadow: [
@@ -529,6 +531,40 @@ class _GameScreenState extends State<GameScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (settings != null) ...[
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _MiniHudTag(
+                      icon: Icons.track_changes_rounded,
+                      label: switch (getDifficultyFromValue(
+                        settings.difficulty,
+                      )) {
+                        Difficulty.easy => l10n.difficulty_easy,
+                        Difficulty.medium => l10n.difficulty_medium,
+                        Difficulty.hard => l10n.difficulty_hard,
+                        Difficulty.sandbox => l10n.difficulty_sandbox,
+                      },
+                    ),
+                    _MiniHudTag(
+                      icon: Icons.timer_outlined,
+                      label: getTimeFromValue(settings.time) == Time.sandbox
+                          ? l10n.difficulty_sandbox
+                          : '${getTimeFromValue(settings.time).value}s',
+                    ),
+                    _MiniHudTag(
+                      icon: settings.muted
+                          ? Icons.volume_off_rounded
+                          : Icons.volume_up_rounded,
+                      label: settings.muted
+                          ? l10n.home_muted
+                          : l10n.home_sound_on,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+              ],
               ValueListenableBuilder<int>(
                 valueListenable: elapsedTicksNotifier,
                 builder: (context, elapsed, _) {
@@ -558,8 +594,8 @@ class _GameScreenState extends State<GameScreen> {
                       LinearProgressIndicator(
                         value: progress.isFinite ? progress : 0,
                         backgroundColor: Colors.white24,
-                        color: Colors.amberAccent,
-                        minHeight: 6,
+                        color: PawPalette.lemon,
+                        minHeight: 8,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       const SizedBox(height: 12),
@@ -621,6 +657,7 @@ class Game extends FlameGame
   bool get debugMode => false;
 
   DifficultyProfile _resolveDifficultyProfile() {
+    //? Difficulty controls both density and motion speed so rounds feel materially different.
     final difficulty = getDifficultyFromValue(gameSettings?.difficulty);
     final baseProfile = switch (difficulty) {
       Difficulty.easy => const DifficultyProfile(
@@ -650,6 +687,7 @@ class Game extends FlameGame
     };
 
     if (gameSettings?.lowPower ?? false) {
+      //! Low power intentionally reduces both active count and speed so older devices stay smooth.
       return DifficultyProfile(
         spawnIntervalSeconds: baseProfile.spawnIntervalSeconds + 1,
         maxActiveCreatures: max(
@@ -688,13 +726,14 @@ class Game extends FlameGame
         ),
       );
     }
-    //Add Collision
+    //* Add world bounds before creatures spawn so collision callbacks can work from the first tick.
     add(ScreenHitbox());
     await _startBackgroundAudio();
 
     interval = Timer(
       1.0,
       onTick: () async {
+        //! Spawn cadence is timer-driven, not frame-driven, so gameplay stays stable across device performance.
         if (isOverlayBlocking || isGameOverTriggered) return;
         if (_shouldSpawnThisTick(elapsedTicks)) {
           final activeCreatures = children
@@ -720,7 +759,7 @@ class Game extends FlameGame
           }
         }
         elapsedTicks++;
-        elapsedTicksNotifier.value = elapsedTicks; // Update the ValueNotifier
+        elapsedTicksNotifier.value = elapsedTicks;
         if (elapsedTicks >= gameTimer) {
           await _handleGameOver();
         }
@@ -731,6 +770,7 @@ class Game extends FlameGame
   }
 
   Future<void> restart() async {
+    //? Restart preserves the same settings but rebuilds the runtime round state from scratch.
     pauseEngine();
     await FlameAudio.bgm.stop();
     _clearCreatures();
@@ -807,6 +847,7 @@ class Game extends FlameGame
     super.onTapDown(info);
     final touchPoint = info.eventPosition.widget;
     bool hitAnything = false;
+    //* Hit detection is handled by asking each live creature if the touch landed inside its bounds.
     children.any((component) {
       if (component is Mice && component.containsPoint(touchPoint)) {
         FlameAudio.play(
@@ -831,6 +872,7 @@ class Game extends FlameGame
     });
 
     if (!hitAnything) {
+      //! Misses are important because they reset streaks and feed the end-of-round accuracy.
       clicksCounter.recordMissTap();
     }
   }
@@ -917,7 +959,6 @@ class _ResultSummaryChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 118,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.08),
@@ -945,6 +986,99 @@ class _ResultSummaryChip extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ResultHeroBurst extends StatelessWidget {
+  const _ResultHeroBurst({
+    required this.title,
+    required this.accuracy,
+    required this.grade,
+    required this.mood,
+  });
+
+  final String title;
+  final int accuracy;
+  final String grade;
+  final _CatMood mood;
+
+  @override
+  Widget build(BuildContext context) {
+    //? The grade ring is intentionally high-contrast because it will likely appear in screenshots.
+    return Column(
+      children: [
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 126,
+              height: 126,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    mood.color.withValues(alpha: 0.34),
+                    Colors.white.withValues(alpha: 0.04),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 102,
+              height: 102,
+              child: CircularProgressIndicator(
+                value: (accuracy / 100).clamp(0, 1).toDouble(),
+                strokeWidth: 8,
+                color: mood.color,
+                backgroundColor: Colors.white12,
+              ),
+            ),
+            Container(
+              width: 78,
+              height: 78,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.08),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    grade,
+                    style: TextStyle(
+                      color: mood.color,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  Text(
+                    '$accuracy%',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 26,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 8),
+        _MoodBadge(mood: mood),
+      ],
     );
   }
 }
@@ -978,26 +1112,242 @@ class _MoodBadge extends StatelessWidget {
   }
 }
 
+class _HudRoundButton extends StatelessWidget {
+  const _HudRoundButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Ink(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: PawPalette.midnight.withValues(alpha: 0.72),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+            boxShadow: [
+              BoxShadow(
+                color: PawPalette.midnight.withValues(alpha: 0.22),
+                blurRadius: 16,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Icon(icon, color: Colors.white, size: 18),
+        ),
+      ),
+    );
+  }
+}
+
+class _TimerNestCard extends StatelessWidget {
+  const _TimerNestCard({
+    required this.label,
+    required this.remainingTime,
+    required this.progress,
+  });
+
+  final String label;
+  final int remainingTime;
+  final double progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        gradient: const LinearGradient(
+          colors: [Color(0xDD120B2E), Color(0xDD2E215B)],
+        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 36,
+            height: 36,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CircularProgressIndicator(
+                  value: progress,
+                  strokeWidth: 4,
+                  color: PawPalette.lemon,
+                  backgroundColor: Colors.white12,
+                ),
+                const Icon(
+                  Icons.access_time_rounded,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  '$remainingTime',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TopComboDock extends StatelessWidget {
+  const _TopComboDock({required this.current, required this.best});
+
+  final int current;
+  final int best;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 108,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        gradient: const LinearGradient(
+          colors: [Color(0xDDFE5D8F), Color(0xDDFF8C42)],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: PawPalette.bubbleGum.withValues(alpha: 0.22),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.auto_awesome_rounded,
+                color: Colors.white,
+                size: current > 0 ? 16 : 14,
+              ),
+              const SizedBox(width: 6),
+              const Expanded(
+                child: Text(
+                  'Purr',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '$current',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          Text(
+            'Best $best',
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MiniHudTag extends StatelessWidget {
+  const _MiniHudTag({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: Colors.white.withValues(alpha: 0.08),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white70, size: 14),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _StreakPill extends StatelessWidget {
   const _StreakPill({
     required this.label,
     required this.value,
     this.accent = PawPalette.bubbleGum,
-    this.compact = false,
   });
 
   final String label;
   final int value;
   final Color accent;
-  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: compact ? 12 : 14,
-        vertical: compact ? 8 : 10,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
         color: Colors.white.withValues(alpha: 0.08),
@@ -1007,11 +1357,7 @@ class _StreakPill extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.auto_awesome_rounded,
-            color: accent,
-            size: compact ? 14 : 16,
-          ),
+          Icon(Icons.auto_awesome_rounded, color: accent, size: 16),
           const SizedBox(width: 8),
           Flexible(
             child: Text(
@@ -1019,7 +1365,7 @@ class _StreakPill extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: compact ? 12 : 13,
+                fontSize: 13,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -1176,4 +1522,16 @@ _CatMood _resolveCatMood(
     color: PawPalette.bubbleGum,
     icon: Icons.visibility_rounded,
   );
+}
+
+String _resolveHuntGrade({
+  required int accuracy,
+  required int bestStreak,
+  required int totalTaps,
+}) {
+  if (totalTaps == 0) return 'C';
+  if (accuracy >= 90 && bestStreak >= 6) return 'S';
+  if (accuracy >= 80) return 'A';
+  if (accuracy >= 65) return 'B';
+  return 'C';
 }

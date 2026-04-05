@@ -6,6 +6,10 @@ import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/services/app_logger.dart';
 
+//* AppState is the single app-wide source of truth for:
+//* - persisted settings
+//* - onboarding completion
+//* - startup readiness / init errors
 class AppState extends ChangeNotifier {
   AppState({
     AppSettingsRepository? settingsRepository,
@@ -26,6 +30,7 @@ class AppState extends ChangeNotifier {
   bool get isReady => _isReady;
   Object? get initError => _initError;
 
+  //? Locale is derived instead of stored separately so language settings cannot drift.
   Locale? get locale {
     final current = _settings;
     if (current == null) return null;
@@ -33,14 +38,17 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> initialize() async {
+    //* Reset startup flags each time initialize runs so loading / retry UIs stay honest.
     _isReady = false;
     _initError = null;
     notifyListeners();
 
     try {
       AppLogger.info('Initializing app state');
+      //! Onboarding and settings come from two different persistence layers.
       _onboardingComplete = await _onboardingRepository.isCompleted();
       _settings = await _settingsRepository.fetchOrCreate();
+      //? getTimeFromValue also updates the global round timer used by the Flame layer.
       getTimeFromValue(_settings?.time);
       AppLogger.info('App state initialized successfully');
     } catch (error) {
@@ -53,6 +61,7 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> updateSettings(AppSettings settings) async {
+    //* We optimistically update local state first so the UI feels immediate.
     _settings = settings;
     getTimeFromValue(settings.time);
     notifyListeners();
@@ -76,6 +85,7 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> completeOnboarding() async {
+    //! This flag affects routing immediately, so listeners are notified before persistence finishes.
     _onboardingComplete = true;
     notifyListeners();
     await _onboardingRepository.setCompleted(true);

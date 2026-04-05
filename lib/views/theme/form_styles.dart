@@ -1,7 +1,8 @@
-//* Decorations
+//* Shared form decorations for the few remaining classic input surfaces.
 import 'package:flutter/material.dart';
 
 InputDecoration formDecoration() {
+  //! Borders are semi-transparent so they can sit on top of dark / glassy surfaces.
   final border = OutlineInputBorder(
     borderRadius: BorderRadius.circular(20),
     borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.35)),

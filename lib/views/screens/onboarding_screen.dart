@@ -8,6 +8,8 @@ import 'package:game_for_cats_2025/views/widgets/animated_gradient_background.da
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+//* First-run onboarding:
+//* short, visual, and intentionally lightweight so users get into the game fast.
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -41,6 +43,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    //? Each page maps to one mental model: enter, play, review.
     final pages = <_OnboardingPageData>[
       _OnboardingPageData(
         title: l10n.onboarding_title_welcome,
@@ -171,6 +174,7 @@ class _OnboardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //! The page card stays generic enough to localize cleanly but rich enough to feel intentional.
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 28),
       child: Center(

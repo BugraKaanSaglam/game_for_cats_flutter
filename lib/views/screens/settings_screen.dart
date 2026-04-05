@@ -7,17 +7,19 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/models/database/db_error.dart';
 import 'package:game_for_cats_2025/models/app_settings.dart';
+import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
 import 'package:game_for_cats_2025/models/enums/game_enums.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/views/components/main_app_bar.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
-import 'package:game_for_cats_2025/views/widgets/playful_card.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:game_for_cats_2025/state/app_state.dart';
 
+//* Settings screen:
+//* one place where the player configures the next round and optional local customization.
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -84,93 +86,96 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     final l10n = AppLocalizations.of(context)!;
+    //! The screen is split into themed panels so it reads like a control deck, not a list of stock settings cells.
     return SafeArea(
       child: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         children: [
-          _buildHeader(context),
-          PlayfulCard(
-            emoji: '🌍',
-            title: l10n.select_language,
-            subtitle: l10n.settings_language_hint,
-            gradient: PawPalette.pinkToOrange(),
-            child: _buildLanguageDropdown(context),
+          _buildHeader(context, settings),
+          _SettingsPanel(
+            title: l10n.home_setup_title,
+            subtitle: l10n.settings_header_subtitle,
+            accent: const [Color(0xFFFF8C42), Color(0xFFFF5D8F)],
+            child: Column(
+              children: [
+                _SettingsFieldTile(
+                  icon: Icons.language_rounded,
+                  title: l10n.select_language,
+                  subtitle: l10n.settings_language_hint,
+                  child: _buildLanguageDropdown(context),
+                ),
+                _SettingsFieldTile(
+                  icon: Icons.timer_outlined,
+                  title: l10n.select_time,
+                  subtitle: l10n.settings_time_hint,
+                  child: _buildTimeDropdown(context),
+                ),
+                _SettingsFieldTile(
+                  icon: Icons.track_changes_rounded,
+                  title: l10n.select_difficulty,
+                  subtitle: l10n.settings_difficulty_hint,
+                  child: _buildDifficultyDropdown(context),
+                ),
+              ],
+            ),
           ),
-          PlayfulCard(
-            emoji: '⏱️',
-            title: l10n.select_time,
-            subtitle: l10n.settings_time_hint,
-            gradient: PawPalette.tealToLemon(),
-            child: _buildTimeDropdown(context),
-          ),
-          PlayfulCard(
-            emoji: '🎯',
-            title: l10n.select_difficulty,
-            subtitle: l10n.settings_difficulty_hint,
-            child: _buildDifficultyDropdown(context),
-          ),
-          PlayfulCard(
-            emoji: '🔇',
+          _SettingsPanel(
             title: l10n.mute_title,
-            subtitle: l10n.mute_subtitle,
-            gradient: PawPalette.tealToLemon(),
-            child: SwitchListTile.adaptive(
-              contentPadding: EdgeInsets.zero,
-              value: settings.muted,
-              onChanged: (v) =>
-                  _updateSettings((current) => current.copyWith(muted: v)),
-              title: Text(
-                l10n.mute_toggle_label,
-                style: PawTextStyles.cardTitle,
-              ),
+            subtitle: l10n.settings_music_hint,
+            accent: const [Color(0xFF00C6A7), Color(0xFF4FACFE)],
+            child: Column(
+              children: [
+                _SettingsToggleTile(
+                  icon: Icons.volume_off_rounded,
+                  title: l10n.mute_title,
+                  subtitle: l10n.mute_subtitle,
+                  value: settings.muted,
+                  onChanged: (v) =>
+                      _updateSettings((current) => current.copyWith(muted: v)),
+                  label: l10n.mute_toggle_label,
+                ),
+                _SettingsToggleTile(
+                  icon: Icons.bolt_rounded,
+                  title: l10n.lowpower_title,
+                  subtitle: l10n.lowpower_subtitle,
+                  value: settings.lowPower,
+                  onChanged: (v) => _updateSettings(
+                    (current) => current.copyWith(lowPower: v),
+                  ),
+                  label: l10n.lowpower_toggle_label,
+                ),
+                _SettingsFieldTile(
+                  icon: Icons.music_note_rounded,
+                  title: l10n.select_musicvolume,
+                  subtitle: l10n.settings_music_hint,
+                  child: _buildSlider(
+                    value: settings.musicVolume,
+                    onChanged: (v) => _updateSettings(
+                      (current) => current.copyWith(musicVolume: v),
+                    ),
+                    activeColor: PawPalette.grape,
+                  ),
+                ),
+                _SettingsFieldTile(
+                  icon: Icons.pest_control_rodent_rounded,
+                  title: l10n.select_charactervolume,
+                  subtitle: l10n.settings_character_hint,
+                  child: _buildSlider(
+                    value: settings.characterVolume,
+                    onChanged: (v) => _updateSettings(
+                      (current) => current.copyWith(characterVolume: v),
+                    ),
+                    activeColor: PawPalette.teal,
+                  ),
+                ),
+              ],
             ),
           ),
-          PlayfulCard(
-            emoji: '⚡',
-            title: l10n.lowpower_title,
-            subtitle: l10n.lowpower_subtitle,
-            gradient: PawPalette.pinkToOrange(),
-            child: SwitchListTile.adaptive(
-              contentPadding: EdgeInsets.zero,
-              value: settings.lowPower,
-              onChanged: (v) =>
-                  _updateSettings((current) => current.copyWith(lowPower: v)),
-              title: Text(
-                l10n.lowpower_toggle_label,
-                style: PawTextStyles.cardTitle,
-              ),
-            ),
-          ),
-          PlayfulCard(
-            emoji: '🖼️',
+          _SettingsPanel(
             title: l10n.background_title,
             subtitle: l10n.background_subtitle,
-            gradient: PawPalette.pinkToOrange(),
+            accent: const [Color(0xFF7B61FF), Color(0xFFFF5D8F)],
             child: _buildBackgroundPicker(context),
-          ),
-          PlayfulCard(
-            emoji: '🎵',
-            title: l10n.select_musicvolume,
-            subtitle: l10n.settings_music_hint,
-            child: _buildSlider(
-              value: settings.musicVolume,
-              onChanged: (v) => _updateSettings(
-                (current) => current.copyWith(musicVolume: v),
-              ),
-              activeColor: PawPalette.grape,
-            ),
-          ),
-          PlayfulCard(
-            emoji: '🐁',
-            title: l10n.select_charactervolume,
-            subtitle: l10n.settings_character_hint,
-            child: _buildSlider(
-              value: settings.characterVolume,
-              onChanged: (v) => _updateSettings(
-                (current) => current.copyWith(characterVolume: v),
-              ),
-              activeColor: PawPalette.teal,
-            ),
           ),
           const SizedBox(height: 80),
         ],
@@ -184,14 +189,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _draftSettings = update(current));
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, AppSettings settings) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(34),
         gradient: const LinearGradient(
-          colors: [Color(0xFF20133C), Color(0xFF4B2E83), Color(0xFFFF5D8F)],
+          colors: [Color(0xFF20133C), Color(0xFF0E4D68), Color(0xFFFF8C42)],
         ),
         boxShadow: [
           BoxShadow(
@@ -201,37 +207,63 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.14),
-            ),
-            child: const Icon(
-              Icons.tune_rounded,
-              color: Colors.white,
-              size: 30,
-            ),
+          Row(
+            children: [
+              Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.14),
+                ),
+                child: const Icon(
+                  Icons.tune_rounded,
+                  color: Colors.white,
+                  size: 30,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.settings_button,
+                      style: PawTextStyles.heading.copyWith(fontSize: 28),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      l10n.settings_header_subtitle,
+                      style: PawTextStyles.subheading,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.settings_button,
-                  style: PawTextStyles.heading.copyWith(fontSize: 28),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  AppLocalizations.of(context)!.settings_header_subtitle,
-                  style: PawTextStyles.subheading,
-                ),
-              ],
-            ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              _HeaderBadge(
+                icon: Icons.timer_outlined,
+                label: _timeBadgeLabel(l10n, settings.time),
+              ),
+              _HeaderBadge(
+                icon: Icons.track_changes_rounded,
+                label: _difficultyBadgeLabel(l10n, settings.difficulty),
+              ),
+              _HeaderBadge(
+                icon: settings.muted
+                    ? Icons.volume_off_rounded
+                    : Icons.volume_up_rounded,
+                label: settings.muted ? l10n.home_muted : l10n.home_sound_on,
+              ),
+            ],
           ),
         ],
       ),
@@ -341,6 +373,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        //* Live preview of the chosen play mat so the user sees the effect before saving.
         AspectRatio(
           aspectRatio: 16 / 9,
           child: ClipRRect(
@@ -422,6 +455,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<String> _persistPickedImage(XFile picked) async {
+    //! Old custom files are deleted when replaced to avoid silent storage growth.
     final appDir = await getApplicationDocumentsDirectory();
     final baseName = 'bg_${DateTime.now().millisecondsSinceEpoch}';
     final pngPath = '${appDir.path}/$baseName.png';
@@ -448,6 +482,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<Uint8List?> _resizeAndEncodeBackground(String sourcePath) async {
+    //? Resizing here keeps custom backgrounds cheap enough for gameplay rendering later.
     ui.ImmutableBuffer? buffer;
     ui.ImageDescriptor? descriptor;
     ui.Codec? codec;
@@ -580,6 +615,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
+
+  String _difficultyBadgeLabel(AppLocalizations l10n, int value) {
+    return switch (getDifficultyFromValue(value)) {
+      Difficulty.easy => l10n.difficulty_easy,
+      Difficulty.medium => l10n.difficulty_medium,
+      Difficulty.hard => l10n.difficulty_hard,
+      Difficulty.sandbox => l10n.difficulty_sandbox,
+    };
+  }
+
+  String _timeBadgeLabel(AppLocalizations l10n, int value) {
+    final current = getTimeFromValue(value);
+    if (current == Time.sandbox) {
+      return l10n.difficulty_sandbox;
+    }
+    return '${current.value}s';
+  }
 }
 
 class _PillDropdown extends StatelessWidget {
@@ -610,6 +662,231 @@ class _PillDropdown extends StatelessWidget {
           items: items,
           onChanged: onChanged,
         ),
+      ),
+    );
+  }
+}
+
+class _SettingsPanel extends StatelessWidget {
+  const _SettingsPanel({
+    required this.title,
+    required this.subtitle,
+    required this.accent,
+    required this.child,
+  });
+
+  final String title;
+  final String subtitle;
+  final List<Color> accent;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    //* Panel wrapper used to visually group related settings instead of exposing a flat form.
+    return Container(
+      margin: const EdgeInsets.only(top: 14),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        gradient: LinearGradient(
+          colors: [
+            accent.first.withValues(alpha: 0.2),
+            accent.last.withValues(alpha: 0.08),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        border: Border.all(color: accent.first.withValues(alpha: 0.22)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(colors: accent),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(child: Text(title, style: PawTextStyles.cardTitle)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(subtitle, style: PawTextStyles.cardSubtitle),
+          const SizedBox(height: 16),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _SettingsFieldTile extends StatelessWidget {
+  const _SettingsFieldTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.child,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          color: Colors.white.withValues(alpha: 0.9),
+          border: Border.all(
+            color: PawPalette.midnight.withValues(alpha: 0.08),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: PawPalette.midnight.withValues(alpha: 0.08),
+                  ),
+                  child: Icon(icon, color: PawPalette.ink, size: 18),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: PawTextStyles.cardTitle),
+                      const SizedBox(height: 4),
+                      Text(subtitle, style: PawTextStyles.cardSubtitle),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingsToggleTile extends StatelessWidget {
+  const _SettingsToggleTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.value,
+    required this.onChanged,
+    required this.label,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          color: Colors.white.withValues(alpha: 0.9),
+          border: Border.all(
+            color: PawPalette.midnight.withValues(alpha: 0.08),
+          ),
+        ),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: PawPalette.midnight.withValues(alpha: 0.08),
+                  ),
+                  child: Icon(icon, color: PawPalette.ink, size: 18),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: PawTextStyles.cardTitle),
+                      const SizedBox(height: 4),
+                      Text(subtitle, style: PawTextStyles.cardSubtitle),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              value: value,
+              onChanged: onChanged,
+              title: Text(label, style: PawTextStyles.cardTitle),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HeaderBadge extends StatelessWidget {
+  const _HeaderBadge({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: Colors.white.withValues(alpha: 0.12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 14),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 12,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -29,6 +29,11 @@ void main() {
 
     expect(find.text('About the Game'), findsWidgets);
     expect(find.text('Why this game exists'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('What makes it distinct'),
+      240,
+      scrollable: find.byType(Scrollable),
+    );
     expect(find.text('What makes it distinct'), findsOneWidget);
     expect(
       find.byWidgetPredicate(_richTextContains('3.5.0+35')),

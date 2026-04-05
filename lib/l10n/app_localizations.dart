@@ -188,6 +188,30 @@ abstract class AppLocalizations {
   /// **'Review recent taps, misses, and accuracy.'**
   String get home_journal_subtitle;
 
+  /// No description provided for @home_guide_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick rules before the hunt starts.'**
+  String get home_guide_subtitle;
+
+  /// No description provided for @home_onboarding_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Paw Tour'**
+  String get home_onboarding_button;
+
+  /// No description provided for @home_onboarding_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'See the playground before your cat jumps in.'**
+  String get home_onboarding_subtitle;
+
+  /// No description provided for @home_play_chip.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get home_play_chip;
+
   /// No description provided for @home_default_playmat.
   ///
   /// In en, this message translates to:

@@ -1,11 +1,14 @@
 import 'dart:math';
+
 import 'package:flame/components.dart';
 import 'package:game_for_cats_2025/models/global/global_variables.dart';
 
+//* Small math helpers for movement, spawning, and wrap-around behavior.
 class Utils {
   static Vector2 generateRandomPosition(Vector2 screenSize, Vector2 margins) {
     var result = Vector2.zero();
-    var randomGenerator = Random();
+    final randomGenerator = Random();
+    //! gameScreenTopBarHeight reserves space for the Flutter HUD overlay above the Flame field.
     result = Vector2(
       randomGenerator
               .nextInt(screenSize.x.toInt() - 2 * margins.x.toInt())
@@ -26,9 +29,10 @@ class Utils {
 
   static Vector2 generateRandomVelocity(Vector2 screenSize, int min, int max) {
     var result = Vector2.zero();
-    var randomGenerator = Random();
+    final randomGenerator = Random();
     double velocity;
 
+    //? We reject the zero vector so creatures always move immediately after spawning.
     while (result == Vector2.zero()) {
       result = Vector2(
         (randomGenerator.nextInt(3) - 1) * randomGenerator.nextDouble(),
@@ -42,7 +46,7 @@ class Utils {
   }
 
   static bool isPositionOutOfBounds(Vector2 bounds, Vector2 position) {
-    bool result = false;
+    var result = false;
 
     if (position.x > bounds.x ||
         position.x < 0 ||
@@ -55,8 +59,9 @@ class Utils {
   }
 
   static Vector2 wrapPosition(Vector2 bounds, Vector2 position) {
-    Vector2 result = position;
+    var result = position;
 
+    //! Wrap-around keeps motion continuous instead of bouncing, which reads better for cats.
     if (position.x >= bounds.x) {
       result.x = gameScreenTopBarHeight;
     } else if (position.x <= gameScreenTopBarHeight) {
@@ -74,7 +79,7 @@ class Utils {
 
   static Vector2 generateRandomDirection() {
     var result = Vector2.zero();
-    var randomGenerator = Random();
+    final randomGenerator = Random();
 
     while (result == Vector2.zero()) {
       result = Vector2(
@@ -86,7 +91,7 @@ class Utils {
   }
 
   static double generateRandomSpeed(int min, int max) {
-    var randomGenerator = Random();
+    final randomGenerator = Random();
     double speed;
 
     speed = (randomGenerator.nextInt(max - min) + min).toDouble();

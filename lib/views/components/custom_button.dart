@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+//* Legacy button helper kept for older parts of the codebase.
 class CustomButton extends ElevatedButton {
   TextStyle buttonTextStyle() {
     return const TextStyle(fontWeight: FontWeight.bold, color: Colors.white);
@@ -12,6 +13,8 @@ class CustomButton extends ElevatedButton {
     Color? backgroundColor,
     Size? fixedSize,
   }) : super(style: gameButtonStyle(fixedSize: fixedSize));
+
+  //? Newer screens prefer custom-composed buttons, but this keeps older UIs stable.
   static ButtonStyle gameButtonStyle({Size? fixedSize}) {
     return ButtonStyle(
       fixedSize: WidgetStatePropertyAll<Size>(fixedSize ?? const Size(200, 40)),

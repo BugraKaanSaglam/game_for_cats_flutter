@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 
-/// Rounded gradient tile with optional emoji avatar used across settings & info screens.
+//* Legacy decorative card used by some non-game screens.
+//? Newer screens are moving toward more bespoke panels, but this remains useful for simple content blocks.
 class PlayfulCard extends StatelessWidget {
   const PlayfulCard({
     super.key,
@@ -22,6 +23,7 @@ class PlayfulCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //! The outer gradient creates the colored rim; the inner container keeps content readable.
     final colors =
         gradient ??
         [

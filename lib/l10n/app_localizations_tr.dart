@@ -58,6 +58,19 @@ class AppLocalizationsTr extends AppLocalizations {
       'Son dokunuşları, kaçırmaları ve isabeti gör.';
 
   @override
+  String get home_guide_subtitle => 'Av başlamadan önce kısa kurallar.';
+
+  @override
+  String get home_onboarding_button => 'Pati Turu';
+
+  @override
+  String get home_onboarding_subtitle =>
+      'Kedin atlamadan önce oyun alanını gör.';
+
+  @override
+  String get home_play_chip => 'Aç';
+
+  @override
   String get home_default_playmat => 'Varsayılan oyun zemini';
 
   @override

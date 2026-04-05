@@ -8,7 +8,8 @@ import 'package:game_for_cats_2025/models/global/global_images.dart';
 import 'package:game_for_cats_2025/models/global/global_variables.dart';
 import 'package:game_for_cats_2025/controllers/utils.dart';
 
-// Bug class is a PositionComponent so we get the angle and position of the element.
+//* Bug target entity.
+//? It mirrors the mouse movement model, but uses a different sheet and slightly different size / cadence.
 class Bug extends SpriteAnimationComponent
     with HasGameRef<FlameGame>, CollisionCallbacks {
   late Vector2 _velocity;
@@ -54,7 +55,7 @@ class Bug extends SpriteAnimationComponent
       _lastCollisionTime = currentTime;
       target = Utils.generateRandomPosition(gameRef.size, Vector2(0, 10));
 
-      // Reset _isColliding after a certain delay
+      //? Cooldown avoids unstable collision feedback loops.
       Future.delayed(Duration(milliseconds: waitTimeForCollisions), () {
         _isColliding = false;
       });
@@ -65,37 +66,28 @@ class Bug extends SpriteAnimationComponent
   void update(double dt) {
     super.update(dt);
 
-    //Select Target Direction
-    Vector2 directionToTarget = (target - position).normalized();
+    final directionToTarget = (target - position).normalized();
 
-    //Add Acceleration
-    Vector2 desiredVelocity = directionToTarget * acceleration;
+    final desiredVelocity = directionToTarget * acceleration;
 
-    //Update Velocity
     _velocity += (desiredVelocity - _velocity) * steeringFactor;
 
-    //Friction Added
     _velocity *= (1.0 - friction);
 
-    //Max Speed Check
     if (_velocity.length > _speed) {
       _velocity = _velocity.normalized()..scaleTo(_speed);
     }
 
-    //Update Position
     position += _velocity * dt;
 
-    //New Target Added, When Bug Get the Current Target
     if ((target - position).length < 10.0) {
       target = Utils.generateRandomPosition(gameRef.size, Vector2(0, 10));
     }
 
-    //Don't Let It Go OutOfBounds
     if (Utils.isPositionOutOfBounds(gameRef.size, position)) {
       position = Utils.wrapPosition(gameRef.size, position);
     }
 
-    //Update Bug Angle
     angle = _velocity.screenAngle();
   }
 }

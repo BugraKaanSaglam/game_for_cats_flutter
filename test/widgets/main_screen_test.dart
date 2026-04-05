@@ -28,6 +28,7 @@ void main() {
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Hunt Journal'), findsOneWidget);
     expect(find.text('How It Works'), findsOneWidget);
+    expect(find.text('Paw Tour'), findsOneWidget);
     expect(find.text('About the Game'), findsOneWidget);
   });
 

@@ -1,3 +1,4 @@
+//* One local play session aggregate stored for the activity / hunt journal screen.
 class SessionLog {
   SessionLog({
     this.id,
@@ -7,7 +8,8 @@ class SessionLog {
   });
 
   final int? id;
-  final String dateKey; // yyyy-MM-dd
+  //! yyyy-MM-dd keeps grouping stable and easy to aggregate without time zone-heavy SQL.
+  final String dateKey;
   final int totalTaps;
   final int wrongTaps;
 

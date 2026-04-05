@@ -8,7 +8,8 @@ import 'package:game_for_cats_2025/models/global/global_images.dart';
 import 'package:game_for_cats_2025/models/global/global_variables.dart';
 import 'package:game_for_cats_2025/controllers/utils.dart';
 
-// Mice class is a PositionComponent so we get the angle and position of the element.
+//* Mouse target entity:
+//* steers toward random targets, wraps at edges, and updates its facing angle from velocity.
 class Mice extends SpriteAnimationComponent
     with HasGameRef<FlameGame>, CollisionCallbacks {
   late Vector2 _velocity;
@@ -30,6 +31,7 @@ class Mice extends SpriteAnimationComponent
         size: Vector2(64, 64),
         anchor: Anchor.center,
       ) {
+    //! Collision bounds are intentionally simple rectangles; precision is less important than responsiveness.
     add(RectangleHitbox());
   }
 
@@ -54,7 +56,7 @@ class Mice extends SpriteAnimationComponent
       _lastCollisionTime = currentTime;
       target = Utils.generateRandomPosition(gameRef.size, Vector2(0, 10));
 
-      // Reset _isColliding after a certain delay
+      //? The cooldown prevents endless jitter when components keep intersecting.
       Future.delayed(Duration(milliseconds: waitTimeForCollisions), () {
         _isColliding = false;
       });
@@ -65,37 +67,31 @@ class Mice extends SpriteAnimationComponent
   void update(double dt) {
     super.update(dt);
 
-    //Select Target Direction
-    Vector2 directionToTarget = (target - position).normalized();
+    //* Steering model:
+    //* choose target -> accelerate toward it -> damp velocity -> clamp speed -> move.
+    final directionToTarget = (target - position).normalized();
 
-    //Add Acceleration
-    Vector2 desiredVelocity = directionToTarget * acceleration;
+    final desiredVelocity = directionToTarget * acceleration;
 
-    //Update Velocity
     _velocity += (desiredVelocity - _velocity) * steeringFactor;
 
-    //Friction Added
     _velocity *= (1.0 - friction);
 
-    //Max Speed Check
     if (_velocity.length > _speed) {
       _velocity = _velocity.normalized()..scaleTo(_speed);
     }
 
-    //Update Position
     position += _velocity * dt;
 
-    //New Target Added, When Mice Get the Current Target
+    //? Reaching the current target simply picks a new roam point.
     if ((target - position).length < 10.0) {
       target = Utils.generateRandomPosition(gameRef.size, Vector2(0, 10));
     }
 
-    //Don't Let It Go OutOfBounds
     if (Utils.isPositionOutOfBounds(gameRef.size, position)) {
       position = Utils.wrapPosition(gameRef.size, position);
     }
 
-    //Update Mice Angle
     angle = _velocity.screenAngle();
   }
 }

@@ -1,19 +1,20 @@
 // ignore_for_file: await_only_futures, depend_on_referenced_packages
 
 import 'dart:developer';
-
 import 'package:game_for_cats_2025/models/app_settings.dart';
-import 'package:sqflite/sqflite.dart';
-import 'dart:io' as io;
+import 'package:game_for_cats_2025/models/database/session_log.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
-import 'package:game_for_cats_2025/models/database/session_log.dart';
+import 'package:sqflite/sqflite.dart';
 
+//* Low-level local database adapter.
+//! This file owns schema creation / migration, while repositories own business meaning.
 class DBHelper {
   DBHelper();
 
   static Database? _db;
   Future<Database?> get db async {
+    //? The app only needs one live database connection per process.
     if (_db != null) {
       return _db;
     }
@@ -23,10 +24,10 @@ class DBHelper {
 
   Future<Database> initDatabase() async {
     try {
-      String fileName = 'miceandpawsdatabase0.db';
-      io.Directory documentDirectory = await getApplicationDocumentsDirectory();
-      String path = join(documentDirectory.path, fileName);
-      var db = await openDatabase(
+      const fileName = 'miceandpawsdatabase0.db';
+      final documentDirectory = await getApplicationDocumentsDirectory();
+      final path = join(documentDirectory.path, fileName);
+      final db = await openDatabase(
         path,
         version: 5,
         onCreate: _onCreate,
@@ -41,15 +42,19 @@ class DBHelper {
   }
 
   Future<void> _onCreate(Database db, int version) async {
+    //* Settings table:
+    //* single-row table keyed by schema version so old migrations can be invalidated cleanly.
     await db.execute(
       'CREATE TABLE OPCGameTable(Ver INTEGER not null PRIMARY KEY, LanguageCode INTEGER not null, MusicVolume DOUBLE not null, CharacterVolume DOUBLE not null, Time INTEGER not null, Difficulty INTEGER not null, BackgroundPath TEXT not null, Mute INTEGER not null, LowPower INTEGER not null)',
     );
+    //* SessionHistory powers the Hunt Journal / activity trend screen.
     await db.execute(
       'CREATE TABLE SessionHistory(Id INTEGER PRIMARY KEY AUTOINCREMENT, Date TEXT not null, TotalTaps INTEGER not null, WrongTaps INTEGER not null)',
     );
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    //! Migrations are intentionally additive because this project upgrades from already-shipped builds.
     if (oldVersion < 2) {
       await db.execute(
         'ALTER TABLE OPCGameTable ADD COLUMN Difficulty INTEGER not null DEFAULT 0',
@@ -77,7 +82,7 @@ class DBHelper {
 
   Future<void> add(AppSettings column) async {
     try {
-      var dbClient = await db;
+      final dbClient = await db;
       await dbClient!.insert(
         'OPCGameTable',
         column.toMap(),
@@ -89,8 +94,8 @@ class DBHelper {
   }
 
   Future<AppSettings?> getList(int ver) async {
-    var dbClient = await db;
-    List<Map<String, dynamic>> maps = await dbClient!.query(
+    final dbClient = await db;
+    final maps = await dbClient!.query(
       'OPCGameTable',
       columns: [
         'Ver',
@@ -107,7 +112,7 @@ class DBHelper {
       whereArgs: [ver],
     );
     if (maps.isNotEmpty) {
-      AppSettings retResult = AppSettings.fromMap(maps.first);
+      final retResult = AppSettings.fromMap(maps.first);
       return retResult;
     } else {
       return null;
@@ -115,7 +120,7 @@ class DBHelper {
   }
 
   Future<int> update(AppSettings column) async {
-    var dbClient = await db;
+    final dbClient = await db;
     return await dbClient!.update(
       'OPCGameTable',
       column.toMap(),
@@ -125,12 +130,12 @@ class DBHelper {
   }
 
   Future close() async {
-    var dbClient = await db;
+    final dbClient = await db;
     dbClient!.close();
   }
 
   Future<int> delete(AppSettings column) async {
-    var dbClient = await db;
+    final dbClient = await db;
     return await dbClient!.delete(
       'OPCGameTable',
       where: 'Ver = ?',
@@ -140,7 +145,7 @@ class DBHelper {
 
   Future<void> addSessionLog(SessionLog sessionLog) async {
     try {
-      var dbClient = await db;
+      final dbClient = await db;
       await dbClient!.insert(
         'SessionHistory',
         sessionLog.toMap(),
@@ -152,7 +157,7 @@ class DBHelper {
   }
 
   Future<List<SessionLog>> fetchSessionLogs({int limit = 30}) async {
-    var dbClient = await db;
+    final dbClient = await db;
     final maps = await dbClient!.query(
       'SessionHistory',
       orderBy: 'Id DESC',
