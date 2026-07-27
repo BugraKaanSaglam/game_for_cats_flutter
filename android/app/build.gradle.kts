@@ -22,7 +22,7 @@ val hasReleaseSigning =
 
 android {
     namespace = "com.mice_and_paws_cat_game"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 37
     ndkVersion = "28.2.13676358"
 
     signingConfigs {
@@ -37,17 +37,17 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     defaultConfig {
         applicationId = "com.mice_and_paws_cat_game"
         minSdk = flutter.minSdkVersion
-        targetSdk = 35
+        targetSdk = 37
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -71,12 +71,12 @@ flutter {
 }
 
 dependencies {
-    // Force a version compatible with current AGP; newer 1.11.x requires AGP 8.9+
-    implementation("androidx.activity:activity:1.8.2")
+    // Keep Activity aligned with API 37 and current AGP support.
+    implementation("androidx.activity:activity:1.13.0")
 }
 
 configurations.all {
     resolutionStrategy {
-        force("androidx.activity:activity:1.8.2")
+        force("androidx.activity:activity:1.13.0")
     }
 }
