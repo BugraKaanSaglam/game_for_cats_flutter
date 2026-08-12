@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
+import 'package:game_for_cats_2025/views/components/hunt_ui.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 
 //* Temporary loading route shown while AppState initializes repositories and locale.
@@ -9,65 +10,52 @@ class LoadingScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: PawPalette.midnight.withValues(alpha: 0.9),
-      body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: PawPalette.shellGradient),
-        child: Center(
+      backgroundColor: HuntColors.paperWarm,
+      body: Center(
+        child: HuntSurface(
+          tone: HuntSurfaceTone.field,
+          margin: const EdgeInsets.all(HuntSpacing.lg),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Container(
-                //? A branded loading mark feels better than a blank spinner-only page during cold start.
-                width: 112,
-                height: 112,
+                width: 96,
+                height: 96,
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.1),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.18),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: PawPalette.bubbleGum.withValues(alpha: 0.35),
-                      blurRadius: 28,
-                      offset: const Offset(0, 18),
-                    ),
-                  ],
+                  color: HuntColors.paper,
+                  borderRadius: BorderRadius.circular(HuntRadii.lg),
+                  border: Border.all(color: HuntColors.fieldLine),
                 ),
-                child: Stack(
+                child: const Stack(
                   alignment: Alignment.center,
-                  children: const [
+                  children: [
                     SizedBox(
-                      width: 68,
-                      height: 68,
+                      width: 56,
+                      height: 56,
                       child: CircularProgressIndicator(
-                        strokeWidth: 6,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        strokeWidth: 5,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          HuntColors.moss,
+                        ),
                       ),
                     ),
-                    Icon(Icons.pets_rounded, color: Colors.white, size: 30),
+                    Icon(
+                      Icons.track_changes_rounded,
+                      color: HuntColors.terracotta,
+                      size: 28,
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: HuntSpacing.lg),
               Text(
                 AppLocalizations.of(context)!.loading,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0.3,
-                ),
+                style: HuntTextStyles.pageTitle,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: HuntSpacing.xs),
               Text(
                 AppLocalizations.of(context)!.game_name,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.4,
-                ),
+                style: HuntTextStyles.supporting,
               ),
             ],
           ),

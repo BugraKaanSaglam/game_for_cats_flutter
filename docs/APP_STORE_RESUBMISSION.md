@@ -9,7 +9,7 @@ The current build now leans much more clearly into a distinct, self-contained ga
 - game-first home screen
 - simplified non-game utility surfaces
 - more distinctive in-round HUD
-- streak-based round summary
+- streak and accuracy-based Hunt Record
 - clearer product story and metadata alignment
 - no backend requirement during review
 
@@ -34,7 +34,7 @@ In this build I focused on making the game experience more distinctive and bette
 ## Recommended What's New
 
 ```text
-Refined the app with a more distinctive game-first home screen, improved the in-game HUD and round summary, added streak and cat mood feedback, refreshed onboarding and help copy, and streamlined non-essential utility surfaces to better match the core play experience.
+Refined the app with a more distinctive game-first home screen, improved the in-game HUD and Hunt Record, added streak and accuracy tracking, refreshed onboarding and help copy, and streamlined non-essential utility surfaces to better match the core play experience.
 ```
 
 ## Subtitle Candidates
@@ -52,7 +52,7 @@ Capture portrait screenshots only and keep them focused on gameplay value.
 2. Live gameplay
    Show moving critters, timer, and the HUD together.
 3. Round summary
-   Show accuracy, best streak, and cat mood.
+   Show accuracy, best streak, and field notes.
 4. Settings
    Show timer, difficulty, sound, and custom play mat controls.
 5. Hunt Journal

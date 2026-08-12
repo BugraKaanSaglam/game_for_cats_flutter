@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "game_for_cats_2025" "\0"
+            VALUE "CompanyName", "Mice and Paws" "\0"
+            VALUE "FileDescription", "Mice and Paws: Cat Game" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "game_for_cats_2025" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Mice and Paws" "\0"
             VALUE "OriginalFilename", "game_for_cats_2025.exe" "\0"
-            VALUE "ProductName", "game_for_cats_2025" "\0"
+            VALUE "ProductName", "Mice and Paws: Cat Game" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

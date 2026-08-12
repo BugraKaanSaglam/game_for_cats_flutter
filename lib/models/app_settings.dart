@@ -1,13 +1,12 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
 import 'package:game_for_cats_2025/models/enums/game_enums.dart';
-import 'package:game_for_cats_2025/models/global/global_variables.dart';
 
 part 'app_settings.freezed.dart';
 
 //* Immutable settings model persisted locally and fanned out through AppState.
 @freezed
-class AppSettings with _$AppSettings {
+abstract class AppSettings with _$AppSettings {
   const AppSettings._();
 
   const factory AppSettings({
@@ -20,11 +19,15 @@ class AppSettings with _$AppSettings {
     required String backgroundPath,
     required bool muted,
     required bool lowPower,
+    @Default(false) bool reducedMotion,
+    @Default(false) bool highContrast,
+    @Default(false) bool largerTargets,
+    @Default(false) bool haptics,
   }) = _AppSettings;
 
   //! Defaults define the first-run experience and must stay aligned with the DB schema.
   factory AppSettings.defaults() => AppSettings(
-    version: databaseVersion,
+    version: 0,
     languageCode: Language.english.value,
     musicVolume: 0.5,
     characterVolume: 1,
@@ -33,6 +36,10 @@ class AppSettings with _$AppSettings {
     backgroundPath: '',
     muted: false,
     lowPower: false,
+    reducedMotion: false,
+    highContrast: false,
+    largerTargets: false,
+    haptics: false,
   );
 
   factory AppSettings.fromMap(Map<String, dynamic> map) {
@@ -46,6 +53,10 @@ class AppSettings with _$AppSettings {
       backgroundPath: (map['BackgroundPath'] as String?) ?? '',
       muted: (map['Mute'] ?? 0) == 1,
       lowPower: (map['LowPower'] ?? 0) == 1,
+      reducedMotion: (map['ReducedMotion'] ?? 0) == 1,
+      highContrast: (map['HighContrast'] ?? 0) == 1,
+      largerTargets: (map['LargerTargets'] ?? 0) == 1,
+      haptics: (map['Haptics'] ?? 0) == 1,
     );
   }
 
@@ -59,6 +70,10 @@ class AppSettings with _$AppSettings {
     'BackgroundPath': backgroundPath,
     'Mute': muted ? 1 : 0,
     'LowPower': lowPower ? 1 : 0,
+    'ReducedMotion': reducedMotion ? 1 : 0,
+    'HighContrast': highContrast ? 1 : 0,
+    'LargerTargets': largerTargets ? 1 : 0,
+    'Haptics': haptics ? 1 : 0,
   };
 
   //? UI code can ask for the semantic enum instead of manually decoding the stored int.

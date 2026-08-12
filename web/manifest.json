@@ -1,11 +1,11 @@
 {
-    "name": "game_for_cats_2025",
-    "short_name": "game_for_cats_2025",
+    "name": "Mice and Paws: Cat Game",
+    "short_name": "Mice and Paws",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F8F0E2",
+    "theme_color": "#24313A",
+    "description": "A local-first indoor hunt game for cats.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -1,15 +1,16 @@
+import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/routing/app_routes.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/state/app_state.dart';
+import 'package:game_for_cats_2025/views/components/hunt_ui.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
-import 'package:game_for_cats_2025/views/widgets/animated_gradient_background.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-//* First-run onboarding:
-//* short, visual, and intentionally lightweight so users get into the game fast.
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -19,7 +20,7 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
-  int _pageIndex = 0;
+  int _page = 0;
 
   @override
   void initState() {
@@ -33,293 +34,164 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  Future<void> _completeOnboarding() async {
+  Future<void> _finish() async {
     await context.read<AppState>().completeOnboarding();
-    if (mounted) {
-      context.go(AppRoutes.main);
-    }
+    if (mounted) context.go(AppRoutes.main);
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    //? Each page maps to one mental model: enter, play, review.
-    final pages = <_OnboardingPageData>[
-      _OnboardingPageData(
-        title: l10n.onboarding_title_welcome,
-        subtitle: l10n.onboarding_subtitle_welcome,
-        icon: Icons.pets,
-        accent: PawPalette.pinkToOrange(),
-      ),
-      _OnboardingPageData(
-        title: l10n.onboarding_title_play,
-        subtitle: l10n.onboarding_subtitle_play,
-        icon: Icons.touch_app_outlined,
-        accent: PawPalette.tealToLemon(),
-      ),
-      _OnboardingPageData(
-        title: l10n.onboarding_title_track,
-        subtitle: l10n.onboarding_subtitle_track,
-        icon: Icons.insights_outlined,
-        accent: const [Color(0xFF4FACFE), Color(0xFF00F2FE)],
-      ),
-    ];
-
-    final isLastPage = _pageIndex == pages.length - 1;
-
+    final last = _page == 1;
     return Scaffold(
-      body: AnimatedGradientBackground(
-        overlayOpacity: 0.12,
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: PawPalette.pinkToOrange(),
-                        ),
-                      ),
-                      child: const Icon(Icons.pets, color: Colors.white),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        l10n.game_name,
-                        style: PawTextStyles.heading.copyWith(fontSize: 20),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        AppAnalytics.track(AnalyticsEvent.onboardingSkipped);
-                        _completeOnboarding();
-                      },
-                      child: Text(
-                        l10n.onboarding_skip,
-                        style: PawTextStyles.cardSubtitle.copyWith(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+      backgroundColor: HuntColors.paperWarm,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                HuntSpacing.lg,
+                HuntSpacing.md,
+                HuntSpacing.lg,
+                HuntSpacing.sm,
               ),
-              Expanded(
-                child: PageView.builder(
-                  controller: _controller,
-                  itemCount: pages.length,
-                  onPageChanged: (index) => setState(() => _pageIndex = index),
-                  itemBuilder: (context, index) =>
-                      _OnboardingPage(data: pages[index]),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        _DotsIndicator(
-                          count: pages.length,
-                          activeIndex: _pageIndex,
-                        ),
-                        const Spacer(),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    _GradientButton(
-                      fullWidth: true,
-                      label: isLastPage
-                          ? l10n.onboarding_start
-                          : l10n.onboarding_next,
-                      gradient: PawPalette.pinkToOrange(),
-                      onPressed: () async {
-                        if (isLastPage) {
-                          await _completeOnboarding();
-                          return;
-                        }
-                        AppAnalytics.track(
-                          AnalyticsEvent.onboardingNextTapped,
-                          parameters: <String, Object?>{
-                            'pageIndex': _pageIndex,
-                          },
-                        );
-                        await _controller.nextPage(
-                          duration: const Duration(milliseconds: 420),
-                          curve: Curves.easeOutCubic,
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OnboardingPage extends StatelessWidget {
-  const _OnboardingPage({required this.data});
-
-  final _OnboardingPageData data;
-
-  @override
-  Widget build(BuildContext context) {
-    //! The page card stays generic enough to localize cleanly but rich enough to feel intentional.
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 28),
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(36),
-            color: Colors.white.withValues(alpha: 0.12),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.18),
-                blurRadius: 24,
-                offset: const Offset(0, 16),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Stack(
-                alignment: Alignment.center,
+              child: Row(
                 children: [
-                  Container(
-                    width: 178,
-                    height: 178,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.08),
+                  const Icon(
+                    Icons.track_changes,
+                    color: HuntColors.moss,
+                    size: 28,
+                  ),
+                  const SizedBox(width: HuntSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      l10n.game_name,
+                      style: HuntTextStyles.sectionTitle,
                     ),
                   ),
-                  Container(
-                    width: 142,
-                    height: 142,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(colors: data.accent),
-                      boxShadow: [
-                        BoxShadow(
-                          color: data.accent.first.withValues(alpha: 0.32),
-                          blurRadius: 28,
-                          offset: const Offset(0, 18),
-                        ),
-                      ],
+                  TextButton(
+                    onPressed: () {
+                      AppAnalytics.track(AnalyticsEvent.onboardingSkipped);
+                      unawaited(_finish());
+                    },
+                    child: Text(
+                      l10n.onboarding_skip,
+                      style: HuntTextStyles.action.copyWith(
+                        color: HuntColors.moss,
+                      ),
                     ),
-                    child: Icon(data.icon, color: Colors.white, size: 64),
                   ),
                 ],
               ),
-              const SizedBox(height: 28),
-              Text(
-                data.title,
-                textAlign: TextAlign.center,
-                style: PawTextStyles.heading.copyWith(fontSize: 28),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                data.subtitle,
-                textAlign: TextAlign.center,
-                style: PawTextStyles.subheading.copyWith(
-                  color: Colors.white.withValues(alpha: 0.88),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DotsIndicator extends StatelessWidget {
-  const _DotsIndicator({required this.count, required this.activeIndex});
-
-  final int count;
-  final int activeIndex;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: List.generate(count, (index) {
-        final isActive = index == activeIndex;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 240),
-          margin: const EdgeInsets.only(right: 8),
-          height: 8,
-          width: isActive ? 28 : 8,
-          decoration: BoxDecoration(
-            gradient: isActive
-                ? const LinearGradient(
-                    colors: [Color(0xFFFF8C42), Color(0xFFFF5D8F)],
-                  )
-                : null,
-            color: isActive ? null : Colors.white54,
-            borderRadius: BorderRadius.circular(20),
-          ),
-        );
-      }),
-    );
-  }
-}
-
-class _GradientButton extends StatelessWidget {
-  const _GradientButton({
-    required this.label,
-    required this.gradient,
-    required this.onPressed,
-    this.fullWidth = false,
-  });
-
-  final String label;
-  final List<Color> gradient;
-  final VoidCallback onPressed;
-  final bool fullWidth;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: fullWidth ? double.infinity : null,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(24),
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            gradient: LinearGradient(colors: gradient),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.18),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: 16,
-                letterSpacing: 0.3,
+            ),
+            Expanded(
+              child: PageView(
+                controller: _controller,
+                onPageChanged: (value) => setState(() => _page = value),
+                children: [
+                  _WelcomePage(l10n: l10n),
+                  _PracticePage(l10n: l10n),
+                ],
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                HuntSpacing.lg,
+                HuntSpacing.sm,
+                HuntSpacing.lg,
+                HuntSpacing.lg,
+              ),
+              child: Row(
+                children: [
+                  Row(
+                    children: List.generate(
+                      2,
+                      (index) => AnimatedContainer(
+                        duration: HuntMotion.tap,
+                        margin: const EdgeInsets.only(right: HuntSpacing.sm),
+                        width: index == _page ? 28 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: index == _page
+                              ? HuntColors.moss
+                              : HuntColors.lineStrong,
+                          borderRadius: BorderRadius.circular(HuntRadii.pill),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  SizedBox(
+                    width: 150,
+                    child: HuntActionButton(
+                      label: last
+                          ? l10n.onboarding_start
+                          : l10n.onboarding_next,
+                      icon: last
+                          ? Icons.play_arrow_rounded
+                          : Icons.arrow_forward_rounded,
+                      onPressed: () async {
+                        if (last) {
+                          await _finish();
+                        } else {
+                          AppAnalytics.track(
+                            AnalyticsEvent.onboardingNextTapped,
+                            parameters: {'pageIndex': _page},
+                          );
+                          await _controller.nextPage(
+                            duration: HuntMotion.standard,
+                            curve: HuntMotion.curve,
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WelcomePage extends StatelessWidget {
+  const _WelcomePage({required this.l10n});
+
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(HuntSpacing.lg),
+      child: Center(
+        child: HuntSurface(
+          tone: HuntSurfaceTone.field,
+          padding: const EdgeInsets.all(HuntSpacing.xl),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 170, child: _FieldIllustration()),
+              const SizedBox(height: HuntSpacing.xl),
+              Text(
+                l10n.onboarding_title_welcome,
+                textAlign: TextAlign.center,
+                style: HuntTextStyles.pageTitle,
+              ),
+              const SizedBox(height: HuntSpacing.md),
+              Text(
+                l10n.onboarding_subtitle_welcome,
+                textAlign: TextAlign.center,
+                style: HuntTextStyles.body,
+              ),
+              const SizedBox(height: HuntSpacing.lg),
+              HuntTag(
+                label: l10n.home_feature_paw_first,
+                icon: Icons.touch_app_outlined,
+                tone: HuntTagTone.success,
+              ),
+            ],
           ),
         ),
       ),
@@ -327,16 +199,156 @@ class _GradientButton extends StatelessWidget {
   }
 }
 
-class _OnboardingPageData {
-  const _OnboardingPageData({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.accent,
-  });
+class _PracticePage extends StatefulWidget {
+  const _PracticePage({required this.l10n});
 
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final List<Color> accent;
+  final AppLocalizations l10n;
+
+  @override
+  State<_PracticePage> createState() => _PracticePageState();
+}
+
+class _PracticePageState extends State<_PracticePage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  bool _tapped = false;
+  bool _reducedMotion = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final reducedMotion =
+        context.read<AppState>().settings?.reducedMotion ?? false;
+    if (reducedMotion == _reducedMotion &&
+        (_controller.isAnimating || reducedMotion)) {
+      return;
+    }
+    _reducedMotion = reducedMotion;
+    if (_reducedMotion) {
+      _controller.stop();
+    } else {
+      _controller.repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = widget.l10n;
+    return Padding(
+      padding: const EdgeInsets.all(HuntSpacing.lg),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            HuntSurface(
+              tone: HuntSurfaceTone.field,
+              padding: const EdgeInsets.all(HuntSpacing.md),
+              child: GestureDetector(
+                onTap: () => setState(() => _tapped = true),
+                child: SizedBox(
+                  height: 260,
+                  width: double.infinity,
+                  child: AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, _) => CustomPaint(
+                      painter: _PracticePainter(
+                        progress: _reducedMotion ? 0 : _controller.value,
+                        tapped: _tapped,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: HuntSpacing.lg),
+            Text(
+              l10n.onboarding_title_play,
+              textAlign: TextAlign.center,
+              style: HuntTextStyles.pageTitle,
+            ),
+            const SizedBox(height: HuntSpacing.sm),
+            Text(
+              l10n.onboarding_subtitle_play,
+              textAlign: TextAlign.center,
+              style: HuntTextStyles.body,
+            ),
+            const SizedBox(height: HuntSpacing.md),
+            HuntTag(
+              label: _tapped ? l10n.current_streak_label : l10n.guide_practice,
+              icon: _tapped ? Icons.check_rounded : Icons.ads_click_rounded,
+              tone: _tapped ? HuntTagTone.success : HuntTagTone.neutral,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FieldIllustration extends StatelessWidget {
+  const _FieldIllustration();
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(painter: _PracticePainter(progress: 0.2, tapped: false));
+  }
+}
+
+class _PracticePainter extends CustomPainter {
+  const _PracticePainter({required this.progress, required this.tapped});
+
+  final double progress;
+  final bool tapped;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final line = Paint()
+      ..color = HuntColors.fieldLine
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(20)),
+      line,
+    );
+    final target = Offset(
+      size.width * (0.18 + progress * 0.64),
+      size.height * (0.38 + math.sin(progress * math.pi * 2) * 0.16),
+    );
+    final targetPaint = Paint()
+      ..color = tapped ? HuntColors.moss : HuntColors.coral;
+    canvas.drawCircle(target, 28, targetPaint);
+    canvas.drawCircle(
+      target,
+      18,
+      Paint()..color = HuntColors.paper.withValues(alpha: 0.8),
+    );
+    canvas.drawCircle(target, 8, targetPaint);
+    final pawPaint = Paint()..color = HuntColors.moss.withValues(alpha: 0.28);
+    for (var i = 0; i < 3; i++) {
+      canvas.drawCircle(
+        Offset(size.width * (0.2 + i * 0.28), size.height * 0.76),
+        6,
+        pawPaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _PracticePainter oldDelegate) =>
+      oldDelegate.progress != progress || oldDelegate.tapped != tapped;
 }

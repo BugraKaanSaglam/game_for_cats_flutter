@@ -1,256 +1,219 @@
-// ignore_for_file: must_be_immutable
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
+import 'package:game_for_cats_2025/services/app_analytics.dart';
+import 'package:game_for_cats_2025/views/components/hunt_ui.dart';
+import 'package:game_for_cats_2025/views/components/main_app_bar.dart';
+import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 
-import '../components/main_app_bar.dart';
-
-//* How-to screen framed as a short mission briefing rather than a generic FAQ.
-class HowToPlayScreen extends StatelessWidget {
+class HowToPlayScreen extends StatefulWidget {
   const HowToPlayScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: MainAppBar(title: AppLocalizations.of(context)!.howtoplay_button),
-      body: Container(
-        decoration: const BoxDecoration(gradient: PawPalette.lightBackground),
-        child: mainBody(context),
-      ),
-    );
+  State<HowToPlayScreen> createState() => _HowToPlayScreenState();
+}
+
+class _HowToPlayScreenState extends State<HowToPlayScreen> {
+  bool _practiceTapped = false;
+
+  @override
+  void initState() {
+    super.initState();
+    AppAnalytics.screenView('how_to_play');
   }
 
-  Widget mainBody(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    //? Keeping instructions to three steps reduces cognitive load and makes this screen screenshot-friendly.
-    final sections = [
-      _InstructionSection(
-        step: '01',
-        icon: Icons.tune_rounded,
-        title: l10n.howtoplay_label_forhuman,
-        description: l10n.howtoplay_text_forhuman,
-        gradient: PawPalette.pinkToOrange(),
-      ),
-      _InstructionSection(
-        step: '02',
-        icon: Icons.ads_click_rounded,
-        title: l10n.howtoplay_label_forcats,
-        description: l10n.howtoplay_text_forcats,
-        gradient: PawPalette.tealToLemon(),
-      ),
-      _InstructionSection(
-        step: '03',
-        icon: Icons.auto_awesome_rounded,
-        title: l10n.howtoplay_label_forstreaks,
-        description: l10n.howtoplay_text_forstreaks,
-        gradient: const [Color(0xFF4FACFE), Color(0xFF7B61FF)],
-      ),
-    ];
-
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        children: [
-          _HowToHero(
-            title: l10n.howtoplay_title,
-            subtitle: l10n.howtoplay_subtitle,
-          ),
-          const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Column(
-              children: List.generate(
-                sections.length,
-                (index) => TweenAnimationBuilder<double>(
-                  tween: Tween(begin: 0.96, end: 1),
-                  duration: Duration(milliseconds: 420 + (index * 120)),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, value, child) =>
-                      Transform.scale(scale: value, child: child),
-                  child: _HowToStepCard(
-                    isLast: index == sections.length - 1,
-                    data: sections[index],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _InstructionSection {
-  const _InstructionSection({
-    required this.step,
-    required this.icon,
-    required this.title,
-    required this.description,
-    required this.gradient,
-  });
-
-  final String step;
-  final IconData icon;
-  final String title;
-  final String description;
-  final List<Color> gradient;
-}
-
-class _HowToHero extends StatelessWidget {
-  const _HowToHero({required this.title, required this.subtitle});
-
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(32),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF140F2D), Color(0xFF2A1A58), Color(0xFF0E6B88)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: PawPalette.midnight.withValues(alpha: 0.18),
-            blurRadius: 24,
-            offset: const Offset(0, 16),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.12),
-            ),
-            child: const Icon(Icons.map_rounded, color: Colors.white, size: 30),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: PawTextStyles.heading.copyWith(fontSize: 28),
-                ),
-                const SizedBox(height: 8),
-                Text(subtitle, style: PawTextStyles.subheading),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HowToStepCard extends StatelessWidget {
-  const _HowToStepCard({required this.data, required this.isLast});
-
-  final _InstructionSection data;
-  final bool isLast;
-
-  @override
-  Widget build(BuildContext context) {
-    //! The vertical rail gives the screen a route / sequence feeling instead of stacked info cards.
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            width: 56,
-            child: Column(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(colors: data.gradient),
-                  ),
-                  child: Center(
-                    child: Text(
-                      data.step,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ),
-                if (!isLast)
-                  Expanded(
-                    child: Container(
-                      width: 3,
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(999),
-                        gradient: LinearGradient(colors: data.gradient),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 16),
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(28),
-                color: Colors.white.withValues(alpha: 0.9),
-                border: Border.all(
-                  color: data.gradient.first.withValues(alpha: 0.2),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: data.gradient.first.withValues(alpha: 0.12),
-                    blurRadius: 16,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      appBar: MainAppBar(title: l10n.howtoplay_button),
+      body: ColoredBox(
+        color: HuntColors.paperWarm,
+        child: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 720),
+              child: ListView(
+                padding: const EdgeInsets.all(HuntSpacing.lg),
                 children: [
-                  Container(
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(colors: data.gradient),
-                    ),
-                    child: Icon(data.icon, color: Colors.white, size: 22),
+                  HuntSectionHeading(
+                    eyebrow: l10n.guide_practice,
+                    title: l10n.howtoplay_title,
+                    subtitle: l10n.howtoplay_subtitle,
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
+                  const SizedBox(height: HuntSpacing.lg),
+                  HuntSurface(
+                    tone: HuntSurfaceTone.field,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(data.title, style: PawTextStyles.cardTitle),
-                        const SizedBox(height: 6),
                         Text(
-                          data.description,
-                          style: PawTextStyles.cardSubtitle,
+                          l10n.guide_practice,
+                          style: HuntTextStyles.sectionTitle,
+                        ),
+                        const SizedBox(height: HuntSpacing.xs),
+                        Text(
+                          l10n.guide_practice_subtitle,
+                          style: HuntTextStyles.supporting,
+                        ),
+                        const SizedBox(height: HuntSpacing.md),
+                        GestureDetector(
+                          onTap: () => setState(() => _practiceTapped = true),
+                          child: SizedBox(
+                            height: 190,
+                            width: double.infinity,
+                            child: CustomPaint(
+                              painter: _GuideFieldPainter(
+                                tapped: _practiceTapped,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: HuntSpacing.sm),
+                        HuntTag(
+                          label: _practiceTapped
+                              ? l10n.onboarding_title_track
+                              : l10n.onboarding_title_play,
+                          icon: _practiceTapped
+                              ? Icons.check_rounded
+                              : Icons.touch_app_outlined,
+                          tone: _practiceTapped
+                              ? HuntTagTone.success
+                              : HuntTagTone.neutral,
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(height: HuntSpacing.md),
+                  _GuideSection(
+                    step: '01',
+                    title: l10n.howtoplay_label_forhuman,
+                    text: l10n.howtoplay_text_forhuman,
+                    icon: Icons.tune_rounded,
+                  ),
+                  _GuideSection(
+                    step: '02',
+                    title: l10n.howtoplay_label_forcats,
+                    text: l10n.howtoplay_text_forcats,
+                    icon: Icons.ads_click_rounded,
+                  ),
+                  _GuideSection(
+                    step: '03',
+                    title: l10n.howtoplay_label_forstreaks,
+                    text: l10n.howtoplay_text_forstreaks,
+                    icon: Icons.auto_awesome_rounded,
+                  ),
                 ],
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GuideSection extends StatelessWidget {
+  const _GuideSection({
+    required this.step,
+    required this.title,
+    required this.text,
+    required this.icon,
+  });
+
+  final String step;
+  final String title;
+  final String text;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return HuntSurface(
+      margin: const EdgeInsets.only(bottom: HuntSpacing.md),
+      padding: const EdgeInsets.all(HuntSpacing.md),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: HuntColors.field,
+              borderRadius: BorderRadius.circular(HuntRadii.sm),
+              border: Border.all(color: HuntColors.fieldLine),
+            ),
+            child: Center(child: Icon(icon, color: HuntColors.moss, size: 21)),
+          ),
+          const SizedBox(width: HuntSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(step, style: HuntTextStyles.eyebrow),
+                const SizedBox(height: HuntSpacing.xs),
+                Text(
+                  title,
+                  style: HuntTextStyles.sectionTitle.copyWith(fontSize: 17),
+                ),
+                const SizedBox(height: HuntSpacing.sm),
+                Text(text, style: HuntTextStyles.supporting),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+}
+
+class _GuideFieldPainter extends CustomPainter {
+  const _GuideFieldPainter({required this.tapped});
+
+  final bool tapped;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final border = Paint()
+      ..color = HuntColors.fieldLine
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Offset.zero & size,
+        const Radius.circular(HuntRadii.md),
+      ),
+      border,
+    );
+    final center = Offset(
+      size.width * (tapped ? 0.66 : 0.32),
+      size.height * 0.48,
+    );
+    final color = tapped ? HuntColors.moss : HuntColors.coral;
+    canvas.drawCircle(center, 31, Paint()..color = color);
+    canvas.drawCircle(
+      center,
+      20,
+      Paint()..color = HuntColors.paper.withValues(alpha: 0.82),
+    );
+    canvas.drawCircle(center, 8, Paint()..color = color);
+    final path = Path()..moveTo(size.width * 0.1, size.height * 0.76);
+    for (var i = 0; i < 4; i++) {
+      path.lineTo(
+        size.width * (0.22 + i * 0.18),
+        size.height * (0.72 + math.sin(i) * 0.04),
+      );
+    }
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = HuntColors.moss.withValues(alpha: 0.35)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _GuideFieldPainter oldDelegate) =>
+      oldDelegate.tapped != tapped;
 }

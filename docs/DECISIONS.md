@@ -2,7 +2,7 @@
 
 This file captures the most important engineering choices in the repository and why they were made.
 
-The project also intentionally preserves the context that this was my first app. The goal is not to present a perfect greenfield architecture, but to show sound decisions, visible tradeoffs, and disciplined iteration.
+The project favors explicit product decisions, visible tradeoffs, and disciplined iteration over unnecessary framework churn.
 
 ## ADR-001: Keep `provider` Instead of Migrating to `riverpod`
 

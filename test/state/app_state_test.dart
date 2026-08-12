@@ -3,7 +3,6 @@ import 'package:game_for_cats_2025/data/app_settings_repository.dart';
 import 'package:game_for_cats_2025/data/onboarding_repository.dart';
 import 'package:game_for_cats_2025/models/app_settings.dart';
 import 'package:game_for_cats_2025/models/enums/game_enums.dart';
-import 'package:game_for_cats_2025/models/global/global_variables.dart';
 import 'package:game_for_cats_2025/state/app_state.dart';
 
 void main() {
@@ -12,7 +11,6 @@ void main() {
     late FakeOnboardingRepository onboardingRepository;
 
     setUp(() {
-      gameTimer = 100;
       settingsRepository = FakeAppSettingsRepository(
         current: AppSettings.defaults().copyWith(
           languageCode: Language.turkish.value,
@@ -35,7 +33,7 @@ void main() {
       expect(appState.onboardingComplete, isFalse);
       expect(appState.settings, settingsRepository.current);
       expect(appState.locale?.languageCode, 'tr');
-      expect(gameTimer, Time.twohundered.value);
+      expect(appState.settings?.time, Time.twohundered.value);
     });
 
     test('updateSettings persists the new settings', () async {
@@ -54,7 +52,7 @@ void main() {
 
       expect(appState.settings, nextSettings);
       expect(settingsRepository.savedSettings, nextSettings);
-      expect(gameTimer, Time.sandbox.value);
+      expect(appState.settings?.time, Time.sandbox.value);
     });
 
     test('completeOnboarding updates state and repository', () async {

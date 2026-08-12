@@ -21,19 +21,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get howtoplay_button => 'Nasıl İşler?';
 
   @override
-  String get credits_button => 'Emeği Geçenler';
-
-  @override
   String get about_button => 'Oyun Hakkında';
-
-  @override
-  String get exit_button => 'Çıkış Yap';
-
-  @override
-  String get main_tagline => 'Her ekranı renkli bir ev içi ava dönüştür.';
-
-  @override
-  String get home_kicker => 'Meraklı kediler için tasarlandı';
 
   @override
   String get home_headline =>
@@ -42,13 +30,6 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get home_subheadline =>
       'Avı ayarla, turu başlat ve kedinin bugün nasıl oynadığını takip et.';
-
-  @override
-  String get home_setup_title => 'Bugünkü av ayarı';
-
-  @override
-  String get home_setup_subtitle =>
-      'Süre, zorluk, ses ve oyun zemininin hızlı özeti.';
 
   @override
   String get home_customize_subtitle => 'Zorluk, süre, ses ve zemini ayarla.';
@@ -61,35 +42,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get home_guide_subtitle => 'Av başlamadan önce kısa kurallar.';
 
   @override
-  String get home_onboarding_button => 'Pati Turu';
-
-  @override
-  String get home_onboarding_subtitle =>
-      'Kedin atlamadan önce oyun alanını gör.';
-
-  @override
-  String get home_play_chip => 'Aç';
-
-  @override
   String get home_default_playmat => 'Varsayılan oyun zemini';
 
   @override
   String get home_custom_playmat_ready => 'Özel zemin hazır';
-
-  @override
-  String get home_muted => 'Sessiz';
-
-  @override
-  String get home_sound_on => 'Ses açık';
-
-  @override
-  String get home_live_badge => 'Canlı';
-
-  @override
-  String get home_feature_quick_rounds => 'Hızlı turlar';
-
-  @override
-  String get home_feature_moving_targets => 'Hareketli hedefler';
 
   @override
   String get home_feature_paw_first => 'Pati odaklı oyun';
@@ -112,10 +68,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get onboarding_title_track => 'Eğlenceyi Takip Et';
 
   @override
-  String get onboarding_subtitle_track =>
-      'Günlük dokunuşları, kaçırmaları ve isabeti av günlüğünde incele.';
-
-  @override
   String get onboarding_skip => 'Atla';
 
   @override
@@ -123,9 +75,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get onboarding_start => 'Başla';
-
-  @override
-  String get select_language => 'Dil Seçiniz';
 
   @override
   String get select_difficulty => 'Zorluk Seçiniz';
@@ -141,15 +90,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get save_button => 'Kaydet';
-
-  @override
-  String get countdown => 'Kalan Süre: ';
-
-  @override
-  String get game_over => 'Oyun Bitti';
-
-  @override
-  String get tryagain_button => 'Tekrar Dene';
 
   @override
   String get return_mainmenu_button => 'Ana Menü\'ye Dön';
@@ -180,16 +120,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get howtoplay_text_forstreaks =>
-      'Her başarılı dokunuş seriyi büyütür. Kaçırmalar seriyi sıfırlar. Tur sonunda isabet, en iyi seri ve kedinin genel modu gösterilir.';
+      'Her başarılı dokunuş seriyi büyütür. Kaçırmalar seriyi sıfırlar. Av Kaydı isabeti, en iyi seriyi ve turun nasıl geçtiğini gösterir.';
 
   @override
   String get micetap_count => 'Tıklanan Fareler:';
 
   @override
   String get bugtap_count => 'Tıklanan Böcekler:';
-
-  @override
-  String get wrongtap_count => 'Dışarı Tıklamalar:';
 
   @override
   String get save_complete_snackbar => 'İşlem Başarıyla Tamamlandı!';
@@ -202,19 +139,6 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get credits_creators_text => 'Buğra Kaan Sağlam';
-
-  @override
-  String get exit_validation => 'Ava ara verilsin mi?';
-
-  @override
-  String get this_will_close_automatically_in_seconds =>
-      'Menüye dönebilir ya da tura devam edebilirsin.';
-
-  @override
-  String get i_am_cat => 'Avı sürdür';
-
-  @override
-  String get i_am_human => 'Turu bitir';
 
   @override
   String get pause_hunt_title => 'Ava ara verilsin mi?';
@@ -237,10 +161,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bir sonraki av için süreyi, sesi, zorluğu ve zemini ayarla.';
 
   @override
-  String get settings_language_hint =>
-      'Menüler insan dostunun tercih ettiği dilde görünsün.';
-
-  @override
   String get settings_time_hint =>
       'Kısa bir koşu mu sınırsız kum havuzu mu? En uygun süreyi seç.';
 
@@ -248,25 +168,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settings_music_hint => 'Miyavları dans partisine çevir!';
 
   @override
-  String get settings_character_hint => 'Ciyaklama ve mırıldanma sesleri.';
-
-  @override
-  String get credits_subtitle => 'Kedilere ve renklere aşık küçücük bir ekip.';
-
-  @override
-  String get credits_special_thanks => 'Özel Teşekkürler';
-
-  @override
   String get credits_version_label => 'Sürüm';
 
   @override
   String get credits_version_loading => 'Uygulama bilgileri yükleniyor...';
-
-  @override
-  String get credits_share_title => 'Oyunu paylaş';
-
-  @override
-  String get credits_share_subtitle => 'Oyunu başka bir kedi severle gönder.';
 
   @override
   String get about_title => 'Oyun Hakkında';
@@ -279,78 +184,14 @@ class AppLocalizationsTr extends AppLocalizations {
   String get about_story_title => 'Bu oyun neden var?';
 
   @override
-  String get about_story_subtitle =>
-      'Basit bir fikir, zamanla daha derli toplu bir deneyime dönüştü.';
-
-  @override
   String get about_story_body =>
-      'Fareler ve Patiler; parlak hareket, kısa turlar ve hafif bir kurulum akışı üzerine kurulu özgün bir kedi oyunu olarak geliştirildi. İlk uygulama olarak başladı, sonra yerel geçmiş, özelleştirme ve daha güçlü bir görsel kimlikle daha bilinçli bir ürüne dönüştü.';
-
-  @override
-  String get about_highlights_title => 'Bu sürümü farklı yapan ne?';
-
-  @override
-  String get about_highlights_subtitle =>
-      'Bu yapının özellikle öne çıkardığı noktalar.';
-
-  @override
-  String get about_highlight_one =>
-      'Araç ekranlarından önce av düzenini öne çıkaran oyun-merkezli ana ekran.';
-
-  @override
-  String get about_highlight_two =>
-      'Her cihazı biraz daha kişisel hissettiren özel oyun zemini arka planları.';
-
-  @override
-  String get about_highlight_three =>
-      'Seri, isabet ve kedinin modunu gösteren tur özeti.';
+      'Fareler ve Patiler; parlak hareket, kısa turlar ve hafif bir kurulum akışı üzerine kurulu özgün bir kedi oyunudur. Yerel geçmiş ve esnek oyun alanı ayarları her avı başlatmayı kolay, yeniden dönmeyi keyifli tutar.';
 
   @override
   String get about_info_title => 'Sürüm detayları';
 
   @override
-  String get about_info_subtitle => 'Yüklü yapıya ait sürüm ve ürün notları.';
-
-  @override
   String get about_platform_label => 'Platform';
-
-  @override
-  String get about_release_model_label => 'Uygulama yapısı';
-
-  @override
-  String get about_release_model_value => 'Yerel çalışır, backend gerekmez';
-
-  @override
-  String get store_links_title => 'Mağaza Linkleri';
-
-  @override
-  String get store_links_subtitle =>
-      'Oyunun yayınlanmış mağaza sayfalarını aç.';
-
-  @override
-  String get google_play_button => 'Google Play';
-
-  @override
-  String get app_store_button => 'App Store';
-
-  @override
-  String get connectivity_title => 'Bağlantı Durumu';
-
-  @override
-  String get connectivity_subtitle => 'Cihazın güncel ağ erişim durumu.';
-
-  @override
-  String get connectivity_status_online => 'Çevrimiçi';
-
-  @override
-  String get connectivity_status_offline => 'Çevrimdışı';
-
-  @override
-  String get connectivity_status_unknown => 'Kontrol ediliyor...';
-
-  @override
-  String get offline_banner =>
-      'Çevrimdışısın. Oyun çalışmaya devam eder, çevrimiçi servisler beklemeye alınır.';
 
   @override
   String get settings_difficulty_hint =>
@@ -376,10 +217,6 @@ class AppLocalizationsTr extends AppLocalizations {
       'Yerel oyun kayıtlarından son turlar, günlük dokunuşlar ve kaçırma düzeni.';
 
   @override
-  String get activity_empty =>
-      'Henüz kayıtlı oyun yok. Takip için bir tur başlat!';
-
-  @override
   String get activity_button => 'Av Günlüğü';
 
   @override
@@ -387,44 +224,10 @@ class AppLocalizationsTr extends AppLocalizations {
       'Aktivite yüklenemedi. Yenilemek için aşağı çekin.';
 
   @override
-  String get activity_legend_total => 'Toplam tıklama';
-
-  @override
-  String get activity_legend_miss => 'Kaçırılan tıklama';
-
-  @override
-  String get activity_total_label => 'Toplam';
-
-  @override
-  String get activity_miss_label => 'Kaçırma';
-
-  @override
-  String get activity_accuracy_label => 'İsabet';
-
-  @override
   String get current_streak_label => 'Seri';
 
   @override
   String get best_streak_label => 'En iyi seri';
-
-  @override
-  String get cat_mood_warming_up => 'Isınıyor';
-
-  @override
-  String get cat_mood_curious => 'Meraklı patiler';
-
-  @override
-  String get cat_mood_playful => 'Oyuncu avcı';
-
-  @override
-  String get cat_mood_hunt_legend => 'Av efsanesi';
-
-  @override
-  String get background_title => 'Arka Plan';
-
-  @override
-  String get background_subtitle =>
-      'Oyun alanı için bir fotoğraf seç ya da varsayılanı kullan.';
 
   @override
   String get background_change_button => 'Arka Planı Değiştir';
@@ -447,9 +250,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get mute_subtitle => 'Tüm müzik ve efektleri anında kapat.';
 
   @override
-  String get mute_toggle_label => 'Aç/Kapat';
-
-  @override
   String get lowpower_title => 'Düşük Performans Modu';
 
   @override
@@ -457,13 +257,135 @@ class AppLocalizationsTr extends AppLocalizations {
       'Daha az yaratık ve hız ile eski cihazlarda daha akıcı oynat.';
 
   @override
-  String get lowpower_toggle_label => 'Hareketi azalt';
+  String get hunt_ready => 'Alan hazır';
 
   @override
-  String get share_app_button => 'Uygulamayı paylaş';
+  String get hunt_ready_subtitle =>
+      'Alana bir an ver, sonra patilerin yönünü izlesin.';
 
   @override
-  String share_app_text(Object gameName, Object version) {
-    return '$gameName oyununu $version sürümünde oynuyoruz. Fareleri yakala, böceklerden kaç, kedini gururlandır!';
-  }
+  String get hunt_record_eyebrow => 'Av kaydı';
+
+  @override
+  String get hunt_record_proud => 'Gurur veren küçük bir av';
+
+  @override
+  String get hunt_record_complete => 'Av tamamlandı';
+
+  @override
+  String get hunt_record_subtitle => 'Bu turdan kalan sakin bir not.';
+
+  @override
+  String get hunt_record_accuracy => 'hedef isabeti';
+
+  @override
+  String get hunt_record_hits => 'Başarılı dokunuş';
+
+  @override
+  String get hunt_record_misses => 'Kaçırma';
+
+  @override
+  String get hunt_record_details => 'Alan notları';
+
+  @override
+  String get hunt_record_manual_end => 'Av erken sonlandırıldı.';
+
+  @override
+  String get hunt_record_timer_end => 'Süre avı tamamladı.';
+
+  @override
+  String get hunt_again => 'Tekrar avlan';
+
+  @override
+  String get hunt_view_journal => 'Günlüğü gör';
+
+  @override
+  String get hunt_adjust => 'Avı ayarla';
+
+  @override
+  String get reduced_motion_title => 'Azaltılmış hareket';
+
+  @override
+  String get reduced_motion_subtitle =>
+      'Geçişleri ve alan tepkilerini sakinleştir.';
+
+  @override
+  String get high_contrast_title => 'Güçlü kontrast';
+
+  @override
+  String get high_contrast_subtitle =>
+      'Hedefleri ve kontrolleri daha kolay ayırt et.';
+
+  @override
+  String get larger_targets_title => 'Büyük hedefler';
+
+  @override
+  String get larger_targets_subtitle =>
+      'Hareketli hedeflere daha fazla dokunma alanı ver.';
+
+  @override
+  String get haptics_title => 'Dokunma tepkisi';
+
+  @override
+  String get haptics_subtitle =>
+      'İnsan kontrollerinde nazik dokunma geri bildirimi kullan.';
+
+  @override
+  String get playfield_title => 'Oyun alanı';
+
+  @override
+  String get playfield_subtitle => 'Bir sonraki avın kullanacağı yüzeyi seç.';
+
+  @override
+  String get hunt_setup_title => 'Bir sonraki avı hazırla';
+
+  @override
+  String get hunt_setup_subtitle =>
+      'Ekranı teslim etmeden önce tempo, alan ve tepkileri ayarla.';
+
+  @override
+  String get journal_records_title => 'Son kayıtlar';
+
+  @override
+  String get journal_records_subtitle =>
+      'Bu cihazda oynanan avların yerel izi.';
+
+  @override
+  String get journal_personal_best => 'Kişisel rekorlar';
+
+  @override
+  String get journal_best_accuracy => 'En iyi isabet';
+
+  @override
+  String get journal_best_streak => 'En iyi seri';
+
+  @override
+  String get journal_hunts_completed => 'Tamamlanan av';
+
+  @override
+  String get guide_practice => 'Alanı dene';
+
+  @override
+  String get guide_practice_subtitle =>
+      'Meraklı patileri çağırmadan önce hareketleri kendin dene.';
+
+  @override
+  String get about_local_note => 'Ayarların ve av kayıtların bu cihazda kalır.';
+
+  @override
+  String get state_retry => 'Tekrar dene';
+
+  @override
+  String get state_empty_title => 'Henüz kayıt yok';
+
+  @override
+  String get state_empty_subtitle =>
+      'Bir avı tamamla; ilk alan notun burada görünsün.';
+
+  @override
+  String get accessibility_title => 'Erişilebilirlik';
+
+  @override
+  String get accessibility_subtitle =>
+      'İnsan kontrollerini rahat, oyun alanını okunaklı tut.';
 }

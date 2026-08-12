@@ -4,15 +4,26 @@ import 'dart:ui';
 
 import 'package:flame/cache.dart';
 import 'package:flame_audio/flame_audio.dart';
-import 'package:game_for_cats_2025/models/global/global_images.dart';
+
+class GameAssets {
+  const GameAssets({
+    required this.mice,
+    required this.bug,
+    required this.background,
+  });
+
+  final Image mice;
+  final Image bug;
+  final Image background;
+}
 
 //* Shared asset-loading entry points used by the Flame game.
 //! This layer keeps expensive audio/image decoding out of individual components.
 final Images _gameImages = Images();
 bool _audioLoaded = false;
-bool _coreImagesLoaded = false;
-bool _backgroundLoaded = false;
 String? _backgroundPath;
+Image? _cachedMice;
+Image? _cachedBug;
 
 Future<void> loadGameAudio() async {
   //? Audio is cached once because every round reuses the same clips.
@@ -25,29 +36,28 @@ Future<void> loadGameAudio() async {
   _audioLoaded = true;
 }
 
-Future<void> loadGameImagesAndAssets({String? backgroundPath}) async {
+Future<GameAssets> loadGameImagesAndAssets({String? backgroundPath}) async {
   //* Core creature sprites are stable across rounds; only the optional background can vary.
-  if (!_coreImagesLoaded) {
-    globalMiceImage = await _gameImages.load('mice_sprite.png');
-    globalBugImage = await _gameImages.load('bug_sprite.png');
-    globalBackButtonImage = await _gameImages.load('back_button.png');
-    _coreImagesLoaded = true;
-  }
+  _cachedMice ??= await _gameImages.load('mice_sprite.png');
+  _cachedBug ??= await _gameImages.load('bug_sprite.png');
 
   final normalizedPath = (backgroundPath != null && backgroundPath.isNotEmpty)
       ? backgroundPath
       : null;
-  if (!_backgroundLoaded || _backgroundPath != normalizedPath) {
+  if (_backgroundPath != normalizedPath || _cachedBackground == null) {
     final newBackground = await _loadBackgroundImage(normalizedPath);
-    //! Backgrounds can be replaced at runtime from Settings, so old images are disposed on swap.
-    if (_backgroundLoaded) {
-      globalBackgroundImage.dispose();
-    }
-    globalBackgroundImage = newBackground;
-    _backgroundLoaded = true;
+    _cachedBackground?.dispose();
+    _cachedBackground = newBackground;
     _backgroundPath = normalizedPath;
   }
+  return GameAssets(
+    mice: _cachedMice!,
+    bug: _cachedBug!,
+    background: _cachedBackground!,
+  );
 }
+
+Image? _cachedBackground;
 
 Future<Image> _loadBackgroundImage(String? path) async {
   try {

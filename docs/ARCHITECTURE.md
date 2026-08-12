@@ -2,7 +2,7 @@
 
 ## Goal
 
-This project is intentionally positioned between a playful game and a production-minded Flutter application. It is also my first app, so the surrounding product shell is structured to show how the codebase evolved beyond a simple starter project into something maintainable, testable, and portfolio-ready.
+This project combines a playful cat game with a production-minded Flutter application shell. The surrounding product structure keeps the hunt lifecycle, local persistence, and human-facing controls explicit and testable.
 
 ## High-Level System
 
@@ -15,7 +15,7 @@ flowchart TD
     E --> F[Repositories]
     F --> G[SharedPreferences / SQLite]
     B --> H[Screens]
-    H --> I[Widgets]
+    H --> I[Components]
     H --> J[Analytics / App Info]
     H --> K[Flame Game Screen]
     D --> L[Logging]
@@ -50,13 +50,13 @@ flowchart TD
 
 ### UI Shell
 
-- `lib/views/screens/`
+- `lib/views/screens/` and `lib/views/components/`
 - screens outside the Flame canvas handle onboarding, settings, hunt journal, and game info
 
 ### Game Runtime
 
 - `lib/views/screens/game_screen.dart`
-- integrates `FlameGame`, overlays, streak tracking, and local session persistence
+- integrates `FlameGame`, `HuntSessionState`, overlays, streak tracking, and local session persistence
 
 ## State Management Choice
 

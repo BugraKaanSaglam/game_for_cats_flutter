@@ -1,25 +1,21 @@
-// ignore_for_file: must_be_immutable, use_build_context_synchronously
 import 'dart:io';
 import 'dart:math' as math;
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/models/database/db_error.dart';
-import 'package:game_for_cats_2025/models/app_settings.dart';
-import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
-import 'package:game_for_cats_2025/models/enums/game_enums.dart';
+import 'package:flutter/services.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
+import 'package:game_for_cats_2025/models/app_settings.dart';
+import 'package:game_for_cats_2025/models/enums/game_enums.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
+import 'package:game_for_cats_2025/state/app_state.dart';
+import 'package:game_for_cats_2025/views/components/hunt_ui.dart';
 import 'package:game_for_cats_2025/views/components/main_app_bar.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:game_for_cats_2025/state/app_state.dart';
 
-//* Settings screen:
-//* one place where the player configures the next round and optional local customization.
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -28,8 +24,9 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  static const int _backgroundMaxDimension = 1280;
-  AppSettings? _draftSettings;
+  static const _maxBackgroundDimension = 1280;
+  AppSettings? _draft;
+  bool _saving = false;
 
   @override
   void initState() {
@@ -40,573 +37,220 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final settings = context.read<AppState>().settings;
-    if (_draftSettings == null && settings != null) {
-      _draftSettings = settings;
+    _draft ??= context.read<AppState>().settings;
+  }
+
+  void _update(AppSettings Function(AppSettings current) update) {
+    final current = _draft;
+    if (current == null) return;
+    if (current.haptics) HapticFeedback.selectionClick();
+    setState(() => _draft = update(current));
+  }
+
+  Future<void> _save() async {
+    final draft = _draft;
+    if (draft == null || _saving) return;
+    setState(() => _saving = true);
+    try {
+      await context.read<AppState>().updateSettings(draft);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.save_complete_snackbar),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final appState = context.watch<AppState>();
-    if (!appState.isReady) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(color: PawPalette.bubbleGum),
-        ),
-      );
+    final l10n = AppLocalizations.of(context)!;
+    final draft = _draft;
+    if (draft == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
     return Scaffold(
-      appBar: MainAppBar(title: AppLocalizations.of(context)!.settings_button),
-      body: Container(
-        decoration: const BoxDecoration(gradient: PawPalette.lightBackground),
-        child: _buildBody(),
-      ),
-      bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.fromLTRB(24, 0, 24, 16),
-        child: _draftSettings == null
-            ? const SizedBox.shrink()
-            : _buildSaveButton(context),
-      ),
-    );
-  }
-
-  Widget _buildBody() {
-    final appState = context.watch<AppState>();
-    if (appState.initError != null) {
-      return Center(child: dbError(context));
-    }
-
-    final settings = _draftSettings;
-    if (settings == null) {
-      return const Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      );
-    }
-
-    final l10n = AppLocalizations.of(context)!;
-    //! The screen is split into themed panels so it reads like a control deck, not a list of stock settings cells.
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        children: [
-          _buildHeader(context, settings),
-          _SettingsPanel(
-            title: l10n.home_setup_title,
-            subtitle: l10n.settings_header_subtitle,
-            accent: const [Color(0xFFFF8C42), Color(0xFFFF5D8F)],
-            child: Column(
-              children: [
-                _SettingsFieldTile(
-                  icon: Icons.language_rounded,
-                  title: l10n.select_language,
-                  subtitle: l10n.settings_language_hint,
-                  child: _buildLanguageDropdown(context),
-                ),
-                _SettingsFieldTile(
-                  icon: Icons.timer_outlined,
-                  title: l10n.select_time,
-                  subtitle: l10n.settings_time_hint,
-                  child: _buildTimeDropdown(context),
-                ),
-                _SettingsFieldTile(
-                  icon: Icons.track_changes_rounded,
-                  title: l10n.select_difficulty,
-                  subtitle: l10n.settings_difficulty_hint,
-                  child: _buildDifficultyDropdown(context),
-                ),
-              ],
-            ),
-          ),
-          _SettingsPanel(
-            title: l10n.mute_title,
-            subtitle: l10n.settings_music_hint,
-            accent: const [Color(0xFF00C6A7), Color(0xFF4FACFE)],
-            child: Column(
-              children: [
-                _SettingsToggleTile(
-                  icon: Icons.volume_off_rounded,
-                  title: l10n.mute_title,
-                  subtitle: l10n.mute_subtitle,
-                  value: settings.muted,
-                  onChanged: (v) =>
-                      _updateSettings((current) => current.copyWith(muted: v)),
-                  label: l10n.mute_toggle_label,
-                ),
-                _SettingsToggleTile(
-                  icon: Icons.bolt_rounded,
-                  title: l10n.lowpower_title,
-                  subtitle: l10n.lowpower_subtitle,
-                  value: settings.lowPower,
-                  onChanged: (v) => _updateSettings(
-                    (current) => current.copyWith(lowPower: v),
-                  ),
-                  label: l10n.lowpower_toggle_label,
-                ),
-                _SettingsFieldTile(
-                  icon: Icons.music_note_rounded,
-                  title: l10n.select_musicvolume,
-                  subtitle: l10n.settings_music_hint,
-                  child: _buildSlider(
-                    value: settings.musicVolume,
-                    onChanged: (v) => _updateSettings(
-                      (current) => current.copyWith(musicVolume: v),
-                    ),
-                    activeColor: PawPalette.grape,
-                  ),
-                ),
-                _SettingsFieldTile(
-                  icon: Icons.pest_control_rodent_rounded,
-                  title: l10n.select_charactervolume,
-                  subtitle: l10n.settings_character_hint,
-                  child: _buildSlider(
-                    value: settings.characterVolume,
-                    onChanged: (v) => _updateSettings(
-                      (current) => current.copyWith(characterVolume: v),
-                    ),
-                    activeColor: PawPalette.teal,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          _SettingsPanel(
-            title: l10n.background_title,
-            subtitle: l10n.background_subtitle,
-            accent: const [Color(0xFF7B61FF), Color(0xFFFF5D8F)],
-            child: _buildBackgroundPicker(context),
-          ),
-          const SizedBox(height: 80),
-        ],
-      ),
-    );
-  }
-
-  void _updateSettings(AppSettings Function(AppSettings current) update) {
-    final current = _draftSettings;
-    if (current == null) return;
-    setState(() => _draftSettings = update(current));
-  }
-
-  Widget _buildHeader(BuildContext context, AppSettings settings) {
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(34),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF20133C), Color(0xFF0E4D68), Color(0xFFFF8C42)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: PawPalette.midnight.withValues(alpha: 0.2),
-            blurRadius: 24,
-            offset: const Offset(0, 16),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 58,
-                height: 58,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.14),
-                ),
-                child: const Icon(
-                  Icons.tune_rounded,
-                  color: Colors.white,
-                  size: 30,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.settings_button,
-                      style: PawTextStyles.heading.copyWith(fontSize: 28),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      l10n.settings_header_subtitle,
-                      style: PawTextStyles.subheading,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              _HeaderBadge(
-                icon: Icons.timer_outlined,
-                label: _timeBadgeLabel(l10n, settings.time),
-              ),
-              _HeaderBadge(
-                icon: Icons.track_changes_rounded,
-                label: _difficultyBadgeLabel(l10n, settings.difficulty),
-              ),
-              _HeaderBadge(
-                icon: settings.muted
-                    ? Icons.volume_off_rounded
-                    : Icons.volume_up_rounded,
-                label: settings.muted ? l10n.home_muted : l10n.home_sound_on,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLanguageDropdown(BuildContext context) {
-    final items = [
-      DropdownMenuItem(
-        value: Language.turkish.value,
-        child: Text(Language.turkish.name),
-      ),
-      DropdownMenuItem(
-        value: Language.english.value,
-        child: Text(Language.english.name),
-      ),
-    ];
-
-    final settings = _draftSettings;
-    if (settings == null) return const SizedBox.shrink();
-    return _PillDropdown(
-      value: settings.languageCode,
-      items: items,
-      onChanged: (v) => _updateSettings(
-        (current) =>
-            current.copyWith(languageCode: v ?? Language.english.value),
-      ),
-    );
-  }
-
-  Widget _buildTimeDropdown(BuildContext context) {
-    final items = [
-      DropdownMenuItem(value: Time.fifty.value, child: Text(Time.fifty.name)),
-      DropdownMenuItem(
-        value: Time.hundered.value,
-        child: Text(Time.hundered.name),
-      ),
-      DropdownMenuItem(
-        value: Time.twohundered.value,
-        child: Text(Time.twohundered.name),
-      ),
-      DropdownMenuItem(
-        value: Time.sandbox.value,
-        child: Text(Time.sandbox.name),
-      ),
-    ];
-
-    final settings = _draftSettings;
-    if (settings == null) return const SizedBox.shrink();
-    return _PillDropdown(
-      value: settings.time,
-      items: items,
-      onChanged: (v) => _updateSettings(
-        (current) => current.copyWith(time: v ?? Time.fifty.value),
-      ),
-    );
-  }
-
-  Widget _buildDifficultyDropdown(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final items = [
-      DropdownMenuItem(
-        value: Difficulty.easy.value,
-        child: Text(l10n.difficulty_easy),
-      ),
-      DropdownMenuItem(
-        value: Difficulty.medium.value,
-        child: Text(l10n.difficulty_medium),
-      ),
-      DropdownMenuItem(
-        value: Difficulty.hard.value,
-        child: Text(l10n.difficulty_hard),
-      ),
-      DropdownMenuItem(
-        value: Difficulty.sandbox.value,
-        child: Text(l10n.difficulty_sandbox),
-      ),
-    ];
-
-    final settings = _draftSettings;
-    if (settings == null) return const SizedBox.shrink();
-    return _PillDropdown(
-      value: settings.difficulty,
-      items: items,
-      onChanged: (v) => _updateSettings(
-        (current) => current.copyWith(difficulty: v ?? Difficulty.easy.value),
-      ),
-    );
-  }
-
-  Widget _buildBackgroundPicker(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final path = _draftSettings?.backgroundPath ?? '';
-    final file = path.isNotEmpty ? File(path) : null;
-    final hasCustom = file != null && file.existsSync();
-    final ImageProvider image = hasCustom
-        ? FileImage(file)
-        : const AssetImage('assets/images/background.webp');
-
-    if (!hasCustom && path.isNotEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        _updateSettings((current) => current.copyWith(backgroundPath: ''));
-      });
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        //* Live preview of the chosen play mat so the user sees the effect before saving.
-        AspectRatio(
-          aspectRatio: 16 / 9,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: PawPalette.midnight.withValues(alpha: 0.08),
-                ),
-              ),
-              child: Image(image: image, fit: BoxFit.cover),
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: PawPalette.grape,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-                onPressed: _pickBackground,
-                icon: const Icon(Icons.photo_library_rounded),
-                label: Text(l10n.background_change_button),
-              ),
-            ),
-            const SizedBox(width: 10),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: PawPalette.midnight,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 14,
-                ),
-              ),
-              onPressed: hasCustom ? _resetBackground : null,
-              child: Text(l10n.background_reset_button),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        Text(l10n.background_hint, style: PawTextStyles.cardSubtitle),
-      ],
-    );
-  }
-
-  Future<void> _pickBackground() async {
-    final picker = ImagePicker();
-    final result = await picker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: _backgroundMaxDimension.toDouble(),
-      maxHeight: _backgroundMaxDimension.toDouble(),
-    );
-    if (result == null) return;
-    final savedPath = await _persistPickedImage(result);
-    _updateSettings((current) => current.copyWith(backgroundPath: savedPath));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          AppLocalizations.of(context)!.background_selected_snackbar,
-        ),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
-  void _resetBackground() {
-    _updateSettings((current) => current.copyWith(backgroundPath: ''));
-  }
-
-  Future<String> _persistPickedImage(XFile picked) async {
-    //! Old custom files are deleted when replaced to avoid silent storage growth.
-    final appDir = await getApplicationDocumentsDirectory();
-    final baseName = 'bg_${DateTime.now().millisecondsSinceEpoch}';
-    final pngPath = '${appDir.path}/$baseName.png';
-    final fallbackExtension = picked.name.split('.').last;
-    final fallbackPath = '${appDir.path}/$baseName.$fallbackExtension';
-
-    // Clean previous custom file to avoid storage bloat.
-    final oldPath = _draftSettings?.backgroundPath ?? '';
-    if (oldPath.isNotEmpty) {
-      final oldFile = File(oldPath);
-      if (await oldFile.exists()) {
-        await oldFile.delete().catchError((_) => oldFile);
-      }
-    }
-
-    final resizedBytes = await _resizeAndEncodeBackground(picked.path);
-    if (resizedBytes != null) {
-      await File(pngPath).writeAsBytes(resizedBytes, flush: true);
-      return pngPath;
-    }
-
-    await File(picked.path).copy(fallbackPath);
-    return fallbackPath;
-  }
-
-  Future<Uint8List?> _resizeAndEncodeBackground(String sourcePath) async {
-    //? Resizing here keeps custom backgrounds cheap enough for gameplay rendering later.
-    ui.ImmutableBuffer? buffer;
-    ui.ImageDescriptor? descriptor;
-    ui.Codec? codec;
-    ui.Image? image;
-
-    try {
-      final bytes = await File(sourcePath).readAsBytes();
-      buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
-      descriptor = await ui.ImageDescriptor.encoded(buffer);
-
-      final width = descriptor.width;
-      final height = descriptor.height;
-      final scale = math.min(
-        1.0,
-        math.min(
-          _backgroundMaxDimension / width,
-          _backgroundMaxDimension / height,
-        ),
-      );
-      final targetWidth = math.max(1, (width * scale).round());
-      final targetHeight = math.max(1, (height * scale).round());
-
-      codec = await descriptor.instantiateCodec(
-        targetWidth: targetWidth,
-        targetHeight: targetHeight,
-      );
-      final frame = await codec.getNextFrame();
-      image = frame.image;
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      if (byteData == null) return null;
-      return byteData.buffer.asUint8List();
-    } catch (_) {
-      return null;
-    } finally {
-      image?.dispose();
-      codec?.dispose();
-      descriptor?.dispose();
-      buffer?.dispose();
-    }
-  }
-
-  Widget _buildSlider({
-    required double value,
-    required ValueChanged<double> onChanged,
-    required Color activeColor,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SliderTheme(
-          data: SliderThemeData(
-            activeTrackColor: activeColor,
-            inactiveTrackColor: activeColor.withValues(alpha: 0.3),
-            thumbColor: Colors.white,
-            overlayColor: activeColor.withValues(alpha: 0.15),
-          ),
-          child: Slider(min: 0, max: 1, value: value, onChanged: onChanged),
-        ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: Text(
-            '${(value * 100).round()}%',
-            style: PawTextStyles.cardSubtitle,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSaveButton(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.9, end: 1),
-      duration: const Duration(milliseconds: 450),
-      curve: Curves.easeOutBack,
-      builder: (context, value, child) =>
-          Transform.scale(scale: value, child: child),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () async {
-            final messenger = ScaffoldMessenger.of(context);
-            final settings = _draftSettings;
-            if (settings == null) return;
-
-            await context.read<AppState>().updateSettings(settings);
-
-            if (!mounted) return;
-            messenger.showSnackBar(
-              SnackBar(
-                content: Text(l10n.save_complete_snackbar),
-                elevation: 10,
-                duration: const Duration(seconds: 2),
-              ),
-            );
-          },
-          borderRadius: BorderRadius.circular(28),
-          child: Ink(
-            height: 56,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(colors: PawPalette.pinkToOrange()),
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 14,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
+      appBar: MainAppBar(title: l10n.settings_button),
+      body: ColoredBox(
+        color: HuntColors.paperWarm,
+        child: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 720),
+              child: ListView(
+                padding: const EdgeInsets.all(HuntSpacing.lg),
                 children: [
-                  const Icon(Icons.save_rounded, color: Colors.white),
-                  const SizedBox(width: 10),
-                  Text(
-                    l10n.save_button,
-                    style: PawTextStyles.subheading.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  HuntSectionHeading(
+                    eyebrow: l10n.settings_button,
+                    title: l10n.hunt_setup_title,
+                    subtitle: l10n.hunt_setup_subtitle,
                   ),
+                  const SizedBox(height: HuntSpacing.lg),
+                  _HuntSection(
+                    title: l10n.start_button,
+                    subtitle: l10n.settings_header_subtitle,
+                    children: [
+                      _DropdownField(
+                        icon: Icons.timer_outlined,
+                        title: l10n.select_time,
+                        subtitle: l10n.settings_time_hint,
+                        value: draft.time,
+                        items: [
+                          DropdownMenuItem(
+                            value: Time.fifty.value,
+                            child: Text(Time.fifty.name),
+                          ),
+                          DropdownMenuItem(
+                            value: Time.hundered.value,
+                            child: Text(Time.hundered.name),
+                          ),
+                          DropdownMenuItem(
+                            value: Time.twohundered.value,
+                            child: Text(Time.twohundered.name),
+                          ),
+                          DropdownMenuItem(
+                            value: Time.sandbox.value,
+                            child: Text(l10n.difficulty_sandbox),
+                          ),
+                        ],
+                        onChanged: (value) => _update(
+                          (current) =>
+                              current.copyWith(time: value ?? Time.fifty.value),
+                        ),
+                      ),
+                      _DropdownField(
+                        icon: Icons.speed_rounded,
+                        title: l10n.select_difficulty,
+                        subtitle: l10n.settings_difficulty_hint,
+                        value: draft.difficulty,
+                        items: [
+                          DropdownMenuItem(
+                            value: Difficulty.easy.value,
+                            child: Text(l10n.difficulty_easy),
+                          ),
+                          DropdownMenuItem(
+                            value: Difficulty.medium.value,
+                            child: Text(l10n.difficulty_medium),
+                          ),
+                          DropdownMenuItem(
+                            value: Difficulty.hard.value,
+                            child: Text(l10n.difficulty_hard),
+                          ),
+                          DropdownMenuItem(
+                            value: Difficulty.sandbox.value,
+                            child: Text(l10n.difficulty_sandbox),
+                          ),
+                        ],
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(
+                            difficulty: value ?? Difficulty.easy.value,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: HuntSpacing.md),
+                  _HuntSection(
+                    title: l10n.playfield_title,
+                    subtitle: l10n.playfield_subtitle,
+                    children: [
+                      _PlayfieldPicker(draft: draft, onUpdate: _update),
+                    ],
+                  ),
+                  const SizedBox(height: HuntSpacing.md),
+                  _HuntSection(
+                    title: l10n.hunt_record_details,
+                    subtitle: l10n.settings_music_hint,
+                    children: [
+                      _ToggleField(
+                        icon: Icons.volume_off_outlined,
+                        title: l10n.mute_title,
+                        subtitle: l10n.mute_subtitle,
+                        value: draft.muted,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(muted: value),
+                        ),
+                      ),
+                      _VolumeField(
+                        title: l10n.select_musicvolume,
+                        value: draft.musicVolume,
+                        color: HuntColors.sky,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(musicVolume: value),
+                        ),
+                      ),
+                      _VolumeField(
+                        title: l10n.select_charactervolume,
+                        value: draft.characterVolume,
+                        color: HuntColors.coral,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(characterVolume: value),
+                        ),
+                      ),
+                      _ToggleField(
+                        icon: Icons.bolt_outlined,
+                        title: l10n.lowpower_title,
+                        subtitle: l10n.lowpower_subtitle,
+                        value: draft.lowPower,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(lowPower: value),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: HuntSpacing.md),
+                  _HuntSection(
+                    title: l10n.accessibility_title,
+                    subtitle: l10n.accessibility_subtitle,
+                    children: [
+                      _ToggleField(
+                        icon: Icons.motion_photos_off_outlined,
+                        title: l10n.reduced_motion_title,
+                        subtitle: l10n.reduced_motion_subtitle,
+                        value: draft.reducedMotion,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(reducedMotion: value),
+                        ),
+                      ),
+                      _ToggleField(
+                        icon: Icons.contrast_outlined,
+                        title: l10n.high_contrast_title,
+                        subtitle: l10n.high_contrast_subtitle,
+                        value: draft.highContrast,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(highContrast: value),
+                        ),
+                      ),
+                      _ToggleField(
+                        icon: Icons.open_in_full_rounded,
+                        title: l10n.larger_targets_title,
+                        subtitle: l10n.larger_targets_subtitle,
+                        value: draft.largerTargets,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(largerTargets: value),
+                        ),
+                      ),
+                      _ToggleField(
+                        icon: Icons.touch_app_outlined,
+                        title: l10n.haptics_title,
+                        subtitle: l10n.haptics_subtitle,
+                        value: draft.haptics,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(haptics: value),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: HuntSpacing.lg),
+                  HuntActionButton(
+                    label: _saving ? l10n.loading : l10n.save_button,
+                    icon: Icons.check_rounded,
+                    onPressed: _saving ? null : _save,
+                  ),
+                  const SizedBox(height: HuntSpacing.lg),
                 ],
               ),
             ),
@@ -615,187 +259,94 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-
-  String _difficultyBadgeLabel(AppLocalizations l10n, int value) {
-    return switch (getDifficultyFromValue(value)) {
-      Difficulty.easy => l10n.difficulty_easy,
-      Difficulty.medium => l10n.difficulty_medium,
-      Difficulty.hard => l10n.difficulty_hard,
-      Difficulty.sandbox => l10n.difficulty_sandbox,
-    };
-  }
-
-  String _timeBadgeLabel(AppLocalizations l10n, int value) {
-    final current = getTimeFromValue(value);
-    if (current == Time.sandbox) {
-      return l10n.difficulty_sandbox;
-    }
-    return '${current.value}s';
-  }
 }
 
-class _PillDropdown extends StatelessWidget {
-  const _PillDropdown({
-    required this.value,
-    required this.items,
-    required this.onChanged,
-  });
-
-  final int value;
-  final List<DropdownMenuItem<int>> items;
-  final ValueChanged<int?> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-        color: Colors.white,
-        border: Border.all(color: PawPalette.midnight.withValues(alpha: 0.08)),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<int>(
-          value: value,
-          isExpanded: true,
-          icon: const Icon(Icons.expand_more),
-          items: items,
-          onChanged: onChanged,
-        ),
-      ),
-    );
-  }
-}
-
-class _SettingsPanel extends StatelessWidget {
-  const _SettingsPanel({
+class _HuntSection extends StatelessWidget {
+  const _HuntSection({
     required this.title,
     required this.subtitle,
-    required this.accent,
-    required this.child,
+    required this.children,
   });
 
   final String title;
   final String subtitle;
-  final List<Color> accent;
-  final Widget child;
+  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
-    //* Panel wrapper used to visually group related settings instead of exposing a flat form.
-    return Container(
-      margin: const EdgeInsets.only(top: 14),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
-        gradient: LinearGradient(
-          colors: [
-            accent.first.withValues(alpha: 0.2),
-            accent.last.withValues(alpha: 0.08),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        border: Border.all(color: accent.first.withValues(alpha: 0.22)),
-      ),
+    return HuntSurface(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(colors: accent),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(child: Text(title, style: PawTextStyles.cardTitle)),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(subtitle, style: PawTextStyles.cardSubtitle),
-          const SizedBox(height: 16),
-          child,
+          Text(title, style: HuntTextStyles.sectionTitle),
+          const SizedBox(height: HuntSpacing.xs),
+          Text(subtitle, style: HuntTextStyles.supporting),
+          const SizedBox(height: HuntSpacing.md),
+          ...children,
         ],
       ),
     );
   }
 }
 
-class _SettingsFieldTile extends StatelessWidget {
-  const _SettingsFieldTile({
+class _DropdownField extends StatelessWidget {
+  const _DropdownField({
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.child,
+    required this.value,
+    required this.items,
+    required this.onChanged,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
-  final Widget child;
+  final int value;
+  final List<DropdownMenuItem<int>> items;
+  final ValueChanged<int?> onChanged;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          color: Colors.white.withValues(alpha: 0.9),
-          border: Border.all(
-            color: PawPalette.midnight.withValues(alpha: 0.08),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+      padding: const EdgeInsets.only(bottom: HuntSpacing.md),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: HuntColors.moss),
+          const SizedBox(width: HuntSpacing.md),
+          Expanded(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: PawPalette.midnight.withValues(alpha: 0.08),
-                  ),
-                  child: Icon(icon, color: PawPalette.ink, size: 18),
+                Text(
+                  title,
+                  style: HuntTextStyles.sectionTitle.copyWith(fontSize: 16),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: PawTextStyles.cardTitle),
-                      const SizedBox(height: 4),
-                      Text(subtitle, style: PawTextStyles.cardSubtitle),
-                    ],
-                  ),
+                Text(subtitle, style: HuntTextStyles.caption),
+                const SizedBox(height: HuntSpacing.sm),
+                DropdownButtonFormField<int>(
+                  initialValue: value,
+                  items: items,
+                  onChanged: onChanged,
+                  decoration: const InputDecoration(isDense: true),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            child,
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _SettingsToggleTile extends StatelessWidget {
-  const _SettingsToggleTile({
+class _ToggleField extends StatelessWidget {
+  const _ToggleField({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.value,
     required this.onChanged,
-    required this.label,
   });
 
   final IconData icon;
@@ -803,91 +354,195 @@ class _SettingsToggleTile extends StatelessWidget {
   final String subtitle;
   final bool value;
   final ValueChanged<bool> onChanged;
-  final String label;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          color: Colors.white.withValues(alpha: 0.9),
-          border: Border.all(
-            color: PawPalette.midnight.withValues(alpha: 0.08),
+    return Semantics(
+      toggled: value,
+      label: title,
+      child: Material(
+        type: MaterialType.transparency,
+        child: SwitchListTile.adaptive(
+          contentPadding: EdgeInsets.zero,
+          secondary: Icon(icon, color: HuntColors.moss),
+          title: Text(
+            title,
+            style: HuntTextStyles.sectionTitle.copyWith(fontSize: 16),
           ),
-        ),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: PawPalette.midnight.withValues(alpha: 0.08),
-                  ),
-                  child: Icon(icon, color: PawPalette.ink, size: 18),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: PawTextStyles.cardTitle),
-                      const SizedBox(height: 4),
-                      Text(subtitle, style: PawTextStyles.cardSubtitle),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SwitchListTile.adaptive(
-              contentPadding: EdgeInsets.zero,
-              value: value,
-              onChanged: onChanged,
-              title: Text(label, style: PawTextStyles.cardTitle),
-            ),
-          ],
+          subtitle: Text(subtitle, style: HuntTextStyles.caption),
+          value: value,
+          onChanged: onChanged,
+          activeThumbColor: HuntColors.moss,
         ),
       ),
     );
   }
 }
 
-class _HeaderBadge extends StatelessWidget {
-  const _HeaderBadge({required this.icon, required this.label});
+class _VolumeField extends StatelessWidget {
+  const _VolumeField({
+    required this.title,
+    required this.value,
+    required this.color,
+    required this.onChanged,
+  });
 
-  final IconData icon;
-  final String label;
+  final String title;
+  final double value;
+  final Color color;
+  final ValueChanged<double> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withValues(alpha: 0.12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white, size: 14),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-              fontSize: 12,
-            ),
+    return Row(
+      children: [
+        Expanded(child: Text(title, style: HuntTextStyles.supporting)),
+        SizedBox(
+          width: 190,
+          child: SliderTheme(
+            data: SliderTheme.of(
+              context,
+            ).copyWith(activeTrackColor: color, thumbColor: color),
+            child: Slider(value: value, min: 0, max: 1, onChanged: onChanged),
           ),
-        ],
-      ),
+        ),
+        SizedBox(
+          width: 42,
+          child: Text(
+            '${(value * 100).round()}%',
+            style: HuntTextStyles.caption,
+          ),
+        ),
+      ],
     );
+  }
+}
+
+class _PlayfieldPicker extends StatelessWidget {
+  const _PlayfieldPicker({required this.draft, required this.onUpdate});
+
+  final AppSettings draft;
+  final void Function(AppSettings Function(AppSettings current)) onUpdate;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final path = draft.backgroundPath;
+    final file = path.isEmpty ? null : File(path);
+    final hasCustom = file?.existsSync() ?? false;
+    final image = hasCustom
+        ? FileImage(file!) as ImageProvider
+        : const AssetImage('assets/images/background.webp');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AspectRatio(
+          aspectRatio: 16 / 9,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(HuntRadii.md),
+            child: Image(image: image, fit: BoxFit.cover),
+          ),
+        ),
+        const SizedBox(height: HuntSpacing.md),
+        Row(
+          children: [
+            Expanded(
+              child: HuntActionButton(
+                label: l10n.background_change_button,
+                icon: Icons.photo_library_outlined,
+                onPressed: () => _pick(context),
+              ),
+            ),
+            const SizedBox(width: HuntSpacing.sm),
+            HuntActionButton(
+              label: l10n.background_reset_button,
+              secondary: true,
+              expand: false,
+              onPressed: hasCustom
+                  ? () => onUpdate(
+                      (current) => current.copyWith(backgroundPath: ''),
+                    )
+                  : null,
+            ),
+          ],
+        ),
+        const SizedBox(height: HuntSpacing.sm),
+        Text(l10n.background_hint, style: HuntTextStyles.caption),
+      ],
+    );
+  }
+
+  Future<void> _pick(BuildContext context) async {
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: _SettingsScreenState._maxBackgroundDimension.toDouble(),
+      maxHeight: _SettingsScreenState._maxBackgroundDimension.toDouble(),
+    );
+    if (picked == null) return;
+    final savedPath = await _persist(picked);
+    onUpdate((current) => current.copyWith(backgroundPath: savedPath));
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.background_selected_snackbar,
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<String> _persist(XFile picked) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final base = 'playfield_${DateTime.now().millisecondsSinceEpoch}';
+    final path = '${directory.path}/$base.png';
+    final oldPath = draft.backgroundPath;
+    if (oldPath.isNotEmpty) {
+      final oldFile = File(oldPath);
+      if (await oldFile.exists()) await oldFile.delete();
+    }
+    final bytes = await _resize(picked.path);
+    if (bytes != null) {
+      await File(path).writeAsBytes(bytes, flush: true);
+      return path;
+    }
+    return (await File(
+      picked.path,
+    ).copy('${directory.path}/$base.${picked.name.split('.').last}')).path;
+  }
+
+  Future<Uint8List?> _resize(String sourcePath) async {
+    ui.ImmutableBuffer? buffer;
+    ui.ImageDescriptor? descriptor;
+    ui.Codec? codec;
+    ui.Image? image;
+    try {
+      buffer = await ui.ImmutableBuffer.fromUint8List(
+        await File(sourcePath).readAsBytes(),
+      );
+      descriptor = await ui.ImageDescriptor.encoded(buffer);
+      final scale = math.min(
+        1.0,
+        math.min(
+          _SettingsScreenState._maxBackgroundDimension / descriptor.width,
+          _SettingsScreenState._maxBackgroundDimension / descriptor.height,
+        ),
+      );
+      codec = await descriptor.instantiateCodec(
+        targetWidth: math.max(1, (descriptor.width * scale).round()),
+        targetHeight: math.max(1, (descriptor.height * scale).round()),
+      );
+      image = (await codec.getNextFrame()).image;
+      return (await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      ))?.buffer.asUint8List();
+    } catch (_) {
+      return null;
+    } finally {
+      image?.dispose();
+      codec?.dispose();
+      descriptor?.dispose();
+      buffer?.dispose();
+    }
   }
 }

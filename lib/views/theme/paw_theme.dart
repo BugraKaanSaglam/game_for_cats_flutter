@@ -1,119 +1,154 @@
 import 'package:flutter/material.dart';
 
-//* Shared visual language for Flutter-side screens.
-//! Flame gameplay renders its own scene, but menus / settings / info screens still need a consistent brand layer.
-class PawPalette {
-  static const List<List<Color>> playfulBackgrounds = [
-    [Color(0xFF140F2D), Color(0xFF372D74), Color(0xFFFF5D8F)],
-    [Color(0xFF0D1B2A), Color(0xFF005F73), Color(0xFF00C6A7)],
-    [Color(0xFF2A1A13), Color(0xFF6B2D5C), Color(0xFFFF9F1C)],
-    [Color(0xFF10131F), Color(0xFF1C355E), Color(0xFF6C63FF)],
-  ];
-
-  static const Color bubbleGum = Color(0xFFFF5D8F);
-  static const Color grape = Color(0xFF7B61FF);
-  static const Color teal = Color(0xFF00C6A7);
-  static const Color lemon = Color(0xFFFFD166);
-  static const Color tangerine = Color(0xFFFF8C42);
-  static const Color midnight = Color(0xFF120B2E);
-  static const Color ink = Color(0xFF241B49);
-  static const Color surface = Color(0xFFFFFBFF);
-  static const Color mist = Color(0xFFF4F7FB);
-
-  static const LinearGradient lightBackground = LinearGradient(
-    colors: [Color(0xFFFFF6EC), Color(0xFFF7F5FF), Color(0xFFEFFDF9)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient buttonGradient = LinearGradient(
-    colors: [Color(0xFFFF5D8F), Color(0xFFFF8C42)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient shellGradient = LinearGradient(
-    colors: [Color(0xFF1D133E), Color(0xFF38296B), Color(0xFFFF5D8F)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient aquaGlow = LinearGradient(
-    colors: [Color(0xFF00C6A7), Color(0xFF00A6FB)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static List<Color> pinkToOrange({double opacity = 1}) => [
-    bubbleGum.withValues(alpha: opacity),
-    tangerine.withValues(alpha: opacity),
-  ];
-
-  static List<Color> tealToLemon({double opacity = 1}) => [
-    teal.withValues(alpha: opacity),
-    lemon.withValues(alpha: opacity),
+class HuntColors {
+  static const ink = Color(0xFF24313A);
+  static const inkSoft = Color(0xFF52616B);
+  static const paper = Color(0xFFFFFCF5);
+  static const paperWarm = Color(0xFFF8F0E2);
+  static const field = Color(0xFFE7F0DE);
+  static const fieldLine = Color(0xFFCADBBF);
+  static const line = Color(0xFFE4D8C8);
+  static const lineStrong = Color(0xFFCBBBA7);
+  static const moss = Color(0xFF527A55);
+  static const mossDark = Color(0xFF36573C);
+  static const sun = Color(0xFFF5C76A);
+  static const sunLine = Color(0xFFE4AA46);
+  static const terracotta = Color(0xFFC86B4A);
+  static const coral = Color(0xFFE47E67);
+  static const sky = Color(0xFF79A8B5);
+  static const night = Color(0xFF182329);
+  static const success = Color(0xFF4D875A);
+  static const warning = Color(0xFFB2773F);
+  static const failure = Color(0xFFB7594F);
+  static const List<Color> journalBackground = [
+    Color(0xFFF5EFE5),
+    Color(0xFFEAF1E5),
   ];
 }
 
-class PawTextStyles {
-  //* Canonical text presets so headings / cards stay visually related across screens.
-  static const TextStyle heading = TextStyle(
-    fontSize: 30,
+class HuntSpacing {
+  static const xs = 4.0;
+  static const sm = 8.0;
+  static const md = 16.0;
+  static const lg = 24.0;
+  static const xl = 32.0;
+  static const xxl = 48.0;
+}
+
+class HuntRadii {
+  static const sm = 10.0;
+  static const md = 16.0;
+  static const lg = 24.0;
+  static const pill = 999.0;
+}
+
+class HuntMotion {
+  static const tap = Duration(milliseconds: 120);
+  static const standard = Duration(milliseconds: 280);
+  static const entrance = Duration(milliseconds: 420);
+  static const field = Duration(milliseconds: 650);
+  static const curve = Curves.easeOutCubic;
+}
+
+class HuntTextStyles {
+  static const display = TextStyle(
+    fontSize: 42,
+    height: 1.02,
     fontWeight: FontWeight.w900,
-    color: Colors.white,
-    height: 1.05,
-    letterSpacing: 0.2,
+    letterSpacing: -0.8,
+    color: HuntColors.ink,
   );
-
-  static const TextStyle subheading = TextStyle(
-    fontSize: 16,
-    color: Color(0xFFE9E7FF),
-    height: 1.45,
-  );
-
-  static const TextStyle cardTitle = TextStyle(
-    fontSize: 18,
+  static const pageTitle = TextStyle(
+    fontSize: 28,
+    height: 1.08,
     fontWeight: FontWeight.w800,
-    color: PawPalette.ink,
+    color: HuntColors.ink,
   );
-
-  static const TextStyle cardSubtitle = TextStyle(
+  static const sectionTitle = TextStyle(
+    fontSize: 19,
+    height: 1.15,
+    fontWeight: FontWeight.w800,
+    color: HuntColors.ink,
+  );
+  static const metric = TextStyle(
+    fontSize: 26,
+    height: 1,
+    fontWeight: FontWeight.w900,
+    color: HuntColors.ink,
+  );
+  static const body = TextStyle(
+    fontSize: 16,
+    height: 1.5,
+    color: HuntColors.ink,
+  );
+  static const supporting = TextStyle(
     fontSize: 14,
-    color: Color(0xFF4B5563),
     height: 1.4,
+    color: HuntColors.inkSoft,
+  );
+  static const action = TextStyle(
+    fontSize: 15,
+    height: 1.1,
+    fontWeight: FontWeight.w800,
+    letterSpacing: 0.1,
+  );
+  static const caption = TextStyle(
+    fontSize: 12,
+    height: 1.2,
+    fontWeight: FontWeight.w700,
+    color: HuntColors.inkSoft,
+  );
+  static const eyebrow = TextStyle(
+    fontSize: 11,
+    height: 1.1,
+    fontWeight: FontWeight.w900,
+    letterSpacing: 1.2,
+    color: HuntColors.moss,
   );
 }
 
 class PawTheme {
-  //? Material theme intentionally stays minimal because most major surfaces are custom-painted / custom-composed.
   static ThemeData light = ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: PawPalette.bubbleGum,
+      seedColor: HuntColors.moss,
       brightness: Brightness.light,
     ),
-    scaffoldBackgroundColor: PawPalette.mist,
+    scaffoldBackgroundColor: HuntColors.paperWarm,
     appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.transparent,
+      backgroundColor: HuntColors.ink,
+      foregroundColor: HuntColors.paper,
       elevation: 0,
       surfaceTintColor: Colors.transparent,
     ),
-    navigationBarTheme: NavigationBarThemeData(
-      backgroundColor: const Color(0xFFFFE6EF),
-      indicatorColor: PawPalette.bubbleGum.withValues(alpha: 0.18),
-    ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        backgroundColor: PawPalette.bubbleGum,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: HuntColors.ink,
+        foregroundColor: HuntColors.paper,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(HuntRadii.md),
+        ),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: PawPalette.ink,
-        side: const BorderSide(color: Color(0x33241B49)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        foregroundColor: HuntColors.ink,
+        side: const BorderSide(color: HuntColors.lineStrong),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(HuntRadii.md),
+        ),
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: HuntColors.paper,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(HuntRadii.md),
+        borderSide: const BorderSide(color: HuntColors.line),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(HuntRadii.md),
+        borderSide: const BorderSide(color: HuntColors.line),
       ),
     ),
     visualDensity: VisualDensity.adaptivePlatformDensity,

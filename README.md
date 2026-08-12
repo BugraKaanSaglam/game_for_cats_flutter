@@ -4,7 +4,7 @@
 
 ![Mice and Paws splash art](assets/images/splashscreen.png)
 
-Colorful Flutter + Flame cat game built as a polished public portfolio project. This was my first app, so the repository is intentionally shaped to show both the product itself and how I approached architecture, testing, and iteration as I leveled up.
+Flutter + Flame cat game built around a local-first hunt lifecycle, tactile playfield interactions, and a maintainable product shell.
 
 ## Highlights
 
@@ -13,7 +13,7 @@ Colorful Flutter + Flame cat game built as a polished public portfolio project. 
 - Persisted settings, onboarding, and play activity history
 - Typed internal analytics layer with event taxonomy
 - Game-first home screen with hunt setup summary
-- Round summaries with streaks and cat mood feedback
+- Round summaries with streaks, accuracy, and field notes
 - Unit, widget, golden, and integration coverage
 - GitHub Actions CI with coverage artifact output
 
@@ -22,7 +22,7 @@ Colorful Flutter + Flame cat game built as a polished public portfolio project. 
 This repo is deliberately built to read well for hiring managers and senior engineers reviewing public code:
 
 - product thinking instead of toy-demo code
-- clear growth from a first app into a maintainable codebase
+- a maintainable codebase around a focused game loop
 - visible architecture boundaries
 - explicit engineering decisions and tradeoffs
 - local-first product posture without backend coupling
@@ -48,7 +48,7 @@ flowchart LR
 - Onboarding flow with guarded initial navigation
 - Hunt Journal screen backed by local session logs
 - About screen with product story and build metadata
-- Round summary with streak and cat mood feedback
+- Round summary with streak and accuracy tracking
 - Cross-platform Flutter targets: Android, iOS, web, desktop shells
 
 ## Architecture
@@ -60,8 +60,8 @@ This project intentionally stays pragmatic.
 - `lib/data/`: repository layer for settings and onboarding persistence
 - `lib/services/`: app info, logging, and analytics
 - `lib/views/screens/`: game-adjacent screens and product UI
-- `lib/views/widgets/`: reusable presentation widgets
-- `lib/models/`: entities, enums, DB models, global game variables
+- `lib/views/components/`: reusable presentation components
+- `lib/models/`: settings, entities, enums, database records, and hunt session state
 - `test/`: unit and widget coverage with shared test harness helpers
 - `integration_test/`: routed app-flow smoke tests
 - `docs/`: architecture, decisions, analytics, and release notes
@@ -138,7 +138,7 @@ flutter run
 
 Current automated coverage includes:
 
-- model tests for `AppSettings`
+- model tests for `AppSettings`, hunt sessions, persistence compatibility, and field math
 - state tests for `AppState`
 - widget tests for loading, about, and main menu navigation
 - golden tests for stable UI snapshots
@@ -148,7 +148,7 @@ Current automated coverage includes:
 
 This repository is meant to present more than a toy app. It demonstrates:
 
-- how I approached building my first app with increasing engineering rigor
+- how the hunt product is structured with increasing engineering rigor
 - game loop integration
 - product-focused UI layers outside the game canvas
 - local persistence and settings design

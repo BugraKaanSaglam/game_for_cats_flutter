@@ -1,14 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:game_for_cats_2025/models/app_settings.dart';
+import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
 import 'package:game_for_cats_2025/models/enums/game_enums.dart';
-import 'package:game_for_cats_2025/models/global/global_variables.dart';
 
 void main() {
   group('AppSettings', () {
     test('defaults returns expected baseline values', () {
       final settings = AppSettings.defaults();
 
-      expect(settings.version, databaseVersion);
+      expect(settings.version, 0);
       expect(settings.languageCode, Language.english.value);
       expect(settings.musicVolume, 0.5);
       expect(settings.characterVolume, 1);
@@ -31,12 +31,25 @@ void main() {
         backgroundPath: '/tmp/background.png',
         muted: true,
         lowPower: true,
+        reducedMotion: true,
+        highContrast: true,
+        largerTargets: true,
+        haptics: true,
       );
 
       final roundTrip = AppSettings.fromMap(settings.toMap());
 
       expect(roundTrip, settings);
       expect(roundTrip.language, Language.turkish);
+    });
+
+    test('enum mappings keep sandbox and difficulty choices semantic', () {
+      expect(getTimeFromValue(Time.sandbox.value), Time.sandbox);
+      expect(getDifficultyFromValue(Difficulty.hard.value), Difficulty.hard);
+      expect(
+        getDifficultyFromValue(Difficulty.sandbox.value),
+        Difficulty.sandbox,
+      );
     });
   });
 }

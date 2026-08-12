@@ -24,11 +24,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 700));
 
     expect(find.text('Start Hunt'), findsOneWidget);
-    expect(find.text("Today's hunt setup"), findsOneWidget);
+    expect(find.text('PREPARE THE NEXT HUNT'), findsOneWidget);
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Hunt Journal'), findsOneWidget);
     expect(find.text('How It Works'), findsOneWidget);
-    expect(find.text('Paw Tour'), findsOneWidget);
     expect(find.text('About the Game'), findsOneWidget);
   });
 
@@ -74,6 +73,21 @@ void main() {
     await tester.pump(const Duration(milliseconds: 700));
 
     expect(find.text('Start Hunt'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('remains usable with larger system text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 1.5;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+    await tester.pumpWidget(
+      buildRouterTestApp(
+        home: const MainScreen(),
+        appState: FakeAppState(currentSettings: AppSettings.defaults()),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 700));
+
     expect(tester.takeException(), isNull);
   });
 }

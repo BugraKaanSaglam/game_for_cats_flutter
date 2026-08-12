@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/data/app_settings_repository.dart';
 import 'package:game_for_cats_2025/data/onboarding_repository.dart';
 import 'package:game_for_cats_2025/models/app_settings.dart';
-import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/services/app_logger.dart';
 
@@ -48,8 +47,6 @@ class AppState extends ChangeNotifier {
       //! Onboarding and settings come from two different persistence layers.
       _onboardingComplete = await _onboardingRepository.isCompleted();
       _settings = await _settingsRepository.fetchOrCreate();
-      //? getTimeFromValue also updates the global round timer used by the Flame layer.
-      getTimeFromValue(_settings?.time);
       AppLogger.info('App state initialized successfully');
     } catch (error) {
       _initError = error;
@@ -63,7 +60,6 @@ class AppState extends ChangeNotifier {
   Future<void> updateSettings(AppSettings settings) async {
     //* We optimistically update local state first so the UI feels immediate.
     _settings = settings;
-    getTimeFromValue(settings.time);
     notifyListeners();
     try {
       await _settingsRepository.save(settings);

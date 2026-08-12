@@ -1,12 +1,14 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:ui';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:game_for_cats_2025/controllers/animation_handler.dart';
-import 'package:game_for_cats_2025/models/global/global_images.dart';
-import 'package:game_for_cats_2025/models/global/global_variables.dart';
 import 'package:game_for_cats_2025/controllers/utils.dart';
+
+const _collisionCooldown = Duration(milliseconds: 5000);
 
 //* Mouse target entity:
 //* steers toward random targets, wraps at edges, and updates its facing angle from velocity.
@@ -14,6 +16,16 @@ class Mice extends SpriteAnimationComponent
     with HasGameRef<FlameGame>, CollisionCallbacks {
   late Vector2 _velocity;
   late final double _speed;
+  final double topInset;
+  final bool highContrast;
+  final Paint _contrastOuter = Paint()
+    ..color = const Color(0xFF182329)
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 7;
+  final Paint _contrastInner = Paint()
+    ..color = const Color(0xFFFFFCF5)
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 3;
   bool _isColliding = false;
   DateTime? _lastCollisionTime;
 
@@ -22,15 +34,22 @@ class Mice extends SpriteAnimationComponent
   double steeringFactor = 0.01;
   Vector2 target = Vector2.zero();
 
-  Mice(Vector2 position, Vector2 velocity, double speed)
-    : _velocity = velocity,
-      _speed = speed,
-      super(
-        animation: animationHandler(globalMiceImage, 5, 1),
-        position: position,
-        size: Vector2(64, 64),
-        anchor: Anchor.center,
-      ) {
+  Mice(
+    Vector2 position,
+    Vector2 velocity,
+    double speed,
+    Image spriteSheet, {
+    this.topInset = 0,
+    double sizeScale = 1,
+    this.highContrast = false,
+  }) : _velocity = velocity,
+       _speed = speed,
+       super(
+         animation: animationHandler(spriteSheet, 5, 1),
+         position: position,
+         size: Vector2.all(64 * sizeScale),
+         anchor: Anchor.center,
+       ) {
     //! Collision bounds are intentionally simple rectangles; precision is less important than responsiveness.
     add(RectangleHitbox());
   }
@@ -40,7 +59,11 @@ class Mice extends SpriteAnimationComponent
     await super.onLoad();
     _velocity = (_velocity)..scaleTo(_speed);
     angle = _velocity.screenAngle();
-    target = Utils.generateRandomPosition(gameRef.size, Vector2(0, 10));
+    target = Utils.generateRandomPosition(
+      gameRef.size,
+      Vector2(0, 10),
+      topInset: topInset,
+    );
   }
 
   @override
@@ -50,14 +73,17 @@ class Mice extends SpriteAnimationComponent
     final currentTime = DateTime.now();
     if (!_isColliding ||
         _lastCollisionTime == null ||
-        currentTime.difference(_lastCollisionTime!) >=
-            Duration(milliseconds: waitTimeForCollisions)) {
+        currentTime.difference(_lastCollisionTime!) >= _collisionCooldown) {
       _isColliding = true;
       _lastCollisionTime = currentTime;
-      target = Utils.generateRandomPosition(gameRef.size, Vector2(0, 10));
+      target = Utils.generateRandomPosition(
+        gameRef.size,
+        Vector2(0, 10),
+        topInset: topInset,
+      );
 
       //? The cooldown prevents endless jitter when components keep intersecting.
-      Future.delayed(Duration(milliseconds: waitTimeForCollisions), () {
+      Future.delayed(_collisionCooldown, () {
         _isColliding = false;
       });
     }
@@ -85,13 +111,32 @@ class Mice extends SpriteAnimationComponent
 
     //? Reaching the current target simply picks a new roam point.
     if ((target - position).length < 10.0) {
-      target = Utils.generateRandomPosition(gameRef.size, Vector2(0, 10));
+      target = Utils.generateRandomPosition(
+        gameRef.size,
+        Vector2(0, 10),
+        topInset: topInset,
+      );
     }
 
-    if (Utils.isPositionOutOfBounds(gameRef.size, position)) {
-      position = Utils.wrapPosition(gameRef.size, position);
+    if (Utils.isPositionOutOfBounds(
+      gameRef.size,
+      position,
+      topInset: topInset,
+    )) {
+      position = Utils.wrapPosition(gameRef.size, position, topInset: topInset);
     }
 
     angle = _velocity.screenAngle();
+  }
+
+  @override
+  void render(Canvas canvas) {
+    if (highContrast) {
+      final center = Offset(size.x / 2, size.y / 2);
+      final radius = size.x * 0.42;
+      canvas.drawCircle(center, radius, _contrastOuter);
+      canvas.drawCircle(center, radius, _contrastInner);
+    }
+    super.render(canvas);
   }
 }

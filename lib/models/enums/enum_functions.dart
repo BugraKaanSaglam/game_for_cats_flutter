@@ -1,8 +1,6 @@
-import 'package:game_for_cats_2025/models/global/global_variables.dart';
 import 'game_enums.dart';
 
 //* Mapper helpers between stored ints and semantic enums.
-//! getTimeFromValue also mutates the global Flame round timer used by the gameplay layer.
 Language getLanguageFromValue(int? value) {
   switch (value) {
     case 0:
@@ -30,22 +28,16 @@ Difficulty getDifficultyFromValue(int? value) {
 }
 
 Time getTimeFromValue(int? value) {
-  //? The global timer is legacy state shared with the Flame loop, so decoding time updates it here.
   switch (value) {
     case 50:
-      gameTimer = 50;
       return Time.fifty;
     case 100:
-      gameTimer = 100;
       return Time.hundered;
     case 200:
-      gameTimer = 200;
       return Time.twohundered;
     case 100000:
-      gameTimer = 100000;
       return Time.sandbox;
     default:
-      gameTimer = value ?? 50;
       return Time.fifty;
   }
 }

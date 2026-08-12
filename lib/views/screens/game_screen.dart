@@ -1,87 +1,30 @@
-// ignore_for_file: must_be_immutable, use_build_context_synchronously, deprecated_member_use
 import 'dart:async';
-import 'dart:math';
+import 'dart:math' as math;
+
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:game_for_cats_2025/models/notifiers/game_classes.dart';
-import 'package:game_for_cats_2025/models/app_settings.dart';
-import 'package:game_for_cats_2025/views/components/loading_screen_view.dart';
-import 'package:game_for_cats_2025/models/global/global_variables.dart';
-import 'package:game_for_cats_2025/models/entities/bug.dart';
-import 'package:game_for_cats_2025/models/entities/mice.dart';
-import 'package:game_for_cats_2025/models/global/global_images.dart';
+import 'package:flutter/services.dart';
+import 'package:game_for_cats_2025/controllers/game_functions.dart';
 import 'package:game_for_cats_2025/controllers/utils.dart';
 import 'package:game_for_cats_2025/l10n/app_localizations.dart';
-import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
-import 'package:game_for_cats_2025/controllers/game_functions.dart';
-import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
-import 'package:game_for_cats_2025/models/enums/game_enums.dart';
+import 'package:game_for_cats_2025/models/app_settings.dart';
 import 'package:game_for_cats_2025/models/database/db_helper.dart';
 import 'package:game_for_cats_2025/models/database/session_log.dart';
+import 'package:game_for_cats_2025/models/entities/bug.dart';
+import 'package:game_for_cats_2025/models/entities/mice.dart';
+import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
+import 'package:game_for_cats_2025/models/enums/game_enums.dart';
+import 'package:game_for_cats_2025/models/game/hunt_session.dart';
 import 'package:game_for_cats_2025/routing/app_routes.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
-
-//* Gameplay bridge file:
-//* - hosts the Flame game instance
-//* - renders Flutter HUD / dialogs around it
-//* - translates taps + timers into a round summary
-bool isBackButtonClicked = false;
-int elapsedTicks = 0; // Seconds
-ValueNotifier<int> elapsedTicksNotifier = ValueNotifier<int>(0);
-bool isBackButtonDialogOpen = false;
-GameClicksCounter clicksCounter = GameClicksCounter();
-bool isOverlayBlocking = false;
-bool isGameOverTriggered = false;
-GameResult? lastGameResult;
-bool hasSessionLogged = false;
-
-//! This reset method must clear every global round flag because Flame and Flutter overlays share these globals.
-void resetRoundState({bool clearResult = true}) {
-  clicksCounter.reset();
-  elapsedTicks = 0;
-  elapsedTicksNotifier.value = 0;
-  isOverlayBlocking = false;
-  isGameOverTriggered = false;
-  isBackButtonDialogOpen = false;
-  isBackButtonClicked = false;
-  hasSessionLogged = false;
-  if (clearResult) {
-    lastGameResult = null;
-  }
-}
-
-class GameResult {
-  GameResult({
-    required this.totalTaps,
-    required this.miceTaps,
-    required this.bugTaps,
-    required this.wrongTaps,
-    required this.bestStreak,
-  });
-
-  final int totalTaps;
-  final int miceTaps;
-  final int bugTaps;
-  final int wrongTaps;
-  final int bestStreak;
-
-  factory GameResult.fromCounter(GameClicksCounter counter) {
-    //? wrong taps are derived so the notifier only needs to track the raw categories.
-    final wrong = counter.totalTaps - (counter.bugTaps + counter.miceTaps);
-    return GameResult(
-      totalTaps: counter.totalTaps,
-      miceTaps: counter.miceTaps,
-      bugTaps: counter.bugTaps,
-      wrongTaps: max(wrong, 0),
-      bestStreak: counter.bestStreak,
-    );
-  }
-}
+import 'package:game_for_cats_2025/views/components/hunt_ui.dart';
+import 'package:game_for_cats_2025/views/components/loading_screen_view.dart';
+import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
+import 'package:go_router/go_router.dart';
 
 class DifficultyProfile {
   const DifficultyProfile({
@@ -101,565 +44,417 @@ class GameScreen extends StatefulWidget {
   const GameScreen({super.key, this.settings});
 
   final AppSettings? settings;
+
   @override
   State<GameScreen> createState() => _GameScreenState();
 }
 
-//* End-of-round dialog:
-//* this is one of the key "signature" surfaces reviewers see in screenshots.
-Dialog endGameDialog(BuildContext context, {required Game game}) {
-  isOverlayBlocking = true;
-  game.pauseEngine();
-  final stats = lastGameResult ?? GameResult.fromCounter(clicksCounter);
-  final wrongTaps = stats.wrongTaps;
-  final successfulTaps = stats.miceTaps + stats.bugTaps;
-  final accuracy = stats.totalTaps == 0
-      ? 0
-      : ((successfulTaps / stats.totalTaps) * 100).round();
-  final l10n = AppLocalizations.of(context)!;
-  final mood = _resolveCatMood(
-    l10n,
-    accuracy: accuracy,
-    bestStreak: stats.bestStreak,
-    totalTaps: stats.totalTaps,
-  );
-  final grade = _resolveHuntGrade(
-    accuracy: accuracy,
-    bestStreak: stats.bestStreak,
-    totalTaps: stats.totalTaps,
-  );
-  final dialogWidth = min(MediaQuery.of(context).size.width * 0.92, 440.0);
-  return Dialog(
-    insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-    backgroundColor: Colors.transparent,
-    child: SizedBox(
-      width: dialogWidth,
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(32),
-          gradient: const LinearGradient(
-            colors: [Color(0xFF160F34), Color(0xFF372D74), Color(0xFFFF5D8F)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: PawPalette.midnight.withValues(alpha: 0.42),
-              blurRadius: 30,
-              offset: const Offset(0, 20),
-            ),
-          ],
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _ResultHeroBurst(
-              title: l10n.game_over,
-              accuracy: accuracy,
-              grade: grade,
-              mood: mood,
-            ),
-            const SizedBox(height: 18),
-            Row(
-              children: [
-                Expanded(
-                  child: _ResultSummaryChip(
-                    label: l10n.activity_total_label,
-                    value: '${stats.totalTaps}',
-                    accent: PawPalette.lemon,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _ResultSummaryChip(
-                    label: l10n.activity_accuracy_label,
-                    value: '$accuracy%',
-                    accent: PawPalette.teal,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _ResultSummaryChip(
-                    label: l10n.best_streak_label,
-                    value: '${stats.bestStreak}',
-                    accent: PawPalette.bubbleGum,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            _StatResultTile(
-              icon: Icons.pest_control,
-              label: l10n.bugtap_count,
-              value: stats.bugTaps,
-              color: PawPalette.bubbleGum,
-            ),
-            _StatResultTile(
-              icon: Icons.pets,
-              label: l10n.micetap_count,
-              value: stats.miceTaps,
-              color: PawPalette.teal,
-            ),
-            _StatResultTile(
-              icon: Icons.cancel_outlined,
-              label: l10n.wrongtap_count,
-              value: wrongTaps,
-              color: const Color(0xFFFFB347),
-            ),
-            const SizedBox(height: 28),
-            Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: _DialogActionButton(
-                    color: PawPalette.bubbleGum,
-                    icon: Icons.refresh,
-                    label: l10n.tryagain_button,
-                    onPressed: () async {
-                      Navigator.pop(context);
-                      await game.restart();
-                    },
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: _DialogActionButton(
-                    color: Colors.white,
-                    foregroundColor: PawPalette.midnight,
-                    icon: Icons.home,
-                    label: l10n.return_mainmenu_button,
-                    onPressed: () async => await closeGame(
-                      game,
-                      context,
-                      routePath: AppRoutes.main,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-//* Shared exit path used by both pause flow and normal game-over flow.
-Future<void> closeGame(
-  Game game,
-  BuildContext context, {
-  String? routePath,
-  Object? extra,
-}) async {
-  lastGameResult ??= GameResult.fromCounter(clicksCounter);
-  await game._persistSessionResult();
-  await FlameAudio.bgm.stop();
-  game.pauseEngine();
-  isOverlayBlocking = false;
-  isGameOverTriggered = false;
-  isBackButtonDialogOpen = false;
-
-  if (routePath != null && context.mounted) {
-    if (extra == null) {
-      context.go(routePath);
-      return;
-    }
-    context.go(routePath, extra: extra);
-  }
-  isBackButtonClicked = false;
-}
-
-//* Pause / leave-round dialog.
-Dialog backButtonDialog(Game game, BuildContext context) {
-  isBackButtonDialogOpen = true;
-  isOverlayBlocking = true;
-  game.pauseEngine();
-  final l10n = AppLocalizations.of(context)!;
-  final dialogWidth = min(MediaQuery.of(context).size.width * 0.92, 420.0);
-  return Dialog(
-    insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-    backgroundColor: Colors.transparent,
-    child: SizedBox(
-      width: dialogWidth,
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
-          gradient: const LinearGradient(
-            colors: [Color(0xFF2A2D3E), Color(0xFF1E1F29)],
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.pause_circle_outline_rounded,
-              color: Colors.white,
-              size: 46,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              l10n.pause_hunt_title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.pause_hunt_subtitle,
-              style: const TextStyle(color: Colors.white70),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: PawPalette.teal,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    onPressed: () {
-                      isBackButtonDialogOpen = false;
-                      isOverlayBlocking = false;
-                      game.resumeEngine();
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      l10n.resume_hunt_button,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    onPressed: () async {
-                      isBackButtonDialogOpen = false;
-                      isOverlayBlocking = false;
-                      Navigator.pop(context);
-                      await closeGame(game, context);
-                      showDialog(
-                        context: context,
-                        builder: (context) =>
-                            endGameDialog(context, game: game),
-                      );
-                    },
-                    child: Text(
-                      l10n.end_round_button,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-//* Auto-close helper used when the player briefly opens the pause dialog and does nothing.
-void closeDialogAutomatically(Game game, BuildContext context) {
-  if (!isBackButtonDialogOpen) return;
-  if (context.mounted == true) {
-    Navigator.pop(context);
-  }
-  isBackButtonDialogOpen = false;
-  isOverlayBlocking = false;
-  game.resumeEngine();
-}
-
 class _GameScreenState extends State<GameScreen> {
-  late final Game _gameInstance;
-  late final AppSettings? _gameSettings;
+  late final AppSettings _settings;
+  late final HuntSessionState _session;
+  late final Game _game;
+  HuntResult? _result;
+  bool _fieldReady = true;
+  bool _starting = false;
+  bool _saving = false;
 
   @override
   void initState() {
     super.initState();
-    resetRoundState();
     AppAnalytics.screenView('game');
-    _gameSettings = widget.settings;
-    _gameInstance = Game(_gameSettings, context);
+    _settings = widget.settings ?? AppSettings.defaults();
+    _session = HuntSessionState();
+    _game = Game(
+      settings: _settings,
+      session: _session,
+      onFinished: _showResult,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _beginHunt());
   }
 
   @override
   void dispose() {
-    _gameInstance.pauseEngine();
+    _game.pauseEngine();
     unawaited(FlameAudio.bgm.stop());
+    _session.dispose();
     super.dispose();
+  }
+
+  Future<void> _beginHunt() async {
+    if (_starting || !mounted) return;
+    _starting = true;
+    await Future<void>.delayed(
+      _settings.reducedMotion
+          ? Duration.zero
+          : const Duration(milliseconds: 720),
+    );
+    if (!mounted) return;
+    setState(() => _fieldReady = false);
+    await _game.begin();
+    _starting = false;
+  }
+
+  void _showResult(HuntResult result) {
+    if (!mounted) return;
+    setState(() => _result = result);
+    unawaited(_saveResult(result));
+  }
+
+  Future<void> _saveResult(HuntResult result) async {
+    if (_saving) return;
+    _saving = true;
+    final timestamp = result.startedAt;
+    final dateKey =
+        '${timestamp.year}-${timestamp.month.toString().padLeft(2, '0')}-${timestamp.day.toString().padLeft(2, '0')}';
+    await DBHelper().addSessionLog(
+      SessionLog(
+        dateKey: dateKey,
+        timestamp: timestamp,
+        durationSeconds: result.durationSeconds,
+        configuredDuration: result.configuredDuration,
+        difficulty: result.difficulty,
+        totalTaps: result.totalTaps,
+        successfulTaps: result.successfulTaps,
+        miceTaps: result.miceTaps,
+        bugTaps: result.bugTaps,
+        wrongTaps: result.wrongTaps,
+        bestStreak: result.bestStreak,
+        completionReason: result.completionReason,
+      ),
+    );
+  }
+
+  Future<void> _restart() async {
+    setState(() {
+      _result = null;
+      _fieldReady = true;
+    });
+    await _game.restart();
+    if (mounted) _beginHunt();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: HuntColors.night,
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          //* Flame owns the actual moving targets; Flutter only frames the experience around it.
-          Positioned.fill(
-            child: GameWidget(
-              game: _gameInstance,
-              loadingBuilder: (p0) => loadingScreen(context),
-            ),
+          GameWidget(
+            game: _game,
+            loadingBuilder: (_) => loadingScreen(context),
           ),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
-                child: _buildTopHud(context),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 12,
-            right: 12,
-            bottom: 20,
-            child: _buildStatsBar(context),
-          ),
-          if (isOverlayBlocking)
-            Positioned.fill(
-              child: IgnorePointer(
-                ignoring: true,
-                child: Container(color: Colors.black54),
-              ),
+          if (_result == null) _LiveHud(session: _session, game: _game),
+          if (_fieldReady && _result == null)
+            _ReadyOverlay(settings: _settings),
+          if (_result != null)
+            HuntRecordView(
+              result: _result!,
+              settings: _settings,
+              onAgain: _restart,
+              onHome: () => context.go(AppRoutes.main),
+              onJournal: () => context.go(AppRoutes.activity),
+              onAdjust: () => context.go(AppRoutes.settings),
             ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildTopHud(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    //! This replaced the stock AppBar so gameplay feels like a bespoke toy, not a standard app page.
-    return Row(
-      children: [
-        _HudRoundButton(
-          icon: Icons.arrow_back_ios_new_rounded,
-          onTap: () => showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (context) {
-              isBackButtonClicked = true;
-              Future.delayed(
-                const Duration(seconds: 2),
-                () => closeDialogAutomatically(_gameInstance, context),
-              );
-              return backButtonDialog(_gameInstance, context);
-            },
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: ValueListenableBuilder<int>(
-            valueListenable: elapsedTicksNotifier,
-            builder: (context, elapsed, _) {
-              final remainingTime = max(gameTimer - elapsed, 0);
-              final progress = 1 - ((elapsed / gameTimer).clamp(0.0, 1.0));
-              return _TimerNestCard(
-                label: l10n.countdown.trim(),
-                remainingTime: remainingTime,
-                progress: progress.isFinite ? progress : 0,
-              );
-            },
-          ),
-        ),
-        const SizedBox(width: 10),
-        AnimatedBuilder(
-          animation: clicksCounter,
-          builder: (context, _) => _TopComboDock(
-            current: clicksCounter.currentStreak,
-            best: clicksCounter.bestStreak,
-          ),
-        ),
-      ],
-    );
-  }
+class _ReadyOverlay extends StatelessWidget {
+  const _ReadyOverlay({required this.settings});
 
-  Widget _buildStatsBar(BuildContext context) {
+  final AppSettings settings;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final settings = _gameSettings;
-    //* Bottom deck:
-    //* quick round config + live counters + progress, all visible without opening a menu.
-    return AnimatedBuilder(
-      animation: clicksCounter,
-      builder: (context, _) {
-        final wrongTaps = max(
-          clicksCounter.totalTaps -
-              (clicksCounter.bugTaps + clicksCounter.miceTaps),
-          0,
-        );
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            gradient: const LinearGradient(
-              colors: [Color(0xE0120B2E), Color(0xE01F3F63), Color(0xD900C6A7)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-            boxShadow: [
-              BoxShadow(
-                color: PawPalette.midnight.withValues(alpha: 0.26),
-                blurRadius: 20,
-                offset: const Offset(0, 12),
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: ColoredBox(
+          color: HuntColors.night.withValues(alpha: 0.32),
+          child: Center(
+            child: Container(
+              margin: const EdgeInsets.all(HuntSpacing.xl),
+              padding: const EdgeInsets.all(HuntSpacing.xl),
+              decoration: BoxDecoration(
+                color: HuntColors.paper.withValues(alpha: 0.96),
+                borderRadius: BorderRadius.circular(HuntRadii.lg),
+                border: Border.all(color: HuntColors.lineStrong),
               ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (settings != null) ...[
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _MiniHudTag(
-                      icon: Icons.track_changes_rounded,
-                      label: switch (getDifficultyFromValue(
-                        settings.difficulty,
-                      )) {
-                        Difficulty.easy => l10n.difficulty_easy,
-                        Difficulty.medium => l10n.difficulty_medium,
-                        Difficulty.hard => l10n.difficulty_hard,
-                        Difficulty.sandbox => l10n.difficulty_sandbox,
-                      },
-                    ),
-                    _MiniHudTag(
-                      icon: Icons.timer_outlined,
-                      label: getTimeFromValue(settings.time) == Time.sandbox
-                          ? l10n.difficulty_sandbox
-                          : '${getTimeFromValue(settings.time).value}s',
-                    ),
-                    _MiniHudTag(
-                      icon: settings.muted
-                          ? Icons.volume_off_rounded
-                          : Icons.volume_up_rounded,
-                      label: settings.muted
-                          ? l10n.home_muted
-                          : l10n.home_sound_on,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-              ],
-              ValueListenableBuilder<int>(
-                valueListenable: elapsedTicksNotifier,
-                builder: (context, elapsed, _) {
-                  final progress = (elapsed / gameTimer).clamp(0.0, 1.0);
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _StreakPill(
-                              label: l10n.current_streak_label,
-                              value: clicksCounter.currentStreak,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: _StreakPill(
-                              label: l10n.best_streak_label,
-                              value: clicksCounter.bestStreak,
-                              accent: PawPalette.teal,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      LinearProgressIndicator(
-                        value: progress.isFinite ? progress : 0,
-                        backgroundColor: Colors.white24,
-                        color: PawPalette.lemon,
-                        minHeight: 8,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-                  );
-                },
-              ),
-              Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: _StatChip(
-                      icon: Icons.pets,
-                      label: l10n.micetap_count,
-                      value: clicksCounter.miceTaps,
-                      color: PawPalette.teal,
-                    ),
+                  const Icon(
+                    Icons.track_changes,
+                    color: HuntColors.moss,
+                    size: 42,
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _StatChip(
-                      icon: Icons.bug_report,
-                      label: l10n.bugtap_count,
-                      value: clicksCounter.bugTaps,
-                      color: PawPalette.bubbleGum,
-                    ),
+                  const SizedBox(height: HuntSpacing.md),
+                  Text(l10n.hunt_ready, style: HuntTextStyles.pageTitle),
+                  const SizedBox(height: HuntSpacing.sm),
+                  Text(
+                    l10n.hunt_ready_subtitle,
+                    textAlign: TextAlign.center,
+                    style: HuntTextStyles.supporting,
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _StatChip(
-                      icon: Icons.touch_app,
-                      label: l10n.wrongtap_count,
-                      value: wrongTaps,
-                      color: PawPalette.lemon,
-                    ),
+                  const SizedBox(height: HuntSpacing.md),
+                  HuntTag(
+                    label: getTimeFromValue(settings.time) == Time.sandbox
+                        ? l10n.difficulty_sandbox
+                        : '${getTimeFromValue(settings.time).value}s',
+                    icon: Icons.timer_outlined,
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
 
-class Game extends FlameGame
-    with TapDetector, HasGameRef, HasCollisionDetection {
-  Game(this.gameSettings, this.context);
+class _LiveHud extends StatelessWidget {
+  const _LiveHud({required this.session, required this.game});
 
-  BuildContext context;
-  AppSettings? gameSettings;
-  final Random _random = Random();
-  bool get _isMuted => gameSettings?.muted ?? false;
-
-  late Timer interval; // Time Variable
-  late DifficultyProfile _difficultyProfile;
+  final HuntSessionState session;
+  final Game game;
 
   @override
-  bool get debugMode => false;
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: SafeArea(
+        bottom: false,
+        child: AnimatedBuilder(
+          animation: session,
+          builder: (context, _) {
+            final remaining = math.max(
+              game.duration - session.elapsedSeconds,
+              0,
+            );
+            final progress = game.duration <= 0
+                ? 0.0
+                : (remaining / game.duration).clamp(0.0, 1.0);
+            final streakTone = session.currentStreak >= 8
+                ? HuntColors.sun
+                : session.currentStreak >= 4
+                ? HuntColors.coral
+                : HuntColors.paper;
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+              child: Row(
+                children: [
+                  _FieldButton(
+                    icon: Icons.pause_rounded,
+                    label: l10n.pause_hunt_title,
+                    onTap: () => _showPause(context),
+                  ),
+                  const SizedBox(width: HuntSpacing.sm),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: HuntSpacing.md,
+                        vertical: HuntSpacing.sm,
+                      ),
+                      decoration: BoxDecoration(
+                        color: HuntColors.night.withValues(alpha: 0.86),
+                        borderRadius: BorderRadius.circular(HuntRadii.md),
+                        border: Border.all(
+                          color: HuntColors.paper.withValues(alpha: 0.2),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                HuntRadii.pill,
+                              ),
+                              child: LinearProgressIndicator(
+                                minHeight: 7,
+                                value: progress,
+                                backgroundColor: HuntColors.paper.withValues(
+                                  alpha: 0.16,
+                                ),
+                                color: HuntColors.sun,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: HuntSpacing.sm),
+                          Text(
+                            '$remaining',
+                            style: HuntTextStyles.metric.copyWith(
+                              color: HuntColors.paper,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: HuntSpacing.sm),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: streakTone.withValues(alpha: 0.96),
+                      borderRadius: BorderRadius.circular(HuntRadii.md),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          l10n.current_streak_label,
+                          style: HuntTextStyles.caption.copyWith(
+                            color: HuntColors.ink,
+                          ),
+                        ),
+                        Text(
+                          '${session.currentStreak}',
+                          style: HuntTextStyles.metric.copyWith(fontSize: 20),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showPause(BuildContext context) {
+    game.pauseHunt();
+    showModalBottomSheet<void>(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: HuntColors.paper,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(HuntRadii.lg)),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            HuntSpacing.lg,
+            HuntSpacing.lg,
+            HuntSpacing.lg,
+            HuntSpacing.md,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(width: 44, height: 4, color: HuntColors.lineStrong),
+              const SizedBox(height: HuntSpacing.lg),
+              const Icon(Icons.pause_rounded, color: HuntColors.moss, size: 36),
+              const SizedBox(height: HuntSpacing.sm),
+              Text(
+                AppLocalizations.of(context)!.pause_hunt_title,
+                style: HuntTextStyles.sectionTitle,
+              ),
+              const SizedBox(height: HuntSpacing.xs),
+              Text(
+                AppLocalizations.of(context)!.pause_hunt_subtitle,
+                style: HuntTextStyles.supporting,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: HuntSpacing.lg),
+              HuntActionButton(
+                label: AppLocalizations.of(context)!.resume_hunt_button,
+                icon: Icons.play_arrow_rounded,
+                onPressed: () {
+                  Navigator.pop(context);
+                  game.resumeHunt();
+                },
+              ),
+              const SizedBox(height: HuntSpacing.sm),
+              HuntActionButton(
+                label: AppLocalizations.of(context)!.end_round_button,
+                icon: Icons.stop_circle_outlined,
+                secondary: true,
+                onPressed: () {
+                  Navigator.pop(context);
+                  game.finishManually();
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FieldButton extends StatelessWidget {
+  const _FieldButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: Material(
+        color: HuntColors.night.withValues(alpha: 0.86),
+        borderRadius: BorderRadius.circular(HuntRadii.md),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(HuntRadii.md),
+          child: SizedBox(
+            width: 48,
+            height: 48,
+            child: Icon(icon, color: HuntColors.paper),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Game extends FlameGame with MultiTouchTapDetector, HasCollisionDetection {
+  Game({
+    required this.settings,
+    required this.session,
+    required this.onFinished,
+  });
+
+  final AppSettings settings;
+  final HuntSessionState session;
+  final ValueChanged<HuntResult> onFinished;
+  final math.Random _random = math.Random();
+  final double topInset = 88;
+  late GameAssets _assets;
+  late Timer _interval;
+  late DifficultyProfile _difficultyProfile;
+  late final HuntRoundClock _clock = HuntRoundClock(durationSeconds: duration);
+  bool _started = false;
+  bool _finished = false;
+
+  int get duration => getTimeFromValue(settings.time).value;
+  bool get _isMuted => settings.muted;
+
+  int get _maxActiveCreatures => settings.lowPower
+      ? math.max((_difficultyProfile.maxActiveCreatures / 2).round(), 4)
+      : _difficultyProfile.maxActiveCreatures;
 
   DifficultyProfile _resolveDifficultyProfile() {
-    //? Difficulty controls both density and motion speed so rounds feel materially different.
-    final difficulty = getDifficultyFromValue(gameSettings?.difficulty);
-    final baseProfile = switch (difficulty) {
+    return switch (getDifficultyFromValue(settings.difficulty)) {
       Difficulty.easy => const DifficultyProfile(
         spawnIntervalSeconds: 5,
         maxActiveCreatures: 8,
@@ -685,853 +480,468 @@ class Game extends FlameGame
         speedRamp: 0.1,
       ),
     };
-
-    if (gameSettings?.lowPower ?? false) {
-      //! Low power intentionally reduces both active count and speed so older devices stay smooth.
-      return DifficultyProfile(
-        spawnIntervalSeconds: baseProfile.spawnIntervalSeconds + 1,
-        maxActiveCreatures: max(
-          4,
-          (baseProfile.maxActiveCreatures * 0.6).round(),
-        ),
-        baseSpeed: baseProfile.baseSpeed * 0.7,
-        speedRamp: baseProfile.speedRamp * 0.5,
-      );
-    }
-
-    return baseProfile;
-  }
-
-  Future<void> _startBackgroundAudio() async {
-    await FlameAudio.bgm.play(
-      'bird_background_sound.mp3',
-      volume: _isMuted ? 0 : (gameSettings?.musicVolume ?? 1),
-    );
   }
 
   @override
   Future<void> onLoad() async {
     _difficultyProfile = _resolveDifficultyProfile();
-    try {
-      await loadGameAudio();
-      await loadGameImagesAndAssets(
-        backgroundPath: gameSettings?.backgroundPath,
-      );
-    } catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("${AppLocalizations.of(context)!.error} \n $e"),
-          content: Text(e.toString()),
-        ),
-      );
-    }
-    //* Add world bounds before creatures spawn so collision callbacks can work from the first tick.
-    add(ScreenHitbox());
-    await _startBackgroundAudio();
-
-    interval = Timer(
-      1.0,
-      onTick: () async {
-        //! Spawn cadence is timer-driven, not frame-driven, so gameplay stays stable across device performance.
-        if (isOverlayBlocking || isGameOverTriggered) return;
-        if (_shouldSpawnThisTick(elapsedTicks)) {
-          final activeCreatures = children
-              .where((component) => component is Mice || component is Bug)
-              .length;
-          if (activeCreatures < _difficultyProfile.maxActiveCreatures) {
-            final startingSpeed = _currentSpeed(elapsedTicks);
-            final startPosition = Vector2(
-              0,
-              gameScreenTopBarHeight +
-                  _random.nextDouble() * (size.y - gameScreenTopBarHeight),
-            );
-            final startRndVelocity = Utils.generateRandomVelocity(
-              size,
-              10,
-              100,
-            );
-            if (_random.nextBool()) {
-              add(Mice(startPosition, startRndVelocity, startingSpeed));
-            } else {
-              add(Bug(startPosition, startRndVelocity, startingSpeed));
-            }
-          }
-        }
-        elapsedTicks++;
-        elapsedTicksNotifier.value = elapsedTicks;
-        if (elapsedTicks >= gameTimer) {
-          await _handleGameOver();
-        }
-      },
-      repeat: true,
+    _assets = await loadGameImagesAndAssets(
+      backgroundPath: settings.backgroundPath,
     );
-    return super.onLoad();
+    await loadGameAudio();
+    add(ScreenHitbox());
+    _interval = Timer(1, onTick: _onSecond, repeat: true);
+    _interval.stop();
+    await super.onLoad();
   }
 
-  Future<void> restart() async {
-    //? Restart preserves the same settings but rebuilds the runtime round state from scratch.
-    pauseEngine();
-    await FlameAudio.bgm.stop();
-    _clearCreatures();
-    resetRoundState();
-    _difficultyProfile = _resolveDifficultyProfile();
-    interval.start();
-    await _startBackgroundAudio();
+  Future<void> begin() async {
+    if (_started || _finished) return;
+    _started = true;
+    _interval.start();
+    await FlameAudio.bgm.play(
+      'bird_background_sound.mp3',
+      volume: _isMuted ? 0 : settings.musicVolume,
+    );
     resumeEngine();
   }
 
-  void _clearCreatures() {
-    final toRemove = children
-        .where((component) => component is Mice || component is Bug)
-        .toList();
-    for (final component in toRemove) {
-      component.removeFromParent();
+  void pauseHunt() {
+    session.setPaused(true);
+    _clock.pause();
+    _interval.pause();
+    pauseEngine();
+  }
+
+  void resumeHunt() {
+    session.setPaused(false);
+    _clock.resume();
+    _interval.resume();
+    resumeEngine();
+  }
+
+  void finishManually() => _finish(HuntCompletionReason.manual);
+
+  Future<void> restart() async {
+    pauseEngine();
+    await FlameAudio.bgm.stop();
+    _clearCreatures();
+    _clearEffects();
+    session.reset();
+    _clock.reset();
+    _finished = false;
+    _started = false;
+    _interval.stop();
+  }
+
+  void _onSecond() {
+    if (!_started || _finished || session.isPaused) return;
+    final complete = _clock.tick();
+    session.setElapsed(_clock.elapsedSeconds);
+    if (complete) {
+      _finish(HuntCompletionReason.timer);
+      return;
+    }
+    if (_clock.elapsedSeconds %
+            math.max(_difficultyProfile.spawnIntervalSeconds, 1) ==
+        0) {
+      _spawnTarget(_clock.elapsedSeconds);
     }
   }
 
-  Future<void> _handleGameOver() async {
-    if (isGameOverTriggered) return;
-    isGameOverTriggered = true;
-    isOverlayBlocking = true;
-    lastGameResult = GameResult.fromCounter(clicksCounter);
-    await _persistSessionResult();
-    pauseEngine();
-    await FlameAudio.bgm.stop();
-    showDialog(
-      context: context,
-      builder: (context) => endGameDialog(context, game: this),
+  void _spawnTarget(int elapsedSeconds) {
+    final active = children
+        .whereType<PositionComponent>()
+        .where((component) => component is Mice || component is Bug)
+        .length;
+    if (active >= _maxActiveCreatures) return;
+    final position = Vector2(
+      _random.nextDouble() * size.x,
+      topInset + _random.nextDouble() * math.max(size.y - topInset, 1),
     );
-  }
-
-  bool _shouldSpawnThisTick(int elapsedSeconds) {
-    final intervalSeconds = max(_difficultyProfile.spawnIntervalSeconds, 1);
-    return elapsedSeconds % intervalSeconds == 0;
+    final velocity = Utils.generateRandomVelocity(size, 10, 100);
+    final speed = _currentSpeed(elapsedSeconds);
+    if (_random.nextBool()) {
+      add(
+        Mice(
+          position,
+          velocity,
+          speed,
+          _assets.mice,
+          topInset: topInset,
+          sizeScale: settings.largerTargets ? 1.25 : 1,
+          highContrast: settings.highContrast,
+        ),
+      );
+    } else {
+      add(
+        Bug(
+          position,
+          velocity,
+          speed * 1.2,
+          _assets.bug,
+          topInset: topInset,
+          sizeScale: settings.largerTargets ? 1.25 : 1,
+          highContrast: settings.highContrast,
+        ),
+      );
+    }
   }
 
   double _currentSpeed(int elapsedSeconds) {
-    final effectiveDuration = max(gameTimer, 1);
-    final progress = (elapsedSeconds / effectiveDuration).clamp(0.0, 1.0);
-    final rampMultiplier = 1 + (_difficultyProfile.speedRamp * progress);
-    return _difficultyProfile.baseSpeed * rampMultiplier;
+    final progress = (elapsedSeconds / math.max(duration, 1)).clamp(0.0, 1.0);
+    return _difficultyProfile.baseSpeed *
+        (1 + (_difficultyProfile.speedRamp * progress));
   }
 
-  Future<void> _persistSessionResult() async {
-    if (hasSessionLogged || lastGameResult == null) return;
-    final result = lastGameResult!;
-    final dbHelper = DBHelper();
-    final log = SessionLog(
-      dateKey: _todayKey(),
-      totalTaps: result.totalTaps,
-      wrongTaps: result.wrongTaps,
+  void _finish(HuntCompletionReason reason) {
+    if (_finished) return;
+    _finished = true;
+    _interval.stop();
+    pauseEngine();
+    unawaited(FlameAudio.bgm.stop());
+    _clearCreatures();
+    final result = session.result(
+      configuredDuration: duration,
+      difficulty: settings.difficulty,
+      reason: reason,
     );
-    await dbHelper.addSessionLog(log);
-    hasSessionLogged = true;
+    onFinished(result);
   }
 
-  String _todayKey() {
-    final now = DateTime.now();
-    final mm = now.month.toString().padLeft(2, '0');
-    final dd = now.day.toString().padLeft(2, '0');
-    return '${now.year}-$mm-$dd';
-  }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-    interval.update(dt);
-  }
-
-  @override
-  void onTapDown(TapDownInfo info) {
-    super.onTapDown(info);
-    final touchPoint = info.eventPosition.widget;
-    bool hitAnything = false;
-    //* Hit detection is handled by asking each live creature if the touch landed inside its bounds.
-    children.any((component) {
-      if (component is Mice && component.containsPoint(touchPoint)) {
-        FlameAudio.play(
-          'mice_tap.mp3',
-          volume: _isMuted ? 0 : (gameSettings?.characterVolume ?? 1),
-        );
-        clicksCounter.recordMiceTap();
-        remove(component);
-        hitAnything = true;
-        return true;
-      } else if (component is Bug && component.containsPoint(touchPoint)) {
-        FlameAudio.play(
-          'bug_tap.wav',
-          volume: _isMuted ? 0 : (gameSettings?.characterVolume ?? 1),
-        );
-        clicksCounter.recordBugTap();
-        remove(component);
-        hitAnything = true;
-        return true;
-      }
-      return false;
-    });
-
-    if (!hitAnything) {
-      //! Misses are important because they reset streaks and feed the end-of-round accuracy.
-      clicksCounter.recordMissTap();
+  void _clearCreatures() {
+    for (final child in children.toList()) {
+      if (child is Mice || child is Bug) child.removeFromParent();
     }
+  }
+
+  void _clearEffects() {
+    for (final child in children.toList()) {
+      if (child is HuntFeedback) child.removeFromParent();
+    }
+  }
+
+  @override
+  void onTapDown(int pointerId, TapDownInfo info) {
+    if (!_started || _finished || session.isPaused) return;
+    final point = info.eventPosition.widget;
+    Component? hit;
+    for (final component in children.toList().reversed) {
+      if ((component is Mice || component is Bug) &&
+          component.containsPoint(point)) {
+        hit = component;
+        break;
+      }
+    }
+    if (hit is Mice) {
+      session.recordHit(HuntTarget.mice);
+      _feedback(hit.position, HuntFeedbackKind.mice, session.currentStreak);
+      _haptic();
+      _playTap('mice_tap.mp3', settings.characterVolume);
+      hit.removeFromParent();
+    } else if (hit is Bug) {
+      session.recordHit(HuntTarget.bug);
+      _feedback(hit.position, HuntFeedbackKind.bug, session.currentStreak);
+      _haptic();
+      _playTap('bug_tap.wav', settings.characterVolume);
+      hit.removeFromParent();
+    } else {
+      session.recordMiss();
+      _feedback(point, HuntFeedbackKind.miss, 0);
+      _haptic();
+    }
+  }
+
+  void _haptic() {
+    if (settings.haptics) unawaited(HapticFeedback.selectionClick());
+  }
+
+  void _playTap(String file, double volume) {
+    unawaited(FlameAudio.play(file, volume: _isMuted ? 0 : volume));
+  }
+
+  void _feedback(Vector2 position, HuntFeedbackKind kind, int streak) {
+    add(
+      HuntFeedback(
+        position: position,
+        kind: kind,
+        streak: streak,
+        reducedMotion: settings.reducedMotion,
+        highContrast: settings.highContrast,
+      ),
+    );
   }
 
   @override
   void render(Canvas canvas) {
+    final source = Rect.fromLTWH(
+      0,
+      0,
+      _assets.background.width.toDouble(),
+      _assets.background.height.toDouble(),
+    );
     canvas.drawImageRect(
-      globalBackgroundImage,
-      const Rect.fromLTWH(0, 0, 1024, 1024),
+      _assets.background,
+      source,
       Rect.fromLTWH(0, 0, size.x, size.y),
       Paint(),
     );
+    if (settings.highContrast) {
+      canvas.drawRect(
+        Rect.fromLTWH(0, topInset, size.x, size.y - topInset),
+        Paint()..color = HuntColors.ink.withValues(alpha: 0.22),
+      );
+    }
     super.render(canvas);
   }
 }
 
-class _StatChip extends StatelessWidget {
-  const _StatChip({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
+enum HuntFeedbackKind { mice, bug, miss }
 
-  final IconData icon;
-  final String label;
-  final int value;
-  final Color color;
+class HuntFeedback extends PositionComponent {
+  HuntFeedback({
+    required Vector2 position,
+    required this.kind,
+    required this.streak,
+    required this.reducedMotion,
+    required this.highContrast,
+  }) : super(position: position, anchor: Anchor.center, size: Vector2.all(72));
+
+  final HuntFeedbackKind kind;
+  final int streak;
+  final bool reducedMotion;
+  final bool highContrast;
+  double age = 0;
+
+  Color get color => switch (kind) {
+    HuntFeedbackKind.mice => HuntColors.moss,
+    HuntFeedbackKind.bug => HuntColors.coral,
+    HuntFeedbackKind.miss => HuntColors.paper,
+  };
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.18),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: 22),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '$value',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            maxLines: 2,
-            textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: Colors.white70, fontSize: 11),
-          ),
-        ],
-      ),
-    );
+  void update(double dt) {
+    age += dt;
+    if (age > (reducedMotion ? 0.12 : 0.42)) removeFromParent();
+    super.update(dt);
+  }
+
+  @override
+  void render(Canvas canvas) {
+    final duration = reducedMotion ? 0.12 : 0.42;
+    final progress = reducedMotion ? 0.35 : (age / duration).clamp(0.0, 1.0);
+    final opacity = (1 - progress).clamp(0.0, 1.0);
+    final paint = Paint()
+      ..color = (highContrast ? HuntColors.paper : color).withValues(
+        alpha: opacity,
+      )
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = highContrast
+          ? 6
+          : kind == HuntFeedbackKind.miss
+          ? 2
+          : 4;
+    final radius = 10 + (progress * (kind == HuntFeedbackKind.miss ? 20 : 34));
+    canvas.drawCircle(Offset(size.x / 2, size.y / 2), radius, paint);
+    if (kind != HuntFeedbackKind.miss) {
+      final rayPaint = Paint()
+        ..color = (highContrast ? HuntColors.paper : color).withValues(
+          alpha: opacity,
+        )
+        ..strokeWidth = 3
+        ..strokeCap = StrokeCap.round;
+      for (var i = 0; i < 6; i++) {
+        final angle = (math.pi * 2 / 6) * i;
+        final start = Offset(
+          size.x / 2 + math.cos(angle) * (radius + 4),
+          size.y / 2 + math.sin(angle) * (radius + 4),
+        );
+        final end = Offset(
+          size.x / 2 + math.cos(angle) * (radius + 12),
+          size.y / 2 + math.sin(angle) * (radius + 12),
+        );
+        canvas.drawLine(start, end, rayPaint);
+      }
+    }
   }
 }
 
-class _ResultSummaryChip extends StatelessWidget {
-  const _ResultSummaryChip({
-    required this.label,
-    required this.value,
-    required this.accent,
+class HuntRecordView extends StatelessWidget {
+  const HuntRecordView({
+    super.key,
+    required this.result,
+    required this.settings,
+    required this.onAgain,
+    required this.onHome,
+    required this.onJournal,
+    required this.onAdjust,
   });
 
-  final String label;
-  final String value;
-  final Color accent;
+  final HuntResult result;
+  final AppSettings settings;
+  final VoidCallback onAgain;
+  final VoidCallback onHome;
+  final VoidCallback onJournal;
+  final VoidCallback onAdjust;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Column(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: TextStyle(
-              color: accent,
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ResultHeroBurst extends StatelessWidget {
-  const _ResultHeroBurst({
-    required this.title,
-    required this.accuracy,
-    required this.grade,
-    required this.mood,
-  });
-
-  final String title;
-  final int accuracy;
-  final String grade;
-  final _CatMood mood;
-
-  @override
-  Widget build(BuildContext context) {
-    //? The grade ring is intentionally high-contrast because it will likely appear in screenshots.
-    return Column(
-      children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 126,
-              height: 126,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    mood.color.withValues(alpha: 0.34),
-                    Colors.white.withValues(alpha: 0.04),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 102,
-              height: 102,
-              child: CircularProgressIndicator(
-                value: (accuracy / 100).clamp(0, 1).toDouble(),
-                strokeWidth: 8,
-                color: mood.color,
-                backgroundColor: Colors.white12,
-              ),
-            ),
-            Container(
-              width: 78,
-              height: 78,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.08),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
-              ),
+    final l10n = AppLocalizations.of(context)!;
+    final recordTitle = result.accuracy >= 80
+        ? l10n.hunt_record_proud
+        : l10n.hunt_record_complete;
+    final duration = result.configuredDuration >= 100000
+        ? l10n.difficulty_sandbox
+        : '${result.configuredDuration}s';
+    return ColoredBox(
+      color: HuntColors.paperWarm,
+      child: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 620),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(HuntSpacing.lg),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    grade,
-                    style: TextStyle(
-                      color: mood.color,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
+                  HuntSectionHeading(
+                    eyebrow: l10n.hunt_record_eyebrow,
+                    title: recordTitle,
+                    subtitle: l10n.hunt_record_subtitle,
+                    trailing: IconButton(
+                      tooltip: l10n.return_mainmenu_button,
+                      onPressed: onHome,
+                      icon: const Icon(Icons.close, color: HuntColors.ink),
                     ),
                   ),
-                  Text(
-                    '$accuracy%',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
+                  const SizedBox(height: HuntSpacing.lg),
+                  HuntSurface(
+                    tone: HuntSurfaceTone.field,
+                    child: Column(
+                      children: [
+                        Text(
+                          '${result.accuracy}%',
+                          style: HuntTextStyles.display.copyWith(
+                            color: HuntColors.moss,
+                          ),
+                        ),
+                        const SizedBox(height: HuntSpacing.xs),
+                        Text(
+                          l10n.hunt_record_accuracy,
+                          style: HuntTextStyles.supporting,
+                        ),
+                        const SizedBox(height: HuntSpacing.md),
+                        Row(
+                          children: [
+                            HuntMetric(
+                              label: l10n.hunt_record_hits,
+                              value: '${result.successfulTaps}',
+                              accent: HuntColors.moss,
+                            ),
+                            const SizedBox(width: HuntSpacing.sm),
+                            HuntMetric(
+                              label: l10n.hunt_record_misses,
+                              value: '${result.wrongTaps}',
+                              accent: HuntColors.terracotta,
+                            ),
+                            const SizedBox(width: HuntSpacing.sm),
+                            HuntMetric(
+                              label: l10n.best_streak_label,
+                              value: '${result.bestStreak}',
+                              accent: HuntColors.coral,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
+                  ),
+                  const SizedBox(height: HuntSpacing.md),
+                  HuntSurface(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.hunt_record_details,
+                          style: HuntTextStyles.sectionTitle,
+                        ),
+                        const SizedBox(height: HuntSpacing.md),
+                        Wrap(
+                          spacing: HuntSpacing.sm,
+                          runSpacing: HuntSpacing.sm,
+                          children: [
+                            HuntTag(
+                              label: duration,
+                              icon: Icons.timer_outlined,
+                            ),
+                            HuntTag(
+                              label: _difficultyLabel(
+                                l10n,
+                                settings.difficulty,
+                              ),
+                              icon: Icons.track_changes_outlined,
+                            ),
+                            HuntTag(
+                              label: '${l10n.micetap_count} ${result.miceTaps}',
+                              tone: HuntTagTone.success,
+                            ),
+                            HuntTag(
+                              label: '${l10n.bugtap_count} ${result.bugTaps}',
+                              tone: HuntTagTone.accent,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: HuntSpacing.md),
+                        Text(
+                          result.completionReason == HuntCompletionReason.manual
+                              ? l10n.hunt_record_manual_end
+                              : l10n.hunt_record_timer_end,
+                          style: HuntTextStyles.supporting,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: HuntSpacing.lg),
+                  HuntActionButton(
+                    label: l10n.hunt_again,
+                    icon: Icons.replay_rounded,
+                    onPressed: onAgain,
+                  ),
+                  const SizedBox(height: HuntSpacing.sm),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: HuntActionButton(
+                          label: l10n.hunt_view_journal,
+                          icon: Icons.menu_book_outlined,
+                          secondary: true,
+                          onPressed: onJournal,
+                        ),
+                      ),
+                      const SizedBox(width: HuntSpacing.sm),
+                      Expanded(
+                        child: HuntActionButton(
+                          label: l10n.hunt_adjust,
+                          icon: Icons.tune_rounded,
+                          secondary: true,
+                          onPressed: onAdjust,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 14),
-        Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 26,
-            fontWeight: FontWeight.w900,
           ),
         ),
-        const SizedBox(height: 8),
-        _MoodBadge(mood: mood),
-      ],
-    );
-  }
-}
-
-class _MoodBadge extends StatelessWidget {
-  const _MoodBadge({required this.mood});
-
-  final _CatMood mood;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        color: mood.color.withValues(alpha: 0.16),
-        border: Border.all(color: mood.color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(mood.icon, color: mood.color, size: 18),
-          const SizedBox(width: 8),
-          Text(
-            mood.label,
-            style: TextStyle(color: mood.color, fontWeight: FontWeight.w800),
-          ),
-        ],
       ),
     );
   }
-}
 
-class _HudRoundButton extends StatelessWidget {
-  const _HudRoundButton({required this.icon, required this.onTap});
-
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
-        child: Ink(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: PawPalette.midnight.withValues(alpha: 0.72),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-            boxShadow: [
-              BoxShadow(
-                color: PawPalette.midnight.withValues(alpha: 0.22),
-                blurRadius: 16,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Icon(icon, color: Colors.white, size: 18),
-        ),
-      ),
-    );
-  }
-}
-
-class _TimerNestCard extends StatelessWidget {
-  const _TimerNestCard({
-    required this.label,
-    required this.remainingTime,
-    required this.progress,
-  });
-
-  final String label;
-  final int remainingTime;
-  final double progress;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-        gradient: const LinearGradient(
-          colors: [Color(0xDD120B2E), Color(0xDD2E215B)],
-        ),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 36,
-            height: 36,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                CircularProgressIndicator(
-                  value: progress,
-                  strokeWidth: 4,
-                  color: PawPalette.lemon,
-                  backgroundColor: Colors.white12,
-                ),
-                const Icon(
-                  Icons.access_time_rounded,
-                  color: Colors.white,
-                  size: 16,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                Text(
-                  '$remainingTime',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TopComboDock extends StatelessWidget {
-  const _TopComboDock({required this.current, required this.best});
-
-  final int current;
-  final int best;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 108,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-        gradient: const LinearGradient(
-          colors: [Color(0xDDFE5D8F), Color(0xDDFF8C42)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: PawPalette.bubbleGum.withValues(alpha: 0.22),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.auto_awesome_rounded,
-                color: Colors.white,
-                size: current > 0 ? 16 : 14,
-              ),
-              const SizedBox(width: 6),
-              const Expanded(
-                child: Text(
-                  'Purr',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '$current',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          Text(
-            'Best $best',
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MiniHudTag extends StatelessWidget {
-  const _MiniHudTag({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withValues(alpha: 0.08),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white70, size: 14),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StreakPill extends StatelessWidget {
-  const _StreakPill({
-    required this.label,
-    required this.value,
-    this.accent = PawPalette.bubbleGum,
-  });
-
-  final String label;
-  final int value;
-  final Color accent;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withValues(alpha: 0.08),
-        border: Border.all(color: accent.withValues(alpha: 0.25)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.auto_awesome_rounded, color: accent, size: 16),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              '$label $value',
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatResultTile extends StatelessWidget {
-  const _StatResultTile({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
-
-  final IconData icon;
-  final String label;
-  final int value;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-        ),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: color.withValues(alpha: 0.22),
-              child: Icon(icon, color: color),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Text(
-                '$value',
-                style: TextStyle(
-                  color: color,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _DialogActionButton extends StatelessWidget {
-  const _DialogActionButton({
-    required this.color,
-    required this.icon,
-    required this.label,
-    required this.onPressed,
-    this.foregroundColor = Colors.white,
-  });
-
-  final Color color;
-  final Color foregroundColor;
-  final IconData icon;
-  final String label;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        foregroundColor: foregroundColor,
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      ),
-      onPressed: onPressed,
-      icon: Icon(icon),
-      label: Text(
-        label,
-        textAlign: TextAlign.center,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
-  }
-}
-
-class _CatMood {
-  const _CatMood({
-    required this.label,
-    required this.color,
-    required this.icon,
-  });
-
-  final String label;
-  final Color color;
-  final IconData icon;
-}
-
-_CatMood _resolveCatMood(
-  AppLocalizations l10n, {
-  required int accuracy,
-  required int bestStreak,
-  required int totalTaps,
-}) {
-  if (totalTaps == 0) {
-    return _CatMood(
-      label: l10n.cat_mood_warming_up,
-      color: const Color(0xFFFFB347),
-      icon: Icons.nights_stay_rounded,
-    );
-  }
-
-  if (accuracy >= 85 && bestStreak >= 5) {
-    return _CatMood(
-      label: l10n.cat_mood_hunt_legend,
-      color: PawPalette.lemon,
-      icon: Icons.workspace_premium_rounded,
-    );
-  }
-
-  if (accuracy >= 65) {
-    return _CatMood(
-      label: l10n.cat_mood_playful,
-      color: PawPalette.teal,
-      icon: Icons.pets_rounded,
-    );
-  }
-
-  return _CatMood(
-    label: l10n.cat_mood_curious,
-    color: PawPalette.bubbleGum,
-    icon: Icons.visibility_rounded,
-  );
-}
-
-String _resolveHuntGrade({
-  required int accuracy,
-  required int bestStreak,
-  required int totalTaps,
-}) {
-  if (totalTaps == 0) return 'C';
-  if (accuracy >= 90 && bestStreak >= 6) return 'S';
-  if (accuracy >= 80) return 'A';
-  if (accuracy >= 65) return 'B';
-  return 'C';
+  String _difficultyLabel(AppLocalizations l10n, int value) =>
+      switch (getDifficultyFromValue(value)) {
+        Difficulty.easy => l10n.difficulty_easy,
+        Difficulty.medium => l10n.difficulty_medium,
+        Difficulty.hard => l10n.difficulty_hard,
+        Difficulty.sandbox => l10n.difficulty_sandbox,
+      };
 }

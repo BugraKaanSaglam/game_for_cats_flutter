@@ -1,30 +1,25 @@
 import 'dart:math';
 
 import 'package:flame/components.dart';
-import 'package:game_for_cats_2025/models/global/global_variables.dart';
 
 //* Small math helpers for movement, spawning, and wrap-around behavior.
 class Utils {
-  static Vector2 generateRandomPosition(Vector2 screenSize, Vector2 margins) {
-    var result = Vector2.zero();
+  static Vector2 generateRandomPosition(
+    Vector2 screenSize,
+    Vector2 margins, {
+    double topInset = 0,
+  }) {
     final randomGenerator = Random();
-    //! gameScreenTopBarHeight reserves space for the Flutter HUD overlay above the Flame field.
-    result = Vector2(
-      randomGenerator
-              .nextInt(screenSize.x.toInt() - 2 * margins.x.toInt())
-              .toDouble() +
-          margins.x,
-      randomGenerator
-              .nextInt(
-                screenSize.y.toInt() +
-                    gameScreenTopBarHeight.toInt() -
-                    2 * margins.y.toInt(),
-              )
-              .toDouble() +
-          margins.y,
+    //! topInset reserves space for the Flutter HUD overlay above the Flame field.
+    final horizontalSpan = max(screenSize.x.toInt() - 2 * margins.x.toInt(), 1);
+    final verticalSpan = max(
+      screenSize.y.toInt() - topInset.toInt() - 2 * margins.y.toInt(),
+      1,
     );
-    result.add(Vector2(0, gameScreenTopBarHeight));
-    return result;
+    return Vector2(
+      randomGenerator.nextInt(horizontalSpan).toDouble() + margins.x,
+      randomGenerator.nextInt(verticalSpan).toDouble() + margins.y + topInset,
+    );
   }
 
   static Vector2 generateRandomVelocity(Vector2 screenSize, int min, int max) {
@@ -45,12 +40,16 @@ class Utils {
     return result * velocity;
   }
 
-  static bool isPositionOutOfBounds(Vector2 bounds, Vector2 position) {
+  static bool isPositionOutOfBounds(
+    Vector2 bounds,
+    Vector2 position, {
+    double topInset = 0,
+  }) {
     var result = false;
 
     if (position.x > bounds.x ||
         position.x < 0 ||
-        position.y < gameScreenTopBarHeight ||
+        position.y < topInset ||
         position.y > bounds.y) {
       result = true;
     }
@@ -58,19 +57,23 @@ class Utils {
     return result;
   }
 
-  static Vector2 wrapPosition(Vector2 bounds, Vector2 position) {
+  static Vector2 wrapPosition(
+    Vector2 bounds,
+    Vector2 position, {
+    double topInset = 0,
+  }) {
     var result = position;
 
     //! Wrap-around keeps motion continuous instead of bouncing, which reads better for cats.
     if (position.x >= bounds.x) {
-      result.x = gameScreenTopBarHeight;
-    } else if (position.x <= gameScreenTopBarHeight) {
+      result.x = 0;
+    } else if (position.x <= 0) {
       result.x = bounds.x;
     }
 
     if (position.y >= bounds.y) {
-      result.y = 0;
-    } else if (position.y <= 0) {
+      result.y = topInset;
+    } else if (position.y <= topInset) {
       result.y = bounds.y;
     }
 

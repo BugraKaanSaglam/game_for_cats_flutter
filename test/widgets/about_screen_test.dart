@@ -29,12 +29,15 @@ void main() {
 
     expect(find.text('About the Game'), findsWidgets);
     expect(find.text('Why this game exists'), findsOneWidget);
-    await tester.scrollUntilVisible(
-      find.text('What makes it distinct'),
-      240,
-      scrollable: find.byType(Scrollable),
+    expect(
+      find.text('Your settings and hunt records stay on this device.'),
+      findsOneWidget,
     );
-    expect(find.text('What makes it distinct'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Build details'),
+      400,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(
       find.byWidgetPredicate(_richTextContains('3.5.0+35')),
       findsOneWidget,
