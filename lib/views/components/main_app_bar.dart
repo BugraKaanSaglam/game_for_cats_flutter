@@ -23,27 +23,62 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       toolbarHeight: 68,
-      backgroundColor: HuntColors.ink,
-      systemOverlayStyle: SystemUiOverlayStyle.light,
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+      forceMaterialTransparency: true,
+      systemOverlayStyle: SystemUiOverlayStyle.dark,
       leading: hasBackButton
-          ? IconButton(
-              tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-              icon: const Icon(Icons.arrow_back_rounded),
-              onPressed: onBack ?? () => context.go(AppRoutes.main),
+          ? Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: HuntColors.sun,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: HuntColors.sunLine, width: 2),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 6,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: IconButton(
+                  tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                  color: HuntColors.ink,
+                  icon: const Icon(Icons.arrow_back_rounded),
+                  onPressed: onBack ?? () => context.go(AppRoutes.main),
+                ),
+              ),
             )
           : null,
-      title: Text(
-        title,
-        style: HuntTextStyles.action.copyWith(
-          color: HuntColors.paper,
-          fontSize: 18,
+      title: DecoratedBox(
+        decoration: BoxDecoration(
+          color: HuntColors.sun,
+          borderRadius: BorderRadius.circular(HuntRadii.pill),
+          border: Border.all(color: HuntColors.sunLine, width: 2),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 7,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+          child: Text(
+            title,
+            style: HuntTextStyles.action.copyWith(
+              color: HuntColors.ink,
+              fontSize: 18,
+            ),
+          ),
         ),
       ),
-      centerTitle: false,
+      centerTitle: true,
       elevation: 0,
-      shape: const Border(
-        bottom: BorderSide(color: HuntColors.mossDark, width: 2),
-      ),
     );
   }
 }

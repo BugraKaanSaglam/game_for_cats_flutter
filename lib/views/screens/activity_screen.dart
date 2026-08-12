@@ -41,8 +41,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: MainAppBar(title: l10n.activity_title),
-      body: ColoredBox(
-        color: HuntColors.paperWarm,
+      body: HuntPageBackground(
         child: SafeArea(
           child: RefreshIndicator(
             onRefresh: _refresh,

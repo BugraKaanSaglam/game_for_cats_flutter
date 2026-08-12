@@ -1,6 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 
+class HuntPageBackground extends StatelessWidget {
+  const HuntPageBackground({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Image.asset(
+          'assets/images/mainscreen_background.png',
+          fit: BoxFit.cover,
+          alignment: Alignment.center,
+          semanticLabel: 'Mice and Paws',
+        ),
+        ColoredBox(color: HuntColors.night.withValues(alpha: 0.24)),
+        child,
+      ],
+    );
+  }
+}
+
 class HuntSurface extends StatelessWidget {
   const HuntSurface({
     super.key,
@@ -110,20 +133,48 @@ class _HuntActionButtonState extends State<HuntActionButton> {
                 color: widget.secondary ? HuntColors.lineStrong : background,
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: widget.expand ? MainAxisSize.max : MainAxisSize.min,
-              children: [
-                if (widget.icon != null) ...[
-                  Icon(widget.icon, color: foreground, size: 19),
-                  const SizedBox(width: HuntSpacing.sm),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(HuntRadii.md),
+              child: Stack(
+                fit: StackFit.loose,
+                children: [
+                  if (enabled)
+                    Positioned.fill(
+                      child: Image.asset(
+                        'assets/images/button.png',
+                        fit: BoxFit.cover,
+                        alignment: Alignment.center,
+                        opacity: const AlwaysStoppedAnimation(0.9),
+                      ),
+                    ),
+                  Positioned.fill(
+                    child: ColoredBox(
+                      color:
+                          (widget.secondary ? HuntColors.paper : HuntColors.ink)
+                              .withValues(alpha: enabled ? 0.36 : 0.7),
+                    ),
+                  ),
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (widget.icon != null) ...[
+                          Icon(widget.icon, color: foreground, size: 19),
+                          const SizedBox(width: HuntSpacing.sm),
+                        ],
+                        Text(
+                          widget.label,
+                          style: HuntTextStyles.action.copyWith(
+                            color: foreground,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
-                Text(
-                  widget.label,
-                  style: HuntTextStyles.action.copyWith(color: foreground),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+              ),
             ),
           ),
         ),

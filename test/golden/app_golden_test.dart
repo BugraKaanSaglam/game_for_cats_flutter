@@ -1,5 +1,4 @@
-import 'dart:ui';
-
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:game_for_cats_2025/services/app_info_service.dart';
 import 'package:game_for_cats_2025/views/components/loading_screen_view.dart';
@@ -34,7 +33,14 @@ void main() {
     });
 
     await tester.pumpWidget(buildTestApp(child: const LoadingScreenView()));
-    await tester.pump(const Duration(milliseconds: 100));
+    await tester.runAsync(() async {
+      await precacheImage(
+        const AssetImage('assets/images/mainscreen_background.png'),
+        tester.element(find.byType(LoadingScreenView)),
+      );
+    });
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump();
 
     await expectLater(
       find.byType(LoadingScreenView),

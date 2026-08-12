@@ -27,8 +27,7 @@ class _AboutScreenState extends State<AboutScreen> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: MainAppBar(title: l10n.about_button),
-      body: ColoredBox(
-        color: HuntColors.paperWarm,
+      body: HuntPageBackground(
         child: FutureBuilder<PackageInfo>(
           future: AppInfoService.instance.load(),
           builder: (context, snapshot) {

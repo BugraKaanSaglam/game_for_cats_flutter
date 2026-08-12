@@ -44,112 +44,113 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final l10n = AppLocalizations.of(context)!;
     final last = _page == 1;
     return Scaffold(
-      backgroundColor: HuntColors.paperWarm,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                HuntSpacing.lg,
-                HuntSpacing.md,
-                HuntSpacing.lg,
-                HuntSpacing.sm,
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.track_changes,
-                    color: HuntColors.moss,
-                    size: 28,
-                  ),
-                  const SizedBox(width: HuntSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      l10n.game_name,
-                      style: HuntTextStyles.sectionTitle,
+      body: HuntPageBackground(
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  HuntSpacing.lg,
+                  HuntSpacing.md,
+                  HuntSpacing.lg,
+                  HuntSpacing.sm,
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.track_changes,
+                      color: HuntColors.moss,
+                      size: 28,
                     ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      AppAnalytics.track(AnalyticsEvent.onboardingSkipped);
-                      unawaited(_finish());
-                    },
-                    child: Text(
-                      l10n.onboarding_skip,
-                      style: HuntTextStyles.action.copyWith(
-                        color: HuntColors.moss,
+                    const SizedBox(width: HuntSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        l10n.game_name,
+                        style: HuntTextStyles.sectionTitle,
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: PageView(
-                controller: _controller,
-                onPageChanged: (value) => setState(() => _page = value),
-                children: [
-                  _WelcomePage(l10n: l10n),
-                  _PracticePage(l10n: l10n),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                HuntSpacing.lg,
-                HuntSpacing.sm,
-                HuntSpacing.lg,
-                HuntSpacing.lg,
-              ),
-              child: Row(
-                children: [
-                  Row(
-                    children: List.generate(
-                      2,
-                      (index) => AnimatedContainer(
-                        duration: HuntMotion.tap,
-                        margin: const EdgeInsets.only(right: HuntSpacing.sm),
-                        width: index == _page ? 28 : 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: index == _page
-                              ? HuntColors.moss
-                              : HuntColors.lineStrong,
-                          borderRadius: BorderRadius.circular(HuntRadii.pill),
+                    TextButton(
+                      onPressed: () {
+                        AppAnalytics.track(AnalyticsEvent.onboardingSkipped);
+                        unawaited(_finish());
+                      },
+                      child: Text(
+                        l10n.onboarding_skip,
+                        style: HuntTextStyles.action.copyWith(
+                          color: HuntColors.moss,
                         ),
                       ),
                     ),
-                  ),
-                  const Spacer(),
-                  SizedBox(
-                    width: 150,
-                    child: HuntActionButton(
-                      label: last
-                          ? l10n.onboarding_start
-                          : l10n.onboarding_next,
-                      icon: last
-                          ? Icons.play_arrow_rounded
-                          : Icons.arrow_forward_rounded,
-                      onPressed: () async {
-                        if (last) {
-                          await _finish();
-                        } else {
-                          AppAnalytics.track(
-                            AnalyticsEvent.onboardingNextTapped,
-                            parameters: {'pageIndex': _page},
-                          );
-                          await _controller.nextPage(
-                            duration: HuntMotion.standard,
-                            curve: HuntMotion.curve,
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+              Expanded(
+                child: PageView(
+                  controller: _controller,
+                  onPageChanged: (value) => setState(() => _page = value),
+                  children: [
+                    _WelcomePage(l10n: l10n),
+                    _PracticePage(l10n: l10n),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  HuntSpacing.lg,
+                  HuntSpacing.sm,
+                  HuntSpacing.lg,
+                  HuntSpacing.lg,
+                ),
+                child: Row(
+                  children: [
+                    Row(
+                      children: List.generate(
+                        2,
+                        (index) => AnimatedContainer(
+                          duration: HuntMotion.tap,
+                          margin: const EdgeInsets.only(right: HuntSpacing.sm),
+                          width: index == _page ? 28 : 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: index == _page
+                                ? HuntColors.moss
+                                : HuntColors.lineStrong,
+                            borderRadius: BorderRadius.circular(HuntRadii.pill),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    SizedBox(
+                      width: 150,
+                      child: HuntActionButton(
+                        label: last
+                            ? l10n.onboarding_start
+                            : l10n.onboarding_next,
+                        icon: last
+                            ? Icons.play_arrow_rounded
+                            : Icons.arrow_forward_rounded,
+                        onPressed: () async {
+                          if (last) {
+                            await _finish();
+                          } else {
+                            AppAnalytics.track(
+                              AnalyticsEvent.onboardingNextTapped,
+                              parameters: {'pageIndex': _page},
+                            );
+                            await _controller.nextPage(
+                              duration: HuntMotion.standard,
+                              curve: HuntMotion.curve,
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

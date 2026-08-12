@@ -28,11 +28,15 @@ Image? _cachedBug;
 Future<void> loadGameAudio() async {
   //? Audio is cached once because every round reuses the same clips.
   if (_audioLoaded) return;
-  await FlameAudio.audioCache.loadAll([
-    'mice_tap.mp3',
-    'bug_tap.wav',
-    'bird_background_sound.mp3',
-  ]);
+  try {
+    await FlameAudio.audioCache.loadAll([
+      'mice_tap.mp3',
+      'bug_tap.wav',
+      'bird_background_sound.mp3',
+    ]);
+  } catch (_) {
+    // Audio is optional; a missing/unsupported clip must not block gameplay.
+  }
   _audioLoaded = true;
 }
 
@@ -76,5 +80,5 @@ Future<Image> _loadBackgroundImage(String? path) async {
   }
 
   //* Safe fallback for first run or missing custom files.
-  return _gameImages.load('background.webp');
+  return _gameImages.load('background.png');
 }

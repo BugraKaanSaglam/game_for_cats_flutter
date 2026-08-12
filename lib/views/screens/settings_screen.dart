@@ -74,8 +74,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     return Scaffold(
       appBar: MainAppBar(title: l10n.settings_button),
-      body: ColoredBox(
-        color: HuntColors.paperWarm,
+      body: HuntPageBackground(
         child: SafeArea(
           child: Center(
             child: ConstrainedBox(
@@ -432,7 +431,7 @@ class _PlayfieldPicker extends StatelessWidget {
     final hasCustom = file?.existsSync() ?? false;
     final image = hasCustom
         ? FileImage(file!) as ImageProvider
-        : const AssetImage('assets/images/background.webp');
+        : const AssetImage('assets/images/background.png');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

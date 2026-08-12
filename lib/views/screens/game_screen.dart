@@ -83,6 +83,12 @@ class _GameScreenState extends State<GameScreen> {
   Future<void> _beginHunt() async {
     if (_starting || !mounted) return;
     _starting = true;
+    try {
+      await _game.waitUntilReady();
+    } catch (_) {
+      _starting = false;
+      return;
+    }
     await Future<void>.delayed(
       _settings.reducedMotion
           ? Duration.zero
@@ -90,8 +96,11 @@ class _GameScreenState extends State<GameScreen> {
     );
     if (!mounted) return;
     setState(() => _fieldReady = false);
-    await _game.begin();
-    _starting = false;
+    try {
+      await _game.begin();
+    } finally {
+      _starting = false;
+    }
   }
 
   void _showResult(HuntResult result) {
@@ -495,15 +504,24 @@ class Game extends FlameGame with MultiTouchTapDetector, HasCollisionDetection {
     await super.onLoad();
   }
 
+  Future<void> waitUntilReady() async {
+    await loaded;
+    await ready();
+  }
+
   Future<void> begin() async {
     if (_started || _finished) return;
     _started = true;
     _interval.start();
-    await FlameAudio.bgm.play(
-      'bird_background_sound.mp3',
-      volume: _isMuted ? 0 : settings.musicVolume,
-    );
     resumeEngine();
+    try {
+      await FlameAudio.bgm.play(
+        'bird_background_sound.mp3',
+        volume: _isMuted ? 0 : settings.musicVolume,
+      );
+    } catch (_) {
+      // Gameplay remains available when the platform cannot play audio.
+    }
   }
 
   void pauseHunt() {
@@ -547,6 +565,15 @@ class Game extends FlameGame with MultiTouchTapDetector, HasCollisionDetection {
         0) {
       _spawnTarget(_clock.elapsedSeconds);
     }
+  }
+
+  @override
+  void update(double dt) {
+    // Flame's Timer is not a component; it must be advanced by the game loop.
+    // Without this call the round starts visually, but the HUD remains frozen
+    // at its configured duration and no targets are spawned.
+    _interval.update(dt);
+    super.update(dt);
   }
 
   void _spawnTarget(int elapsedSeconds) {

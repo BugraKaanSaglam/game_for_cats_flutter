@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 class HuntColors {
   static const ink = Color(0xFF24313A);
+  static const royalBlue = Color(0xFF4169E1);
+  static const royalBlueDark = Color(0xFF2F4EA6);
   static const inkSoft = Color(0xFF52616B);
   static const paper = Color(0xFFFFFCF5);
   static const paperWarm = Color(0xFFF8F0E2);

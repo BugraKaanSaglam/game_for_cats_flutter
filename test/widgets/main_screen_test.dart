@@ -23,8 +23,8 @@ void main() {
     );
     await tester.pump(const Duration(milliseconds: 700));
 
+    expect(find.text('Mice and Paws: Cat Game'), findsOneWidget);
     expect(find.text('Start Hunt'), findsOneWidget);
-    expect(find.text('PREPARE THE NEXT HUNT'), findsOneWidget);
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Hunt Journal'), findsOneWidget);
     expect(find.text('How It Works'), findsOneWidget);

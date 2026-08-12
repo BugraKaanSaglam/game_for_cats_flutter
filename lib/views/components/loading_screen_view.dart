@@ -10,54 +10,55 @@ class LoadingScreenView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: HuntColors.paperWarm,
-      body: Center(
-        child: HuntSurface(
-          tone: HuntSurfaceTone.field,
-          margin: const EdgeInsets.all(HuntSpacing.lg),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Container(
-                width: 96,
-                height: 96,
-                decoration: BoxDecoration(
-                  color: HuntColors.paper,
-                  borderRadius: BorderRadius.circular(HuntRadii.lg),
-                  border: Border.all(color: HuntColors.fieldLine),
-                ),
-                child: const Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      width: 56,
-                      height: 56,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 5,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          HuntColors.moss,
+      body: HuntPageBackground(
+        child: Center(
+          child: HuntSurface(
+            tone: HuntSurfaceTone.field,
+            margin: const EdgeInsets.all(HuntSpacing.lg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  width: 96,
+                  height: 96,
+                  decoration: BoxDecoration(
+                    color: HuntColors.paper,
+                    borderRadius: BorderRadius.circular(HuntRadii.lg),
+                    border: Border.all(color: HuntColors.fieldLine),
+                  ),
+                  child: const Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        width: 56,
+                        height: 56,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 5,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            HuntColors.moss,
+                          ),
                         ),
                       ),
-                    ),
-                    Icon(
-                      Icons.track_changes_rounded,
-                      color: HuntColors.terracotta,
-                      size: 28,
-                    ),
-                  ],
+                      Icon(
+                        Icons.track_changes_rounded,
+                        color: HuntColors.terracotta,
+                        size: 28,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: HuntSpacing.lg),
-              Text(
-                AppLocalizations.of(context)!.loading,
-                style: HuntTextStyles.pageTitle,
-              ),
-              const SizedBox(height: HuntSpacing.xs),
-              Text(
-                AppLocalizations.of(context)!.game_name,
-                style: HuntTextStyles.supporting,
-              ),
-            ],
+                const SizedBox(height: HuntSpacing.lg),
+                Text(
+                  AppLocalizations.of(context)!.loading,
+                  style: HuntTextStyles.pageTitle,
+                ),
+                const SizedBox(height: HuntSpacing.xs),
+                Text(
+                  AppLocalizations.of(context)!.game_name,
+                  style: HuntTextStyles.supporting,
+                ),
+              ],
+            ),
           ),
         ),
       ),

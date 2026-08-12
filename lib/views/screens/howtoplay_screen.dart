@@ -28,8 +28,7 @@ class _HowToPlayScreenState extends State<HowToPlayScreen> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: MainAppBar(title: l10n.howtoplay_button),
-      body: ColoredBox(
-        color: HuntColors.paperWarm,
+      body: HuntPageBackground(
         child: SafeArea(
           child: Center(
             child: ConstrainedBox(

@@ -64,6 +64,11 @@ flutter_native_splash:
     web: false
     fullscreen: true
 
+hooks:
+  user_defines:
+    sqlite3:
+      source: system
+
 flutter:   
   generate: true
   uses-material-design: true
