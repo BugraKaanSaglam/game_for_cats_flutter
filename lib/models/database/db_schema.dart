@@ -14,7 +14,7 @@ Future<void> upgradeAppSchema(
   int oldVersion,
   int newVersion,
 ) async {
-  //! Migrations are additive so existing settings and history remain readable.
+  // ! Migrations are additive so existing settings and history remain readable.
   if (oldVersion < 2) {
     await db.execute(
       'ALTER TABLE OPCGameTable ADD COLUMN Difficulty INTEGER not null DEFAULT 0',

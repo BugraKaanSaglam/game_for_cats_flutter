@@ -1,8 +1,8 @@
 import 'package:game_for_cats_2025/models/app_settings.dart';
 import 'package:game_for_cats_2025/models/database/db_helper.dart';
 
-//* Thin repository around the settings table.
-//? The UI never talks to sqflite directly; it always goes through AppState -> repository -> DBHelper.
+/// Repository that maps persisted settings rows to the app model.
+// ? The UI never talks to sqflite directly; it always goes through AppState -> repository -> DBHelper.
 class AppSettingsRepository {
   AppSettingsRepository({DBHelper? dbHelper})
     : _dbHelper = dbHelper ?? DBHelper();
@@ -10,7 +10,7 @@ class AppSettingsRepository {
   final DBHelper _dbHelper;
 
   Future<AppSettings> fetchOrCreate() async {
-    //! This app expects exactly one settings row keyed by the current schema version.
+    // ! This app expects exactly one settings row keyed by the current schema version.
     final existing = await _dbHelper.getList(0);
     if (existing != null) return existing;
 
@@ -20,7 +20,7 @@ class AppSettingsRepository {
   }
 
   Future<void> save(AppSettings settings) async {
-    //? Replace semantics are handled in DBHelper, so callers only think in terms of current settings.
+    // ? Replace semantics are handled in DBHelper, so callers only think in terms of current settings.
     await _dbHelper.update(settings);
   }
 }

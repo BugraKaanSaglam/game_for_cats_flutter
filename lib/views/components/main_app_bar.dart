@@ -4,6 +4,7 @@ import 'package:game_for_cats_2025/routing/app_routes.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:go_router/go_router.dart';
 
+/// Transparent app bar whose title and controls sit on the page artwork.
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({
     super.key,

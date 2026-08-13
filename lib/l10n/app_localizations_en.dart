@@ -376,6 +376,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get state_retry => 'Try again';
 
   @override
+  String get state_error_subtitle =>
+      'App settings could not be loaded. Try again.';
+
+  @override
   String get state_empty_title => 'No records yet';
 
   @override

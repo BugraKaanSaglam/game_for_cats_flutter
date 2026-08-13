@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-//* SharedPreferences-backed flag for the one-time onboarding flow.
+/// Persists the one-time onboarding completion flag.
 class OnboardingRepository {
   static const String _key = 'onboarding_complete';
 

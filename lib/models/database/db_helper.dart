@@ -8,14 +8,14 @@ import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-//* Low-level local database adapter.
-//! This file owns schema creation / migration, while repositories own business meaning.
+/// Low-level SQLite adapter for settings and local hunt history.
+// ! This file owns schema creation and migration; repositories own business meaning.
 class DBHelper {
   DBHelper();
 
   static Database? _db;
   Future<Database?> get db async {
-    //? The app only needs one live database connection per process.
+    // ? The app only needs one live database connection per process.
     if (_db != null) {
       return _db;
     }

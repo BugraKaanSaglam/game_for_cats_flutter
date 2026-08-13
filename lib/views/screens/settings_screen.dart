@@ -15,6 +15,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
+/// Persisted hunt, accessibility, language, audio, and playfield settings.
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -69,237 +70,233 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final draft = _draft;
     if (draft == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return HuntCorePage(showAppBar: false, child: const HuntLoadingState());
     }
     return HuntCorePage(
       title: l10n.settings_button,
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView(
+      child: HuntCoreViewport(
+        padding: EdgeInsets.zero,
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(
+                  HuntSpacing.lg,
+                  HuntSpacing.lg,
+                  HuntSpacing.lg,
+                  HuntSpacing.md,
+                ),
+                children: [
+                  HuntCoreHeader(
+                    eyebrow: l10n.settings_button,
+                    title: l10n.hunt_setup_title,
+                    subtitle: l10n.hunt_setup_subtitle,
+                    tone: HuntSurfaceTone.accent,
+                  ),
+                  const SizedBox(height: HuntSpacing.lg),
+                  _HuntSection(
+                    title: l10n.start_button,
+                    subtitle: l10n.settings_header_subtitle,
+                    tone: HuntSurfaceTone.field,
+                    children: [
+                      _DropdownField(
+                        icon: Icons.language_rounded,
+                        title: l10n.select_language,
+                        subtitle: l10n.language_hint,
+                        value: draft.languageCode,
+                        items: [
+                          DropdownMenuItem(
+                            value: Language.turkish.value,
+                            child: Text(Language.turkish.name),
+                          ),
+                          DropdownMenuItem(
+                            value: Language.english.value,
+                            child: Text(Language.english.name),
+                          ),
+                        ],
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(
+                            languageCode: value ?? Language.english.value,
+                          ),
+                        ),
+                      ),
+                      _DropdownField(
+                        icon: Icons.timer_outlined,
+                        title: l10n.select_time,
+                        subtitle: l10n.settings_time_hint,
+                        value: draft.time,
+                        items: [
+                          DropdownMenuItem(
+                            value: Time.fifty.value,
+                            child: Text(Time.fifty.name),
+                          ),
+                          DropdownMenuItem(
+                            value: Time.hundered.value,
+                            child: Text(Time.hundered.name),
+                          ),
+                          DropdownMenuItem(
+                            value: Time.twohundered.value,
+                            child: Text(Time.twohundered.name),
+                          ),
+                          DropdownMenuItem(
+                            value: Time.sandbox.value,
+                            child: Text(l10n.difficulty_sandbox),
+                          ),
+                        ],
+                        onChanged: (value) => _update(
+                          (current) =>
+                              current.copyWith(time: value ?? Time.fifty.value),
+                        ),
+                      ),
+                      _DropdownField(
+                        icon: Icons.speed_rounded,
+                        title: l10n.select_difficulty,
+                        subtitle: l10n.settings_difficulty_hint,
+                        value: draft.difficulty,
+                        items: [
+                          DropdownMenuItem(
+                            value: Difficulty.easy.value,
+                            child: Text(l10n.difficulty_easy),
+                          ),
+                          DropdownMenuItem(
+                            value: Difficulty.medium.value,
+                            child: Text(l10n.difficulty_medium),
+                          ),
+                          DropdownMenuItem(
+                            value: Difficulty.hard.value,
+                            child: Text(l10n.difficulty_hard),
+                          ),
+                          DropdownMenuItem(
+                            value: Difficulty.sandbox.value,
+                            child: Text(l10n.difficulty_sandbox),
+                          ),
+                        ],
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(
+                            difficulty: value ?? Difficulty.easy.value,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: HuntSpacing.md),
+                  _HuntSection(
+                    title: l10n.playfield_title,
+                    subtitle: l10n.playfield_subtitle,
+                    tone: HuntSurfaceTone.accent,
+                    children: [
+                      _PlayfieldPicker(draft: draft, onUpdate: _update),
+                    ],
+                  ),
+                  const SizedBox(height: HuntSpacing.md),
+                  _HuntSection(
+                    title: l10n.hunt_record_details,
+                    subtitle: l10n.settings_music_hint,
+                    tone: HuntSurfaceTone.field,
+                    children: [
+                      _ToggleField(
+                        icon: Icons.volume_off_outlined,
+                        title: l10n.mute_title,
+                        subtitle: l10n.mute_subtitle,
+                        value: draft.muted,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(muted: value),
+                        ),
+                      ),
+                      _VolumeField(
+                        title: l10n.select_musicvolume,
+                        value: draft.musicVolume,
+                        color: HuntColors.sky,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(musicVolume: value),
+                        ),
+                      ),
+                      _VolumeField(
+                        title: l10n.select_charactervolume,
+                        value: draft.characterVolume,
+                        color: HuntColors.coral,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(characterVolume: value),
+                        ),
+                      ),
+                      _ToggleField(
+                        icon: Icons.bolt_outlined,
+                        title: l10n.lowpower_title,
+                        subtitle: l10n.lowpower_subtitle,
+                        value: draft.lowPower,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(lowPower: value),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: HuntSpacing.md),
+                  _HuntSection(
+                    title: l10n.accessibility_title,
+                    subtitle: l10n.accessibility_subtitle,
+                    tone: HuntSurfaceTone.accent,
+                    children: [
+                      _ToggleField(
+                        icon: Icons.motion_photos_off_outlined,
+                        title: l10n.reduced_motion_title,
+                        subtitle: l10n.reduced_motion_subtitle,
+                        value: draft.reducedMotion,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(reducedMotion: value),
+                        ),
+                      ),
+                      _ToggleField(
+                        icon: Icons.contrast_outlined,
+                        title: l10n.high_contrast_title,
+                        subtitle: l10n.high_contrast_subtitle,
+                        value: draft.highContrast,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(highContrast: value),
+                        ),
+                      ),
+                      _ToggleField(
+                        icon: Icons.open_in_full_rounded,
+                        title: l10n.larger_targets_title,
+                        subtitle: l10n.larger_targets_subtitle,
+                        value: draft.largerTargets,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(largerTargets: value),
+                        ),
+                      ),
+                      _ToggleField(
+                        icon: Icons.touch_app_outlined,
+                        title: l10n.haptics_title,
+                        subtitle: l10n.haptics_subtitle,
+                        value: draft.haptics,
+                        onChanged: (value) => _update(
+                          (current) => current.copyWith(haptics: value),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            DecoratedBox(
+              decoration: const BoxDecoration(color: Colors.transparent),
+              child: SafeArea(
+                top: false,
+                child: Padding(
                   padding: const EdgeInsets.fromLTRB(
                     HuntSpacing.lg,
-                    HuntSpacing.lg,
+                    HuntSpacing.sm,
                     HuntSpacing.lg,
                     HuntSpacing.md,
                   ),
-                  children: [
-                    HuntCoreHeader(
-                      eyebrow: l10n.settings_button,
-                      title: l10n.hunt_setup_title,
-                      subtitle: l10n.hunt_setup_subtitle,
-                      tone: HuntSurfaceTone.accent,
-                    ),
-                    const SizedBox(height: HuntSpacing.lg),
-                    _HuntSection(
-                      title: l10n.start_button,
-                      subtitle: l10n.settings_header_subtitle,
-                      tone: HuntSurfaceTone.field,
-                      children: [
-                        _DropdownField(
-                          icon: Icons.language_rounded,
-                          title: l10n.select_language,
-                          subtitle: l10n.language_hint,
-                          value: draft.languageCode,
-                          items: [
-                            DropdownMenuItem(
-                              value: Language.turkish.value,
-                              child: Text(Language.turkish.name),
-                            ),
-                            DropdownMenuItem(
-                              value: Language.english.value,
-                              child: Text(Language.english.name),
-                            ),
-                          ],
-                          onChanged: (value) => _update(
-                            (current) => current.copyWith(
-                              languageCode: value ?? Language.english.value,
-                            ),
-                          ),
-                        ),
-                        _DropdownField(
-                          icon: Icons.timer_outlined,
-                          title: l10n.select_time,
-                          subtitle: l10n.settings_time_hint,
-                          value: draft.time,
-                          items: [
-                            DropdownMenuItem(
-                              value: Time.fifty.value,
-                              child: Text(Time.fifty.name),
-                            ),
-                            DropdownMenuItem(
-                              value: Time.hundered.value,
-                              child: Text(Time.hundered.name),
-                            ),
-                            DropdownMenuItem(
-                              value: Time.twohundered.value,
-                              child: Text(Time.twohundered.name),
-                            ),
-                            DropdownMenuItem(
-                              value: Time.sandbox.value,
-                              child: Text(l10n.difficulty_sandbox),
-                            ),
-                          ],
-                          onChanged: (value) => _update(
-                            (current) => current.copyWith(
-                              time: value ?? Time.fifty.value,
-                            ),
-                          ),
-                        ),
-                        _DropdownField(
-                          icon: Icons.speed_rounded,
-                          title: l10n.select_difficulty,
-                          subtitle: l10n.settings_difficulty_hint,
-                          value: draft.difficulty,
-                          items: [
-                            DropdownMenuItem(
-                              value: Difficulty.easy.value,
-                              child: Text(l10n.difficulty_easy),
-                            ),
-                            DropdownMenuItem(
-                              value: Difficulty.medium.value,
-                              child: Text(l10n.difficulty_medium),
-                            ),
-                            DropdownMenuItem(
-                              value: Difficulty.hard.value,
-                              child: Text(l10n.difficulty_hard),
-                            ),
-                            DropdownMenuItem(
-                              value: Difficulty.sandbox.value,
-                              child: Text(l10n.difficulty_sandbox),
-                            ),
-                          ],
-                          onChanged: (value) => _update(
-                            (current) => current.copyWith(
-                              difficulty: value ?? Difficulty.easy.value,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: HuntSpacing.md),
-                    _HuntSection(
-                      title: l10n.playfield_title,
-                      subtitle: l10n.playfield_subtitle,
-                      tone: HuntSurfaceTone.accent,
-                      children: [
-                        _PlayfieldPicker(draft: draft, onUpdate: _update),
-                      ],
-                    ),
-                    const SizedBox(height: HuntSpacing.md),
-                    _HuntSection(
-                      title: l10n.hunt_record_details,
-                      subtitle: l10n.settings_music_hint,
-                      tone: HuntSurfaceTone.field,
-                      children: [
-                        _ToggleField(
-                          icon: Icons.volume_off_outlined,
-                          title: l10n.mute_title,
-                          subtitle: l10n.mute_subtitle,
-                          value: draft.muted,
-                          onChanged: (value) => _update(
-                            (current) => current.copyWith(muted: value),
-                          ),
-                        ),
-                        _VolumeField(
-                          title: l10n.select_musicvolume,
-                          value: draft.musicVolume,
-                          color: HuntColors.sky,
-                          onChanged: (value) => _update(
-                            (current) => current.copyWith(musicVolume: value),
-                          ),
-                        ),
-                        _VolumeField(
-                          title: l10n.select_charactervolume,
-                          value: draft.characterVolume,
-                          color: HuntColors.coral,
-                          onChanged: (value) => _update(
-                            (current) =>
-                                current.copyWith(characterVolume: value),
-                          ),
-                        ),
-                        _ToggleField(
-                          icon: Icons.bolt_outlined,
-                          title: l10n.lowpower_title,
-                          subtitle: l10n.lowpower_subtitle,
-                          value: draft.lowPower,
-                          onChanged: (value) => _update(
-                            (current) => current.copyWith(lowPower: value),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: HuntSpacing.md),
-                    _HuntSection(
-                      title: l10n.accessibility_title,
-                      subtitle: l10n.accessibility_subtitle,
-                      tone: HuntSurfaceTone.accent,
-                      children: [
-                        _ToggleField(
-                          icon: Icons.motion_photos_off_outlined,
-                          title: l10n.reduced_motion_title,
-                          subtitle: l10n.reduced_motion_subtitle,
-                          value: draft.reducedMotion,
-                          onChanged: (value) => _update(
-                            (current) => current.copyWith(reducedMotion: value),
-                          ),
-                        ),
-                        _ToggleField(
-                          icon: Icons.contrast_outlined,
-                          title: l10n.high_contrast_title,
-                          subtitle: l10n.high_contrast_subtitle,
-                          value: draft.highContrast,
-                          onChanged: (value) => _update(
-                            (current) => current.copyWith(highContrast: value),
-                          ),
-                        ),
-                        _ToggleField(
-                          icon: Icons.open_in_full_rounded,
-                          title: l10n.larger_targets_title,
-                          subtitle: l10n.larger_targets_subtitle,
-                          value: draft.largerTargets,
-                          onChanged: (value) => _update(
-                            (current) => current.copyWith(largerTargets: value),
-                          ),
-                        ),
-                        _ToggleField(
-                          icon: Icons.touch_app_outlined,
-                          title: l10n.haptics_title,
-                          subtitle: l10n.haptics_subtitle,
-                          value: draft.haptics,
-                          onChanged: (value) => _update(
-                            (current) => current.copyWith(haptics: value),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              DecoratedBox(
-                decoration: const BoxDecoration(color: Colors.transparent),
-                child: SafeArea(
-                  top: false,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      HuntSpacing.lg,
-                      HuntSpacing.sm,
-                      HuntSpacing.lg,
-                      HuntSpacing.md,
-                    ),
-                    child: HuntActionButton(
-                      label: _saving ? l10n.loading : l10n.save_button,
-                      icon: Icons.check_rounded,
-                      onPressed: _saving ? null : _save,
-                    ),
+                  child: HuntActionButton(
+                    label: _saving ? l10n.loading : l10n.save_button,
+                    icon: Icons.check_rounded,
+                    onPressed: _saving ? null : _save,
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

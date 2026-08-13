@@ -4,7 +4,7 @@ import 'package:game_for_cats_2025/models/enums/game_enums.dart';
 
 part 'app_settings.freezed.dart';
 
-//* Immutable settings model persisted locally and fanned out through AppState.
+/// Immutable settings model persisted locally and exposed through AppState.
 @freezed
 abstract class AppSettings with _$AppSettings {
   const AppSettings._();
@@ -25,7 +25,7 @@ abstract class AppSettings with _$AppSettings {
     @Default(false) bool haptics,
   }) = _AppSettings;
 
-  //! Defaults define the first-run experience and must stay aligned with the DB schema.
+  // ! Defaults define the first-run experience and must stay aligned with the DB schema.
   factory AppSettings.defaults() => AppSettings(
     version: 0,
     languageCode: Language.english.value,
@@ -76,6 +76,6 @@ abstract class AppSettings with _$AppSettings {
     'Haptics': haptics ? 1 : 0,
   };
 
-  //? UI code can ask for the semantic enum instead of manually decoding the stored int.
+  // ? UI code can ask for the semantic enum instead of manually decoding the stored int.
   Language get language => getLanguageFromValue(languageCode);
 }

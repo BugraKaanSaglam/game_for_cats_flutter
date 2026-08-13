@@ -776,6 +776,12 @@ abstract class AppLocalizations {
   /// **'Try again'**
   String get state_retry;
 
+  /// No description provided for @state_error_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App settings could not be loaded. Try again.'**
+  String get state_error_subtitle;
+
   /// No description provided for @state_empty_title.
   ///
   /// In en, this message translates to:

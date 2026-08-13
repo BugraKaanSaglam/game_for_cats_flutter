@@ -375,6 +375,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get state_retry => 'Tekrar dene';
 
   @override
+  String get state_error_subtitle =>
+      'Uygulama ayarları yüklenemedi. Tekrar dene.';
+
+  @override
   String get state_empty_title => 'Henüz kayıt yok';
 
   @override

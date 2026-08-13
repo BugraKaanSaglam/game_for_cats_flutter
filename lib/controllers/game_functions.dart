@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:flame/cache.dart';
 import 'package:flame_audio/flame_audio.dart';
 
+/// Decoded assets shared by one or more hunt rounds.
 class GameAssets {
   const GameAssets({
     required this.mice,
@@ -17,8 +18,8 @@ class GameAssets {
   final Image background;
 }
 
-//* Shared asset-loading entry points used by the Flame game.
-//! This layer keeps expensive audio/image decoding out of individual components.
+// * Shared asset-loading entry points used by the Flame game.
+// ! This layer keeps expensive audio/image decoding out of individual components.
 final Images _gameImages = Images();
 bool _audioLoaded = false;
 String? _backgroundPath;
@@ -26,7 +27,7 @@ Image? _cachedMice;
 Image? _cachedBug;
 
 Future<void> loadGameAudio() async {
-  //? Audio is cached once because every round reuses the same clips.
+  // ? Audio is cached once because every round reuses the same clips.
   if (_audioLoaded) return;
   try {
     await FlameAudio.audioCache.loadAll([
@@ -41,7 +42,7 @@ Future<void> loadGameAudio() async {
 }
 
 Future<GameAssets> loadGameImagesAndAssets({String? backgroundPath}) async {
-  //* Core creature sprites are stable across rounds; only the optional background can vary.
+  // * Core creature sprites are stable across rounds; only the optional background can vary.
   _cachedMice ??= await _gameImages.load('mice_sprite.png');
   _cachedBug ??= await _gameImages.load('bug_sprite.png');
 
@@ -65,7 +66,7 @@ Image? _cachedBackground;
 
 Future<Image> _loadBackgroundImage(String? path) async {
   try {
-    //? User-selected play mats are preferred when the file still exists locally.
+    // ? User-selected play mats are preferred when the file still exists locally.
     if (path != null && path.isNotEmpty) {
       final file = File(path);
       if (await file.exists()) {
@@ -79,6 +80,6 @@ Future<Image> _loadBackgroundImage(String? path) async {
     // Fall back to bundled image below.
   }
 
-  //* Safe fallback for first run or missing custom files.
+  // * Safe fallback for first run or missing custom files.
   return _gameImages.load('background.png');
 }

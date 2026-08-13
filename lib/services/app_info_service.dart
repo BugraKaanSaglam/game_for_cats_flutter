@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-//* Memoized package-info loader used by About/build surfaces.
+/// Memoized package metadata loader used by the About screen.
 class AppInfoService {
   AppInfoService._();
 
@@ -10,7 +10,7 @@ class AppInfoService {
   Future<PackageInfo>? _infoFuture;
   Future<PackageInfo> Function() _loader = PackageInfo.fromPlatform;
 
-  //! PackageInfo.fromPlatform is relatively expensive and static for a session, so we cache the future.
+  // ! PackageInfo.fromPlatform is relatively expensive and static for a session, so we cache the future.
   Future<PackageInfo> load() {
     return _infoFuture ??= _loader();
   }

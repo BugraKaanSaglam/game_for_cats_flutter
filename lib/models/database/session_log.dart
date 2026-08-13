@@ -1,6 +1,6 @@
 import 'package:game_for_cats_2025/models/game/hunt_session.dart';
 
-//* One complete local Hunt Record stored for the journal.
+/// One complete local hunt record stored for the journal.
 class SessionLog {
   SessionLog({
     this.id,

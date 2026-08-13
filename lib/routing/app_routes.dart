@@ -1,4 +1,5 @@
-//* Centralized route names keep GoRouter usage consistent across screens.
+// * Centralized route names keep GoRouter usage consistent across screens.
+/// Canonical route paths shared by the router and navigation actions.
 class AppRoutes {
   static const String loading = '/loading';
   static const String onboarding = '/onboarding';

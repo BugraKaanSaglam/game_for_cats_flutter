@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 
-//* Small math helpers for movement, spawning, and wrap-around behavior.
+// * Small math helpers for movement, spawning, and wrap-around behavior.
 class Utils {
   static Vector2 generateRandomPosition(
     Vector2 screenSize,
@@ -10,7 +10,7 @@ class Utils {
     double topInset = 0,
   }) {
     final randomGenerator = Random();
-    //! topInset reserves space for the Flutter HUD overlay above the Flame field.
+    // ! topInset reserves space for the Flutter HUD overlay above the Flame field.
     final horizontalSpan = max(screenSize.x.toInt() - 2 * margins.x.toInt(), 1);
     final verticalSpan = max(
       screenSize.y.toInt() - topInset.toInt() - 2 * margins.y.toInt(),
@@ -27,7 +27,7 @@ class Utils {
     final randomGenerator = Random();
     double velocity;
 
-    //? We reject the zero vector so creatures always move immediately after spawning.
+    // ? We reject the zero vector so creatures always move immediately after spawning.
     while (result == Vector2.zero()) {
       result = Vector2(
         (randomGenerator.nextInt(3) - 1) * randomGenerator.nextDouble(),
@@ -64,7 +64,7 @@ class Utils {
   }) {
     var result = position;
 
-    //! Wrap-around keeps motion continuous instead of bouncing, which reads better for cats.
+    // ! Wrap-around keeps motion continuous instead of bouncing, which reads better for cats.
     if (position.x >= bounds.x) {
       result.x = 0;
     } else if (position.x <= 0) {

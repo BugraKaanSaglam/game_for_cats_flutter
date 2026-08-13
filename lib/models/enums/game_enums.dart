@@ -1,5 +1,4 @@
-//* Persisted option enums:
-//* each enum exposes the raw stored value plus a presentation-friendly name.
+/// Persisted option enums expose storage values and presentation metadata.
 enum Language {
   turkish(0, "Türkçe", "tr"),
   english(1, "English", "en");
@@ -22,7 +21,7 @@ enum Difficulty {
 }
 
 enum Time {
-  //! "sandbox" is effectively endless mode and is mapped to a very large timer value.
+  // ! "sandbox" is effectively endless mode and is mapped to a very large timer value.
   fifty(50, '50'),
   hundered(100, '100'),
   twohundered(200, '200'),

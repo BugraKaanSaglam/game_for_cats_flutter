@@ -112,6 +112,7 @@
     "guide_practice_subtitle": "Meraklı patileri çağırmadan önce hareketleri kendin dene.",
     "about_local_note": "Ayarların ve av kayıtların bu cihazda kalır.",
     "state_retry": "Tekrar dene",
+    "state_error_subtitle": "Uygulama ayarları yüklenemedi. Tekrar dene.",
     "state_empty_title": "Henüz kayıt yok",
     "state_empty_subtitle": "Bir avı tamamla; ilk alan notun burada görünsün.",
     "accessibility_title": "Erişilebilirlik",

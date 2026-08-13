@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart';
 
+/// Target categories that can be tapped during a hunt.
 enum HuntTarget { mice, bug }
 
+/// Reasons a hunt can leave the active state.
 enum HuntCompletionReason { timer, manual }
 
+/// Deterministic second-based clock used by the Flame game loop.
 class HuntRoundClock {
   HuntRoundClock({required this.durationSeconds});
 
@@ -30,6 +33,7 @@ class HuntRoundClock {
   }
 }
 
+/// Mutable per-round counters shared by Flame entities and Flutter overlays.
 class HuntSessionState extends ChangeNotifier {
   int elapsedSeconds = 0;
   int totalTaps = 0;
@@ -107,6 +111,7 @@ class HuntSessionState extends ChangeNotifier {
   }
 }
 
+/// Immutable summary persisted after a hunt finishes.
 class HuntResult {
   HuntResult({
     required this.startedAt,

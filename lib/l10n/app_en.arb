@@ -112,6 +112,7 @@
     "guide_practice_subtitle": "Try the gestures yourself before inviting curious paws.",
     "about_local_note": "Your settings and hunt records stay on this device.",
     "state_retry": "Try again",
+    "state_error_subtitle": "App settings could not be loaded. Try again.",
     "state_empty_title": "No records yet",
     "state_empty_subtitle": "Complete a hunt and your first field note will appear here.",
     "accessibility_title": "Accessibility",

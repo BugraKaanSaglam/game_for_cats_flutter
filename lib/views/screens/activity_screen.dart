@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import 'package:game_for_cats_2025/routing/app_routes.dart';
 
+/// Local journal of completed hunts with best-score and trend summaries.
 class ActivityScreen extends StatefulWidget {
   const ActivityScreen({super.key});
 
@@ -40,55 +41,60 @@ class _ActivityScreenState extends State<ActivityScreen> {
     final l10n = AppLocalizations.of(context)!;
     return HuntCorePage(
       title: l10n.activity_title,
-      child: RefreshIndicator(
-        onRefresh: _refresh,
-        child: FutureBuilder<List<SessionLog>>(
-          future: _history,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return _StateMessage(
-                title: l10n.activity_error,
-                action: l10n.state_retry,
-                onPressed: _refresh,
-              );
-            }
-            final logs = snapshot.data ?? const <SessionLog>[];
-            if (logs.isEmpty) {
-              return _StateMessage(
-                title: l10n.state_empty_title,
-                action: l10n.start_button,
-                onPressed: () => context.go(AppRoutes.main),
-              );
-            }
-            return ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(HuntSpacing.lg),
-              children: [
-                HuntCoreHeader(
-                  eyebrow: l10n.activity_title,
-                  title: l10n.journal_records_title,
-                  subtitle: l10n.journal_records_subtitle,
-                  tone: HuntSurfaceTone.accent,
-                ),
-                const SizedBox(height: HuntSpacing.lg),
-                _PersonalBestCard(logs: logs),
-                const SizedBox(height: HuntSpacing.md),
-                _TrendCard(logs: logs),
-                const SizedBox(height: HuntSpacing.lg),
-                HuntSurface(
-                  child: Text(
-                    l10n.journal_records_title,
-                    style: HuntTextStyles.sectionTitle,
+      child: HuntCoreViewport(
+        padding: EdgeInsets.zero,
+        child: RefreshIndicator(
+          onRefresh: _refresh,
+          child: FutureBuilder<List<SessionLog>>(
+            future: _history,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return const HuntLoadingState();
+              }
+              if (snapshot.hasError) {
+                return _ActivityStateMessage(
+                  title: l10n.activity_error,
+                  action: l10n.state_retry,
+                  message: l10n.activity_error,
+                  onPressed: _refresh,
+                );
+              }
+              final logs = snapshot.data ?? const <SessionLog>[];
+              if (logs.isEmpty) {
+                return _ActivityStateMessage(
+                  title: l10n.state_empty_title,
+                  action: l10n.start_button,
+                  message: l10n.state_empty_subtitle,
+                  onPressed: () => context.go(AppRoutes.main),
+                );
+              }
+              return ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(HuntSpacing.lg),
+                children: [
+                  HuntCoreHeader(
+                    eyebrow: l10n.activity_title,
+                    title: l10n.journal_records_title,
+                    subtitle: l10n.journal_records_subtitle,
+                    tone: HuntSurfaceTone.accent,
                   ),
-                ),
-                const SizedBox(height: HuntSpacing.sm),
-                for (final log in logs.take(10)) _RecordTile(log: log),
-              ],
-            );
-          },
+                  const SizedBox(height: HuntSpacing.lg),
+                  _PersonalBestCard(logs: logs),
+                  const SizedBox(height: HuntSpacing.md),
+                  _TrendCard(logs: logs),
+                  const SizedBox(height: HuntSpacing.lg),
+                  HuntSurface(
+                    child: Text(
+                      l10n.journal_records_title,
+                      style: HuntTextStyles.sectionTitle,
+                    ),
+                  ),
+                  const SizedBox(height: HuntSpacing.sm),
+                  for (final log in logs.take(10)) _RecordTile(log: log),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -245,15 +251,17 @@ class _RecordTile extends StatelessWidget {
   }
 }
 
-class _StateMessage extends StatelessWidget {
-  const _StateMessage({
+class _ActivityStateMessage extends StatelessWidget {
+  const _ActivityStateMessage({
     required this.title,
     required this.action,
+    required this.message,
     required this.onPressed,
   });
 
   final String title;
   final String action;
+  final String message;
   final VoidCallback onPressed;
 
   @override
@@ -263,25 +271,12 @@ class _StateMessage extends StatelessWidget {
       padding: const EdgeInsets.all(HuntSpacing.lg),
       children: [
         const SizedBox(height: 100),
-        HuntSurface(
-          tone: HuntSurfaceTone.field,
-          child: Column(
-            children: [
-              const Icon(
-                Icons.menu_book_outlined,
-                color: HuntColors.moss,
-                size: 38,
-              ),
-              const SizedBox(height: HuntSpacing.md),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: HuntTextStyles.sectionTitle,
-              ),
-              const SizedBox(height: HuntSpacing.md),
-              HuntActionButton(label: action, onPressed: onPressed),
-            ],
-          ),
+        HuntStateCard(
+          title: title,
+          message: message,
+          actionLabel: action,
+          onAction: onPressed,
+          icon: Icons.menu_book_outlined,
         ),
       ],
     );

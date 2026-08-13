@@ -32,6 +32,7 @@ class HuntCorePage extends StatelessWidget {
   }
 }
 
+/// Standard section header rendered inside a themed surface.
 class HuntCoreHeader extends StatelessWidget {
   const HuntCoreHeader({
     super.key,
@@ -59,6 +60,91 @@ class HuntCoreHeader extends StatelessWidget {
   }
 }
 
+/// Shared loading state used by screens that depend on local repositories.
+class HuntLoadingState extends StatelessWidget {
+  const HuntLoadingState({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(HuntColors.moss),
+      ),
+    );
+  }
+}
+
+/// Shared empty/error state with one clear recovery action.
+class HuntStateCard extends StatelessWidget {
+  const HuntStateCard({
+    super.key,
+    required this.title,
+    this.message,
+    required this.actionLabel,
+    required this.onAction,
+    this.icon = Icons.info_outline_rounded,
+  });
+
+  final String title;
+  final String? message;
+  final String actionLabel;
+  final VoidCallback onAction;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: HuntSurface(
+        margin: const EdgeInsets.all(HuntSpacing.lg),
+        tone: HuntSurfaceTone.field,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: HuntColors.moss, size: 38),
+            const SizedBox(height: HuntSpacing.md),
+            Text(title, style: HuntTextStyles.sectionTitle),
+            if (message != null) ...[
+              const SizedBox(height: HuntSpacing.sm),
+              Text(
+                message!,
+                textAlign: TextAlign.center,
+                style: HuntTextStyles.supporting,
+              ),
+            ],
+            const SizedBox(height: HuntSpacing.md),
+            HuntActionButton(label: actionLabel, onPressed: onAction),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Constrains long-form content without duplicating page-width boilerplate.
+class HuntCoreViewport extends StatelessWidget {
+  const HuntCoreViewport({
+    super.key,
+    required this.child,
+    this.maxWidth = 720,
+    this.padding = const EdgeInsets.all(HuntSpacing.lg),
+  });
+
+  final Widget child;
+  final double maxWidth;
+  final EdgeInsets padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxWidth),
+        child: Padding(padding: padding, child: child),
+      ),
+    );
+  }
+}
+
+/// Shared background stack used by every non-game route.
 class HuntPageBackground extends StatelessWidget {
   const HuntPageBackground({super.key, required this.child});
 
@@ -82,6 +168,7 @@ class HuntPageBackground extends StatelessWidget {
   }
 }
 
+/// Reusable themed card with consistent spacing, border, and elevation.
 class HuntSurface extends StatelessWidget {
   const HuntSurface({
     super.key,
@@ -134,6 +221,7 @@ class HuntSurface extends StatelessWidget {
 
 enum HuntSurfaceTone { paper, ink, field, accent }
 
+/// Primary action control with shared semantics and press feedback.
 class HuntActionButton extends StatefulWidget {
   const HuntActionButton({
     super.key,
@@ -219,6 +307,80 @@ class _HuntActionButtonState extends State<HuntActionButton> {
     return widget.expand
         ? SizedBox(width: double.infinity, child: button)
         : button;
+  }
+}
+
+/// Branded menu button for the main navigation grid.
+///
+/// Keeping this variant in the shared UI layer prevents the home screen from
+/// owning a second button implementation with different touch behavior.
+class HuntMenuButton extends StatelessWidget {
+  const HuntMenuButton({
+    super.key,
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onPressed,
+    this.foreground = HuntColors.paper,
+    this.large = false,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color color;
+  final Color foreground;
+  final bool large;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(HuntRadii.lg);
+    return Semantics(
+      button: true,
+      label: label,
+      child: Material(
+        color: color,
+        borderRadius: radius,
+        elevation: 5,
+        shadowColor: Colors.black45,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: radius,
+          child: SizedBox(
+            height: large ? 68 : 58,
+            child: ClipRRect(
+              borderRadius: radius,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: HuntSpacing.md,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(icon, color: foreground, size: large ? 30 : 23),
+                      const SizedBox(width: HuntSpacing.sm),
+                      Flexible(
+                        child: Text(
+                          label,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: HuntTextStyles.action.copyWith(
+                            color: foreground,
+                            fontSize: large ? 19 : 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

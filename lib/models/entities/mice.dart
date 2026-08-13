@@ -10,8 +10,7 @@ import 'package:game_for_cats_2025/controllers/utils.dart';
 
 const _collisionCooldown = Duration(milliseconds: 5000);
 
-//* Mouse target entity:
-//* steers toward random targets, wraps at edges, and updates its facing angle from velocity.
+/// Animated mouse target that steers, wraps, and reacts to collisions.
 class Mice extends SpriteAnimationComponent
     with HasGameRef<FlameGame>, CollisionCallbacks {
   late Vector2 _velocity;
@@ -50,7 +49,7 @@ class Mice extends SpriteAnimationComponent
          size: Vector2.all(64 * sizeScale),
          anchor: Anchor.center,
        ) {
-    //! Collision bounds are intentionally simple rectangles; precision is less important than responsiveness.
+    // ! Collision bounds are intentionally simple rectangles; precision is less important than responsiveness.
     add(RectangleHitbox());
   }
 
@@ -82,7 +81,7 @@ class Mice extends SpriteAnimationComponent
         topInset: topInset,
       );
 
-      //? The cooldown prevents endless jitter when components keep intersecting.
+      // ? The cooldown prevents endless jitter when components keep intersecting.
       Future.delayed(_collisionCooldown, () {
         _isColliding = false;
       });
@@ -93,8 +92,8 @@ class Mice extends SpriteAnimationComponent
   void update(double dt) {
     super.update(dt);
 
-    //* Steering model:
-    //* choose target -> accelerate toward it -> damp velocity -> clamp speed -> move.
+    // * Steering model:
+    // * choose target -> accelerate toward it -> damp velocity -> clamp speed -> move.
     final directionToTarget = (target - position).normalized();
 
     final desiredVelocity = directionToTarget * acceleration;
@@ -109,7 +108,7 @@ class Mice extends SpriteAnimationComponent
 
     position += _velocity * dt;
 
-    //? Reaching the current target simply picks a new roam point.
+    // ? Reaching the current target simply picks a new roam point.
     if ((target - position).length < 10.0) {
       target = Utils.generateRandomPosition(
         gameRef.size,

@@ -22,7 +22,7 @@ class StartupSplashView extends StatelessWidget {
   }
 }
 
-//* Temporary loading route shown while AppState initializes repositories and locale.
+// * Temporary loading route shown while AppState initializes repositories and locale.
 class LoadingScreenView extends StatelessWidget {
   const LoadingScreenView({super.key});
 
@@ -84,5 +84,5 @@ class LoadingScreenView extends StatelessWidget {
   }
 }
 
-//! Convenience builder used by the Flame GameWidget loadingBuilder callback.
+// ! Convenience builder used by the Flame GameWidget loadingBuilder callback.
 Widget loadingScreen(BuildContext context) => const LoadingScreenView();

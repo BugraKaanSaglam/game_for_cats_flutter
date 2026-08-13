@@ -26,6 +26,7 @@ import 'package:game_for_cats_2025/views/components/loading_screen_view.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:go_router/go_router.dart';
 
+/// Runtime tuning values derived from the selected difficulty.
 class DifficultyProfile {
   const DifficultyProfile({
     required this.spawnIntervalSeconds,
@@ -40,6 +41,7 @@ class DifficultyProfile {
   final double speedRamp;
 }
 
+/// Full-screen Flame playfield with Flutter HUD and result presentation.
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key, this.settings});
 

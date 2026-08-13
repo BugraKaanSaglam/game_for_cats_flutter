@@ -4,6 +4,7 @@ import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/views/components/hunt_ui.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 
+/// Short human and cat instructions shown before the first hunt.
 class HowToPlayScreen extends StatefulWidget {
   const HowToPlayScreen({super.key});
 
@@ -23,32 +24,28 @@ class _HowToPlayScreenState extends State<HowToPlayScreen> {
     final l10n = AppLocalizations.of(context)!;
     return HuntCorePage(
       title: l10n.howtoplay_button,
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
-          child: ListView(
-            padding: const EdgeInsets.all(HuntSpacing.lg),
-            children: [
-              HuntCoreHeader(
-                eyebrow: l10n.howtoplay_button,
-                title: l10n.howtoplay_title,
-                subtitle: l10n.howtoplay_subtitle,
-              ),
-              const SizedBox(height: HuntSpacing.lg),
-              _GuideSection(
-                title: l10n.howtoplay_label_forhuman,
-                text: l10n.howtoplay_text_forhuman,
-                icon: Icons.person_rounded,
-                tone: HuntSurfaceTone.field,
-              ),
-              _GuideSection(
-                title: l10n.howtoplay_label_forcats,
-                text: l10n.howtoplay_text_forcats,
-                icon: Icons.pets_rounded,
-                tone: HuntSurfaceTone.accent,
-              ),
-            ],
-          ),
+      child: HuntCoreViewport(
+        child: ListView(
+          children: [
+            HuntCoreHeader(
+              eyebrow: l10n.howtoplay_button,
+              title: l10n.howtoplay_title,
+              subtitle: l10n.howtoplay_subtitle,
+            ),
+            const SizedBox(height: HuntSpacing.lg),
+            _GuideSection(
+              title: l10n.howtoplay_label_forhuman,
+              text: l10n.howtoplay_text_forhuman,
+              icon: Icons.person_rounded,
+              tone: HuntSurfaceTone.field,
+            ),
+            _GuideSection(
+              title: l10n.howtoplay_label_forcats,
+              text: l10n.howtoplay_text_forcats,
+              icon: Icons.pets_rounded,
+              tone: HuntSurfaceTone.accent,
+            ),
+          ],
         ),
       ),
     );

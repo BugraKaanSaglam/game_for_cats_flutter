@@ -1,8 +1,8 @@
 import 'package:game_for_cats_2025/models/database/db_helper.dart';
 import 'package:game_for_cats_2025/models/database/session_log.dart';
 
-//* Thin loader for the Hunt Journal screen.
-//? Keeping this separate from the widget makes testing and future filtering easier.
+/// Reads recent hunt records for the journal screen.
+// ? Keeping data access separate from widgets makes filtering and testing easier.
 class ActivityController {
   ActivityController({DBHelper? dbHelper}) : _dbHelper = dbHelper ?? DBHelper();
 

@@ -10,8 +10,7 @@ import 'package:game_for_cats_2025/controllers/utils.dart';
 
 const _collisionCooldown = Duration(milliseconds: 5000);
 
-//* Bug target entity.
-//? It mirrors the mouse movement model, but uses a different sheet and slightly different size / cadence.
+/// Animated bug target with the alternate movement cadence and sprite sheet.
 class Bug extends SpriteAnimationComponent
     with HasGameRef<FlameGame>, CollisionCallbacks {
   late Vector2 _velocity;
@@ -81,7 +80,7 @@ class Bug extends SpriteAnimationComponent
         topInset: topInset,
       );
 
-      //? Cooldown avoids unstable collision feedback loops.
+      // ? Cooldown avoids unstable collision feedback loops.
       Future.delayed(_collisionCooldown, () {
         _isColliding = false;
       });

@@ -1,6 +1,6 @@
 import 'game_enums.dart';
 
-//* Mapper helpers between stored ints and semantic enums.
+/// Converts persisted integer values into safe semantic enum values.
 Language getLanguageFromValue(int? value) {
   switch (value) {
     case 0:

@@ -11,6 +11,7 @@ import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+/// Two-step first-run guide that introduces the hunt interaction.
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 

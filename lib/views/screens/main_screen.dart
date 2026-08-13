@@ -8,6 +8,7 @@ import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+/// Main navigation hub for starting a hunt and opening supporting screens.
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -27,20 +28,19 @@ class _MainScreenState extends State<MainScreen> {
     final appState = context.watch<AppState>();
     final l10n = AppLocalizations.of(context)!;
     if (!appState.isReady) {
-      return HuntCorePage(
-        showAppBar: false,
-        child: const Center(child: CircularProgressIndicator()),
-      );
+      return HuntCorePage(showAppBar: false, child: const HuntLoadingState());
     }
     final settings = appState.settings;
     if (settings == null || appState.initError != null) {
       return HuntCorePage(
         title: l10n.game_name,
         hasBackButton: false,
-        child: _StateCard(
+        child: HuntStateCard(
           title: l10n.error,
-          subtitle: l10n.state_retry,
-          onPressed: () => context.read<AppState>().initialize(),
+          message: l10n.state_error_subtitle,
+          actionLabel: l10n.state_retry,
+          onAction: () => context.read<AppState>().initialize(),
+          icon: Icons.warning_amber_rounded,
         ),
       );
     }
@@ -59,7 +59,7 @@ class _MainScreenState extends State<MainScreen> {
                   child: _GameLogo(title: l10n.game_name),
                 ),
                 const SizedBox(height: HuntSpacing.lg),
-                _MainMenuButton(
+                HuntMenuButton(
                   label: l10n.start_button,
                   icon: Icons.play_arrow_rounded,
                   color: HuntColors.sun,
@@ -81,7 +81,7 @@ class _MainScreenState extends State<MainScreen> {
                       children: [
                         SizedBox(
                           width: width,
-                          child: _MainMenuButton(
+                          child: HuntMenuButton(
                             label: l10n.activity_button,
                             icon: Icons.menu_book_rounded,
                             color: HuntColors.sky,
@@ -90,7 +90,7 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                         SizedBox(
                           width: width,
-                          child: _MainMenuButton(
+                          child: HuntMenuButton(
                             label: l10n.settings_button,
                             icon: Icons.tune_rounded,
                             color: HuntColors.coral,
@@ -99,7 +99,7 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                         SizedBox(
                           width: width,
-                          child: _MainMenuButton(
+                          child: HuntMenuButton(
                             label: l10n.howtoplay_button,
                             icon: Icons.lightbulb_rounded,
                             color: HuntColors.field,
@@ -109,7 +109,7 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                         SizedBox(
                           width: width,
-                          child: _MainMenuButton(
+                          child: HuntMenuButton(
                             label: l10n.about_button,
                             icon: Icons.info_rounded,
                             color: HuntColors.paper,
@@ -176,100 +176,6 @@ class _GameLogo extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _MainMenuButton extends StatelessWidget {
-  const _MainMenuButton({
-    required this.label,
-    required this.icon,
-    required this.color,
-    required this.onPressed,
-    this.foreground = HuntColors.paper,
-    this.large = false,
-  });
-
-  final String label;
-  final IconData icon;
-  final Color color;
-  final Color foreground;
-  final bool large;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: label,
-      child: Material(
-        color: color,
-        borderRadius: BorderRadius.circular(HuntRadii.lg),
-        elevation: 5,
-        shadowColor: Colors.black45,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(HuntRadii.lg),
-          child: SizedBox(
-            height: large ? 68 : 58,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(HuntRadii.lg),
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(icon, color: foreground, size: large ? 30 : 23),
-                    const SizedBox(width: HuntSpacing.sm),
-                    Flexible(
-                      child: Text(
-                        label,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: HuntTextStyles.action.copyWith(
-                          color: foreground,
-                          fontSize: large ? 19 : 14,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _StateCard extends StatelessWidget {
-  const _StateCard({
-    required this.title,
-    required this.subtitle,
-    required this.onPressed,
-  });
-
-  final String title;
-  final String subtitle;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: HuntSurface(
-        margin: const EdgeInsets.all(HuntSpacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(title, style: HuntTextStyles.sectionTitle),
-            const SizedBox(height: HuntSpacing.sm),
-            Text(subtitle, style: HuntTextStyles.supporting),
-            const SizedBox(height: HuntSpacing.md),
-            HuntActionButton(label: subtitle, onPressed: onPressed),
-          ],
-        ),
-      ),
     );
   }
 }
