@@ -42,27 +42,32 @@ flutter_launcher_icons:
   ios: true
   macos:
     generate: true
-    image_path: "assets/images/splashscreen.png"
+    image_path: "assets/images/appicon.png"
   windows:
     generate: true
-    image_path: "assets/images/splashscreen.png"
+    image_path: "assets/images/appicon.png"
     icon_size: 48
   web:
     generate: true
-    image_path: "assets/images/splashscreen.png"
+    image_path: "assets/images/appicon.png"
     background_color: "#F8F0E2"
     theme_color: "#24313A"
-  image_path: "assets/images/splashscreen.png"
+  image_path: "assets/images/appicon.png"
   remove_alpha_ios: true
   min_sdk_android: 21
 
 flutter_native_splash:
-    color: "#ffffff" # Splash ekranının arka plan rengi
-    image: assets/images/splashscreen.png # Splash ekranı için logo
+    background_image: assets/images/splashscreen.png
     android: true
     ios: true
     web: false
     fullscreen: true
+    android_gravity: fill
+    ios_content_mode: scaleAspectFill
+    android_12:
+        color: "#5AA6D2"
+        image: assets/images/appicon.png
+        icon_background_color: "#FFFFFF"
 
 hooks:
   user_defines:

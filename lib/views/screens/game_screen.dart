@@ -918,25 +918,41 @@ class HuntRecordView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: HuntSpacing.lg),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: HuntActionButton(
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final buttons = [
+                        HuntActionButton(
                           label: l10n.hunt_again,
                           icon: Icons.replay_rounded,
                           onPressed: onAgain,
                         ),
-                      ),
-                      const SizedBox(width: HuntSpacing.sm),
-                      Expanded(
-                        child: HuntActionButton(
+                        HuntActionButton(
                           label: l10n.return_mainmenu_button,
                           icon: Icons.home_rounded,
                           secondary: true,
                           onPressed: onHome,
                         ),
-                      ),
-                    ],
+                      ];
+
+                      if (constraints.maxWidth < 520) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            buttons[0],
+                            const SizedBox(height: HuntSpacing.sm),
+                            buttons[1],
+                          ],
+                        );
+                      }
+
+                      return Row(
+                        children: [
+                          Expanded(child: buttons[0]),
+                          const SizedBox(width: HuntSpacing.sm),
+                          Expanded(child: buttons[1]),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),

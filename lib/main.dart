@@ -91,7 +91,7 @@ class _MainAppState extends State<MainApp> {
       routes: [
         GoRoute(
           path: AppRoutes.loading,
-          builder: (context, state) => const LoadingScreenView(),
+          builder: (context, state) => const StartupSplashView(),
         ),
         GoRoute(
           path: AppRoutes.onboarding,

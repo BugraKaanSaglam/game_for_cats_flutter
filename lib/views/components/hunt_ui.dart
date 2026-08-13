@@ -200,10 +200,14 @@ class _HuntActionButtonState extends State<HuntActionButton> {
                     Icon(widget.icon, color: foreground, size: 19),
                     const SizedBox(width: HuntSpacing.sm),
                   ],
-                  Text(
-                    widget.label,
-                    style: HuntTextStyles.action.copyWith(color: foreground),
-                    textAlign: TextAlign.center,
+                  Flexible(
+                    child: Text(
+                      widget.label,
+                      style: HuntTextStyles.action.copyWith(color: foreground),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

@@ -3,6 +3,25 @@ import 'package:game_for_cats_2025/l10n/app_localizations.dart';
 import 'package:game_for_cats_2025/views/components/hunt_ui.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 
+/// Full-screen first frame shown while the app decides between onboarding and
+/// the main menu. It keeps Android 12+'s system splash transition seamless.
+class StartupSplashView extends StatelessWidget {
+  const StartupSplashView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: SizedBox.expand(
+        child: Image(
+          image: AssetImage('assets/images/splashscreen.png'),
+          fit: BoxFit.cover,
+          semanticLabel: 'Mice and Paws',
+        ),
+      ),
+    );
+  }
+}
+
 //* Temporary loading route shown while AppState initializes repositories and locale.
 class LoadingScreenView extends StatelessWidget {
   const LoadingScreenView({super.key});
