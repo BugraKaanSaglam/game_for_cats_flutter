@@ -119,7 +119,7 @@ abstract class AppLocalizations {
   /// No description provided for @howtoplay_button.
   ///
   /// In en, this message translates to:
-  /// **'How It Works'**
+  /// **'How to Play'**
   String get howtoplay_button;
 
   /// No description provided for @about_button.
@@ -230,6 +230,18 @@ abstract class AppLocalizations {
   /// **'Select Difficulty'**
   String get select_difficulty;
 
+  /// No description provided for @select_language.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Language'**
+  String get select_language;
+
+  /// No description provided for @language_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the language for the app.'**
+  String get language_hint;
+
   /// No description provided for @select_time.
   ///
   /// In en, this message translates to:
@@ -263,50 +275,38 @@ abstract class AppLocalizations {
   /// No description provided for @howtoplay_title.
   ///
   /// In en, this message translates to:
-  /// **'Keep the hunt clear and exciting'**
+  /// **'A quick guide for humans and cats'**
   String get howtoplay_title;
 
   /// No description provided for @howtoplay_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Three quick tips to help your cat enjoy the round without extra setup.'**
+  /// **'Humans start the game. Cats take over with their paws.'**
   String get howtoplay_subtitle;
 
   /// No description provided for @howtoplay_label_forhuman.
   ///
   /// In en, this message translates to:
-  /// **'Set up the round'**
+  /// **'For humans'**
   String get howtoplay_label_forhuman;
 
   /// No description provided for @howtoplay_text_forhuman.
   ///
   /// In en, this message translates to:
-  /// **'Choose a timer, adjust the difficulty, and pick a bright background if you want a custom play mat. Then start the round and hand the screen to your cat.'**
+  /// **'Choose a timer and difficulty, then tap Start Hunt. Put the phone in front of your cat and let the paws do the work. The game tracks taps and streaks for you.'**
   String get howtoplay_text_forhuman;
 
   /// No description provided for @howtoplay_label_forcats.
   ///
   /// In en, this message translates to:
-  /// **'Tap the moving critters'**
+  /// **'For cats'**
   String get howtoplay_label_forcats;
 
   /// No description provided for @howtoplay_text_forcats.
   ///
   /// In en, this message translates to:
-  /// **'Mice and bugs both count as successful taps. Misses are tracked separately, so keeping your paws on target leads to cleaner hunts.'**
+  /// **'Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow!'**
   String get howtoplay_text_forcats;
-
-  /// No description provided for @howtoplay_label_forstreaks.
-  ///
-  /// In en, this message translates to:
-  /// **'Build a purr streak'**
-  String get howtoplay_label_forstreaks;
-
-  /// No description provided for @howtoplay_text_forstreaks.
-  ///
-  /// In en, this message translates to:
-  /// **'Every successful tap grows the streak. Misses reset it. The Hunt Record shows accuracy, best streak, and how the round went.'**
-  String get howtoplay_text_forstreaks;
 
   /// No description provided for @micetap_count.
   ///

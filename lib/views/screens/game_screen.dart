@@ -162,8 +162,6 @@ class _GameScreenState extends State<GameScreen> {
               settings: _settings,
               onAgain: _restart,
               onHome: () => context.go(AppRoutes.main),
-              onJournal: () => context.go(AppRoutes.activity),
-              onAdjust: () => context.go(AppRoutes.settings),
             ),
         ],
       ),
@@ -800,16 +798,12 @@ class HuntRecordView extends StatelessWidget {
     required this.settings,
     required this.onAgain,
     required this.onHome,
-    required this.onJournal,
-    required this.onAdjust,
   });
 
   final HuntResult result;
   final AppSettings settings;
   final VoidCallback onAgain;
   final VoidCallback onHome;
-  final VoidCallback onJournal;
-  final VoidCallback onAdjust;
 
   @override
   Widget build(BuildContext context) {
@@ -820,8 +814,7 @@ class HuntRecordView extends StatelessWidget {
     final duration = result.configuredDuration >= 100000
         ? l10n.difficulty_sandbox
         : '${result.configuredDuration}s';
-    return ColoredBox(
-      color: HuntColors.paperWarm,
+    return HuntPageBackground(
       child: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -831,15 +824,11 @@ class HuntRecordView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  HuntSectionHeading(
+                  HuntCoreHeader(
                     eyebrow: l10n.hunt_record_eyebrow,
                     title: recordTitle,
                     subtitle: l10n.hunt_record_subtitle,
-                    trailing: IconButton(
-                      tooltip: l10n.return_mainmenu_button,
-                      onPressed: onHome,
-                      icon: const Icon(Icons.close, color: HuntColors.ink),
-                    ),
+                    tone: HuntSurfaceTone.accent,
                   ),
                   const SizedBox(height: HuntSpacing.lg),
                   HuntSurface(
@@ -884,6 +873,7 @@ class HuntRecordView extends StatelessWidget {
                   ),
                   const SizedBox(height: HuntSpacing.md),
                   HuntSurface(
+                    tone: HuntSurfaceTone.accent,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -928,29 +918,22 @@ class HuntRecordView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: HuntSpacing.lg),
-                  HuntActionButton(
-                    label: l10n.hunt_again,
-                    icon: Icons.replay_rounded,
-                    onPressed: onAgain,
-                  ),
-                  const SizedBox(height: HuntSpacing.sm),
                   Row(
                     children: [
                       Expanded(
                         child: HuntActionButton(
-                          label: l10n.hunt_view_journal,
-                          icon: Icons.menu_book_outlined,
-                          secondary: true,
-                          onPressed: onJournal,
+                          label: l10n.hunt_again,
+                          icon: Icons.replay_rounded,
+                          onPressed: onAgain,
                         ),
                       ),
                       const SizedBox(width: HuntSpacing.sm),
                       Expanded(
                         child: HuntActionButton(
-                          label: l10n.hunt_adjust,
-                          icon: Icons.tune_rounded,
+                          label: l10n.return_mainmenu_button,
+                          icon: Icons.home_rounded,
                           secondary: true,
-                          onPressed: onAdjust,
+                          onPressed: onHome,
                         ),
                       ),
                     ],

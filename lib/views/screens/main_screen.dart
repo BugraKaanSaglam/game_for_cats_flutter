@@ -4,7 +4,6 @@ import 'package:game_for_cats_2025/routing/app_routes.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/state/app_state.dart';
 import 'package:game_for_cats_2025/views/components/hunt_ui.dart';
-import 'package:game_for_cats_2025/views/components/main_app_bar.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -28,99 +27,101 @@ class _MainScreenState extends State<MainScreen> {
     final appState = context.watch<AppState>();
     final l10n = AppLocalizations.of(context)!;
     if (!appState.isReady) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return HuntCorePage(
+        showAppBar: false,
+        child: const Center(child: CircularProgressIndicator()),
+      );
     }
     final settings = appState.settings;
     if (settings == null || appState.initError != null) {
-      return Scaffold(
-        appBar: MainAppBar(title: l10n.game_name, hasBackButton: false),
-        body: _StateCard(
+      return HuntCorePage(
+        title: l10n.game_name,
+        hasBackButton: false,
+        child: _StateCard(
           title: l10n.error,
           subtitle: l10n.state_retry,
           onPressed: () => context.read<AppState>().initialize(),
         ),
       );
     }
-    return Scaffold(
-      body: HuntPageBackground(
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(HuntSpacing.md),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 430),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _GameLogo(title: l10n.game_name),
-                    const SizedBox(height: HuntSpacing.lg),
-                    _MainMenuButton(
-                      label: l10n.start_button,
-                      icon: Icons.play_arrow_rounded,
-                      color: HuntColors.sun,
-                      foreground: HuntColors.ink,
-                      large: true,
-                      onPressed: () {
-                        AppAnalytics.track(AnalyticsEvent.gameStarted);
-                        context.go(AppRoutes.game, extra: settings);
-                      },
-                    ),
-                    const SizedBox(height: HuntSpacing.md),
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final width =
-                            (constraints.maxWidth - HuntSpacing.sm) / 2;
-                        return Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: HuntSpacing.sm,
-                          runSpacing: HuntSpacing.sm,
-                          children: [
-                            SizedBox(
-                              width: width,
-                              child: _MainMenuButton(
-                                label: l10n.activity_button,
-                                icon: Icons.menu_book_rounded,
-                                color: HuntColors.sky,
-                                onPressed: () => context.go(AppRoutes.activity),
-                              ),
-                            ),
-                            SizedBox(
-                              width: width,
-                              child: _MainMenuButton(
-                                label: l10n.settings_button,
-                                icon: Icons.tune_rounded,
-                                color: HuntColors.coral,
-                                onPressed: () => context.go(AppRoutes.settings),
-                              ),
-                            ),
-                            SizedBox(
-                              width: width,
-                              child: _MainMenuButton(
-                                label: l10n.howtoplay_button,
-                                icon: Icons.lightbulb_rounded,
-                                color: HuntColors.field,
-                                foreground: HuntColors.ink,
-                                onPressed: () =>
-                                    context.go(AppRoutes.howToPlay),
-                              ),
-                            ),
-                            SizedBox(
-                              width: width,
-                              child: _MainMenuButton(
-                                label: l10n.about_button,
-                                icon: Icons.info_rounded,
-                                color: HuntColors.paper,
-                                foreground: HuntColors.ink,
-                                onPressed: () => context.go(AppRoutes.about),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ],
+    return HuntCorePage(
+      showAppBar: false,
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(HuntSpacing.md),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 430),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                HuntSurface(
+                  tone: HuntSurfaceTone.field,
+                  child: _GameLogo(title: l10n.game_name),
                 ),
-              ),
+                const SizedBox(height: HuntSpacing.lg),
+                _MainMenuButton(
+                  label: l10n.start_button,
+                  icon: Icons.play_arrow_rounded,
+                  color: HuntColors.sun,
+                  foreground: HuntColors.ink,
+                  large: true,
+                  onPressed: () {
+                    AppAnalytics.track(AnalyticsEvent.gameStarted);
+                    context.go(AppRoutes.game, extra: settings);
+                  },
+                ),
+                const SizedBox(height: HuntSpacing.md),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = (constraints.maxWidth - HuntSpacing.sm) / 2;
+                    return Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: HuntSpacing.sm,
+                      runSpacing: HuntSpacing.sm,
+                      children: [
+                        SizedBox(
+                          width: width,
+                          child: _MainMenuButton(
+                            label: l10n.activity_button,
+                            icon: Icons.menu_book_rounded,
+                            color: HuntColors.sky,
+                            onPressed: () => context.go(AppRoutes.activity),
+                          ),
+                        ),
+                        SizedBox(
+                          width: width,
+                          child: _MainMenuButton(
+                            label: l10n.settings_button,
+                            icon: Icons.tune_rounded,
+                            color: HuntColors.coral,
+                            onPressed: () => context.go(AppRoutes.settings),
+                          ),
+                        ),
+                        SizedBox(
+                          width: width,
+                          child: _MainMenuButton(
+                            label: l10n.howtoplay_button,
+                            icon: Icons.lightbulb_rounded,
+                            color: HuntColors.field,
+                            foreground: HuntColors.ink,
+                            onPressed: () => context.go(AppRoutes.howToPlay),
+                          ),
+                        ),
+                        SizedBox(
+                          width: width,
+                          child: _MainMenuButton(
+                            label: l10n.about_button,
+                            icon: Icons.info_rounded,
+                            color: HuntColors.paper,
+                            foreground: HuntColors.ink,
+                            onPressed: () => context.go(AppRoutes.about),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
             ),
           ),
         ),
@@ -213,36 +214,26 @@ class _MainMenuButton extends StatelessWidget {
             height: large ? 68 : 58,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(HuntRadii.lg),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(
-                    'assets/images/button.png',
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                    opacity: const AlwaysStoppedAnimation(0.92),
-                  ),
-                  ColoredBox(color: color.withValues(alpha: 0.48)),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(icon, color: foreground, size: large ? 30 : 23),
-                      const SizedBox(width: HuntSpacing.sm),
-                      Flexible(
-                        child: Text(
-                          label,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: HuntTextStyles.action.copyWith(
-                            color: foreground,
-                            fontSize: large ? 19 : 14,
-                          ),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(icon, color: foreground, size: large ? 30 : 23),
+                    const SizedBox(width: HuntSpacing.sm),
+                    Flexible(
+                      child: Text(
+                        label,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: HuntTextStyles.action.copyWith(
+                          color: foreground,
+                          fontSize: large ? 19 : 14,
                         ),
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

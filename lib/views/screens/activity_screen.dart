@@ -6,7 +6,6 @@ import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
 import 'package:game_for_cats_2025/models/enums/game_enums.dart';
 import 'package:game_for_cats_2025/services/app_analytics.dart';
 import 'package:game_for_cats_2025/views/components/hunt_ui.dart';
-import 'package:game_for_cats_2025/views/components/main_app_bar.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
@@ -39,58 +38,57 @@ class _ActivityScreenState extends State<ActivityScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      appBar: MainAppBar(title: l10n.activity_title),
-      body: HuntPageBackground(
-        child: SafeArea(
-          child: RefreshIndicator(
-            onRefresh: _refresh,
-            child: FutureBuilder<List<SessionLog>>(
-              future: _history,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState != ConnectionState.done) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasError) {
-                  return _StateMessage(
-                    title: l10n.activity_error,
-                    action: l10n.state_retry,
-                    onPressed: _refresh,
-                  );
-                }
-                final logs = snapshot.data ?? const <SessionLog>[];
-                if (logs.isEmpty) {
-                  return _StateMessage(
-                    title: l10n.state_empty_title,
-                    action: l10n.start_button,
-                    onPressed: () => context.go(AppRoutes.main),
-                  );
-                }
-                return ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(HuntSpacing.lg),
-                  children: [
-                    HuntSectionHeading(
-                      eyebrow: l10n.activity_title,
-                      title: l10n.journal_records_title,
-                      subtitle: l10n.journal_records_subtitle,
-                    ),
-                    const SizedBox(height: HuntSpacing.lg),
-                    _PersonalBestCard(logs: logs),
-                    const SizedBox(height: HuntSpacing.md),
-                    _TrendCard(logs: logs),
-                    const SizedBox(height: HuntSpacing.lg),
-                    Text(
-                      l10n.journal_records_title,
-                      style: HuntTextStyles.sectionTitle,
-                    ),
-                    const SizedBox(height: HuntSpacing.sm),
-                    for (final log in logs.take(10)) _RecordTile(log: log),
-                  ],
-                );
-              },
-            ),
-          ),
+    return HuntCorePage(
+      title: l10n.activity_title,
+      child: RefreshIndicator(
+        onRefresh: _refresh,
+        child: FutureBuilder<List<SessionLog>>(
+          future: _history,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return _StateMessage(
+                title: l10n.activity_error,
+                action: l10n.state_retry,
+                onPressed: _refresh,
+              );
+            }
+            final logs = snapshot.data ?? const <SessionLog>[];
+            if (logs.isEmpty) {
+              return _StateMessage(
+                title: l10n.state_empty_title,
+                action: l10n.start_button,
+                onPressed: () => context.go(AppRoutes.main),
+              );
+            }
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(HuntSpacing.lg),
+              children: [
+                HuntCoreHeader(
+                  eyebrow: l10n.activity_title,
+                  title: l10n.journal_records_title,
+                  subtitle: l10n.journal_records_subtitle,
+                  tone: HuntSurfaceTone.accent,
+                ),
+                const SizedBox(height: HuntSpacing.lg),
+                _PersonalBestCard(logs: logs),
+                const SizedBox(height: HuntSpacing.md),
+                _TrendCard(logs: logs),
+                const SizedBox(height: HuntSpacing.lg),
+                HuntSurface(
+                  child: Text(
+                    l10n.journal_records_title,
+                    style: HuntTextStyles.sectionTitle,
+                  ),
+                ),
+                const SizedBox(height: HuntSpacing.sm),
+                for (final log in logs.take(10)) _RecordTile(log: log),
+              ],
+            );
+          },
         ),
       ),
     );

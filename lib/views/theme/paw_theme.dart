@@ -123,6 +123,16 @@ class PawTheme {
       elevation: 0,
       surfaceTintColor: Colors.transparent,
     ),
+    snackBarTheme: SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: HuntColors.mossDark,
+      elevation: 8,
+      contentTextStyle: HuntTextStyles.supporting,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(HuntRadii.md)),
+        side: BorderSide(color: HuntColors.sunLine),
+      ),
+    ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         backgroundColor: HuntColors.ink,

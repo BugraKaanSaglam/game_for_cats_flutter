@@ -18,7 +18,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settings_button => 'Ayarlar';
 
   @override
-  String get howtoplay_button => 'Nasıl İşler?';
+  String get howtoplay_button => 'Nasıl Oynanır?';
 
   @override
   String get about_button => 'Oyun Hakkında';
@@ -80,6 +80,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get select_difficulty => 'Zorluk Seçiniz';
 
   @override
+  String get select_language => 'Dil Seçiniz';
+
+  @override
+  String get language_hint => 'Uygulamanın dilini seçin.';
+
+  @override
   String get select_time => 'Süreyi Seçiniz';
 
   @override
@@ -95,32 +101,25 @@ class AppLocalizationsTr extends AppLocalizations {
   String get return_mainmenu_button => 'Ana Menü\'ye Dön';
 
   @override
-  String get howtoplay_title => 'Avı net ve eğlenceli tut';
+  String get howtoplay_title => 'İnsanlar ve kediler için kısa rehber';
 
   @override
   String get howtoplay_subtitle =>
-      'Kedinin turdan keyif alması için üç kısa ipucu.';
+      'İnsan oyunu başlatır, kedi patileriyle eğlenceyi devralır.';
 
   @override
-  String get howtoplay_label_forhuman => 'Turu hazırla';
+  String get howtoplay_label_forhuman => 'İnsanlar için';
 
   @override
   String get howtoplay_text_forhuman =>
-      'Bir süre seç, zorluğu ayarla ve istersen parlak bir görselle özel bir oyun zemini kur. Sonra turu başlatıp ekranı kedine bırak.';
+      'Bir süre ve zorluk seçip Avı Başlat\'a bas. Telefonu kedinin önüne koy. Ekranda beliren farelere ve böceklere dokunmasını bekle; puanları ve serileri oyun kendisi takip eder.';
 
   @override
-  String get howtoplay_label_forcats => 'Hareket eden canlılara dokun';
+  String get howtoplay_label_forcats => 'Kediler için';
 
   @override
   String get howtoplay_text_forcats =>
-      'Fareler ve böcekler başarılı dokunuş olarak sayılır. Kaçırmalar ayrı tutulur; bu yüzden patileri hedefte tutmak daha temiz avlar çıkarır.';
-
-  @override
-  String get howtoplay_label_forstreaks => 'Pati serisi oluştur';
-
-  @override
-  String get howtoplay_text_forstreaks =>
-      'Her başarılı dokunuş seriyi büyütür. Kaçırmalar seriyi sıfırlar. Av Kaydı isabeti, en iyi seriyi ve turun nasıl geçtiğini gösterir.';
+      'Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav! Miyav!';
 
   @override
   String get micetap_count => 'Tıklanan Fareler:';

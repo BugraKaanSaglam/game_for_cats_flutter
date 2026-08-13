@@ -18,7 +18,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_button => 'Settings';
 
   @override
-  String get howtoplay_button => 'How It Works';
+  String get howtoplay_button => 'How to Play';
 
   @override
   String get about_button => 'About the Game';
@@ -80,6 +80,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get select_difficulty => 'Select Difficulty';
 
   @override
+  String get select_language => 'Select Language';
+
+  @override
+  String get language_hint => 'Choose the language for the app.';
+
+  @override
   String get select_time => 'Select Time';
 
   @override
@@ -95,32 +101,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get return_mainmenu_button => 'Return to MainMenu';
 
   @override
-  String get howtoplay_title => 'Keep the hunt clear and exciting';
+  String get howtoplay_title => 'A quick guide for humans and cats';
 
   @override
   String get howtoplay_subtitle =>
-      'Three quick tips to help your cat enjoy the round without extra setup.';
+      'Humans start the game. Cats take over with their paws.';
 
   @override
-  String get howtoplay_label_forhuman => 'Set up the round';
+  String get howtoplay_label_forhuman => 'For humans';
 
   @override
   String get howtoplay_text_forhuman =>
-      'Choose a timer, adjust the difficulty, and pick a bright background if you want a custom play mat. Then start the round and hand the screen to your cat.';
+      'Choose a timer and difficulty, then tap Start Hunt. Put the phone in front of your cat and let the paws do the work. The game tracks taps and streaks for you.';
 
   @override
-  String get howtoplay_label_forcats => 'Tap the moving critters';
+  String get howtoplay_label_forcats => 'For cats';
 
   @override
   String get howtoplay_text_forcats =>
-      'Mice and bugs both count as successful taps. Misses are tracked separately, so keeping your paws on target leads to cleaner hunts.';
-
-  @override
-  String get howtoplay_label_forstreaks => 'Build a purr streak';
-
-  @override
-  String get howtoplay_text_forstreaks =>
-      'Every successful tap grows the streak. Misses reset it. The Hunt Record shows accuracy, best streak, and how the round went.';
+      'Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow! Meow!';
 
   @override
   String get micetap_count => 'Tapped Mice:';

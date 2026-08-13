@@ -1,5 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:game_for_cats_2025/views/components/main_app_bar.dart';
 import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
+
+/// Shared shell for every non-game screen.
+///
+/// Keeping the background, safe-area handling, and app bar in one place makes
+/// each screen feel like part of the same product instead of a separate page.
+class HuntCorePage extends StatelessWidget {
+  const HuntCorePage({
+    super.key,
+    required this.child,
+    this.title,
+    this.hasBackButton = true,
+    this.showAppBar = true,
+  });
+
+  final Widget child;
+  final String? title;
+  final bool hasBackButton;
+  final bool showAppBar;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: showAppBar,
+      appBar: showAppBar && title != null
+          ? MainAppBar(title: title!, hasBackButton: hasBackButton)
+          : null,
+      body: HuntPageBackground(child: SafeArea(child: child)),
+    );
+  }
+}
+
+class HuntCoreHeader extends StatelessWidget {
+  const HuntCoreHeader({
+    super.key,
+    required this.eyebrow,
+    required this.title,
+    this.subtitle,
+    this.tone = HuntSurfaceTone.field,
+  });
+
+  final String eyebrow;
+  final String title;
+  final String? subtitle;
+  final HuntSurfaceTone tone;
+
+  @override
+  Widget build(BuildContext context) {
+    return HuntSurface(
+      tone: tone,
+      child: HuntSectionHeading(
+        eyebrow: eyebrow,
+        title: title,
+        subtitle: subtitle,
+      ),
+    );
+  }
+}
 
 class HuntPageBackground extends StatelessWidget {
   const HuntPageBackground({super.key, required this.child});
@@ -133,45 +191,19 @@ class _HuntActionButtonState extends State<HuntActionButton> {
                 color: widget.secondary ? HuntColors.lineStrong : background,
               ),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(HuntRadii.md),
-              child: Stack(
-                fit: StackFit.loose,
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (enabled)
-                    Positioned.fill(
-                      child: Image.asset(
-                        'assets/images/button.png',
-                        fit: BoxFit.cover,
-                        alignment: Alignment.center,
-                        opacity: const AlwaysStoppedAnimation(0.9),
-                      ),
-                    ),
-                  Positioned.fill(
-                    child: ColoredBox(
-                      color:
-                          (widget.secondary ? HuntColors.paper : HuntColors.ink)
-                              .withValues(alpha: enabled ? 0.36 : 0.7),
-                    ),
-                  ),
-                  Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (widget.icon != null) ...[
-                          Icon(widget.icon, color: foreground, size: 19),
-                          const SizedBox(width: HuntSpacing.sm),
-                        ],
-                        Text(
-                          widget.label,
-                          style: HuntTextStyles.action.copyWith(
-                            color: foreground,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
+                  if (widget.icon != null) ...[
+                    Icon(widget.icon, color: foreground, size: 19),
+                    const SizedBox(width: HuntSpacing.sm),
+                  ],
+                  Text(
+                    widget.label,
+                    style: HuntTextStyles.action.copyWith(color: foreground),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -184,6 +216,56 @@ class _HuntActionButtonState extends State<HuntActionButton> {
         ? SizedBox(width: double.infinity, child: button)
         : button;
   }
+}
+
+enum HuntSnackBarTone { success, info, warning }
+
+void showHuntSnackBar(
+  BuildContext context, {
+  required String message,
+  IconData icon = Icons.check_circle_outline_rounded,
+  HuntSnackBarTone tone = HuntSnackBarTone.success,
+}) {
+  final color = switch (tone) {
+    HuntSnackBarTone.success => HuntColors.mossDark,
+    HuntSnackBarTone.info => HuntColors.royalBlueDark,
+    HuntSnackBarTone.warning => HuntColors.terracotta,
+  };
+  final messenger = ScaffoldMessenger.of(context);
+  messenger
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: color,
+        elevation: 8,
+        margin: const EdgeInsets.fromLTRB(
+          HuntSpacing.md,
+          0,
+          HuntSpacing.md,
+          HuntSpacing.lg,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(HuntRadii.md),
+          side: BorderSide(color: HuntColors.sun.withValues(alpha: 0.7)),
+        ),
+        content: Row(
+          children: [
+            Icon(icon, color: HuntColors.sun),
+            const SizedBox(width: HuntSpacing.sm),
+            Expanded(
+              child: Text(
+                message,
+                style: HuntTextStyles.supporting.copyWith(
+                  color: HuntColors.paper,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 }
 
 class HuntMetric extends StatelessWidget {
