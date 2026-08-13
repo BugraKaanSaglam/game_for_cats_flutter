@@ -1,7 +1,7 @@
 name: mice_and_paws_cat_game
 description: Mice and Paws is a local-first indoor hunt game for cats.
 publish_to: 'none'
-version: 4.2.0+39
+version: 4.2.1+40
 
 environment:
   sdk: ^3.10.4
