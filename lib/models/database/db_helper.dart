@@ -1,9 +1,9 @@
 // ignore_for_file: await_only_futures, depend_on_referenced_packages
 
 import 'dart:developer';
-import 'package:game_for_cats_2025/models/app_settings.dart';
-import 'package:game_for_cats_2025/models/database/session_log.dart';
-import 'package:game_for_cats_2025/models/database/db_schema.dart';
+import 'package:mice_and_paws_cat_game/models/app_settings.dart';
+import 'package:mice_and_paws_cat_game/models/database/session_log.dart';
+import 'package:mice_and_paws_cat_game/models/database/db_schema.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';

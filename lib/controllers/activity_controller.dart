@@ -1,5 +1,5 @@
-import 'package:game_for_cats_2025/models/database/db_helper.dart';
-import 'package:game_for_cats_2025/models/database/session_log.dart';
+import 'package:mice_and_paws_cat_game/models/database/db_helper.dart';
+import 'package:mice_and_paws_cat_game/models/database/session_log.dart';
 
 /// Reads recent hunt records for the journal screen.
 // ? Keeping data access separate from widgets makes filtering and testing easier.

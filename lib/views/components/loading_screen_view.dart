@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/l10n/app_localizations.dart';
-import 'package:game_for_cats_2025/views/components/hunt_ui.dart';
-import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
+import 'package:mice_and_paws_cat_game/l10n/app_localizations.dart';
+import 'package:mice_and_paws_cat_game/views/components/hunt_ui.dart';
+import 'package:mice_and_paws_cat_game/views/theme/paw_theme.dart';
 
 /// Full-screen first frame shown while the app decides between onboarding and
 /// the main menu. It keeps Android 12+'s system splash transition seamless.

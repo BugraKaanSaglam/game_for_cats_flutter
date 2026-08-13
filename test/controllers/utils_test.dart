@@ -1,6 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:game_for_cats_2025/controllers/utils.dart';
+import 'package:mice_and_paws_cat_game/controllers/utils.dart';
 
 void main() {
   test('spawns targets inside the playable field below the HUD inset', () {

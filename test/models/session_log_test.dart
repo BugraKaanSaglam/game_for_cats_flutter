@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:game_for_cats_2025/models/database/session_log.dart';
-import 'package:game_for_cats_2025/models/game/hunt_session.dart';
+import 'package:mice_and_paws_cat_game/models/database/session_log.dart';
+import 'package:mice_and_paws_cat_game/models/game/hunt_session.dart';
 
 void main() {
   test('round-trips a complete Hunt Record', () {

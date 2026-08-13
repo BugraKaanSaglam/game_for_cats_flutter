@@ -1,8 +1,8 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
 export "FLUTTER_ROOT=/Users/rtl/Documents/flutter"
-export "FLUTTER_APPLICATION_PATH=/Users/rtl/Documents/PROJECTS/game_for_cats_flutter"
-export "FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/Users/rtl/Documents/PROJECTS/game_for_cats_flutter/macos/Flutter/ephemeral/Packages/.packages/FlutterFramework"
+export "FLUTTER_APPLICATION_PATH=/Users/rtl/Documents/PROJECTS/mice_and_paws_cat_game"
+export "FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/Users/rtl/Documents/PROJECTS/mice_and_paws_cat_game/macos/Flutter/ephemeral/Packages/.packages/FlutterFramework"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=4.1.1"

@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "game_for_cats_2025",
+            "name": "Mice and Paws: Cat Game",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "game_for_cats_2025 (profile mode)",
+            "name": "Mice and Paws: Cat Game (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "game_for_cats_2025 (release mode)",
+            "name": "Mice and Paws: Cat Game (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

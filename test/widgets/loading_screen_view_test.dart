@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:game_for_cats_2025/views/components/loading_screen_view.dart';
+import 'package:mice_and_paws_cat_game/views/components/loading_screen_view.dart';
 
 import '../helpers/test_app.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:game_for_cats_2025/models/app_settings.dart';
-import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
-import 'package:game_for_cats_2025/models/enums/game_enums.dart';
+import 'package:mice_and_paws_cat_game/models/app_settings.dart';
+import 'package:mice_and_paws_cat_game/models/enums/enum_functions.dart';
+import 'package:mice_and_paws_cat_game/models/enums/game_enums.dart';
 
 void main() {
   group('AppSettings', () {

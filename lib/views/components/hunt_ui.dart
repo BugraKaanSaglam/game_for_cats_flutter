@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/views/components/main_app_bar.dart';
-import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
+import 'package:mice_and_paws_cat_game/views/components/main_app_bar.dart';
+import 'package:mice_and_paws_cat_game/views/theme/paw_theme.dart';
 
 /// Shared shell for every non-game screen.
 ///
@@ -279,26 +279,34 @@ class _HuntActionButtonState extends State<HuntActionButton> {
                 color: widget.secondary ? HuntColors.lineStrong : background,
               ),
             ),
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (widget.icon != null) ...[
-                    Icon(widget.icon, color: foreground, size: 19),
-                    const SizedBox(width: HuntSpacing.sm),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final label = Text(
+                  widget.label,
+                  style: HuntTextStyles.action.copyWith(color: foreground),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                );
+                final content = Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: constraints.hasBoundedWidth
+                      ? MainAxisSize.max
+                      : MainAxisSize.min,
+                  children: [
+                    if (widget.icon != null) ...[
+                      Icon(widget.icon, color: foreground, size: 19),
+                      const SizedBox(width: HuntSpacing.sm),
+                    ],
+                    constraints.hasBoundedWidth
+                        ? Flexible(child: label)
+                        : label,
                   ],
-                  Flexible(
-                    child: Text(
-                      widget.label,
-                      style: HuntTextStyles.action.copyWith(color: foreground),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
+                );
+                return constraints.hasBoundedWidth
+                    ? content
+                    : Center(child: content);
+              },
             ),
           ),
         ),

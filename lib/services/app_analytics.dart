@@ -1,4 +1,4 @@
-import 'package:game_for_cats_2025/services/app_logger.dart';
+import 'package:mice_and_paws_cat_game/services/app_logger.dart';
 
 /// Typed local analytics facade that can later be backed by an SDK.
 enum AnalyticsEvent {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:game_for_cats_2025/services/app_info_service.dart';
-import 'package:game_for_cats_2025/views/components/loading_screen_view.dart';
-import 'package:game_for_cats_2025/views/screens/about_screen.dart';
+import 'package:mice_and_paws_cat_game/services/app_info_service.dart';
+import 'package:mice_and_paws_cat_game/views/components/loading_screen_view.dart';
+import 'package:mice_and_paws_cat_game/views/screens/about_screen.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../helpers/test_app.dart';

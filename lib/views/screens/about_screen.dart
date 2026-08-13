@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/l10n/app_localizations.dart';
-import 'package:game_for_cats_2025/services/app_analytics.dart';
-import 'package:game_for_cats_2025/services/app_info_service.dart';
-import 'package:game_for_cats_2025/views/components/hunt_ui.dart';
-import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
+import 'package:mice_and_paws_cat_game/l10n/app_localizations.dart';
+import 'package:mice_and_paws_cat_game/services/app_analytics.dart';
+import 'package:mice_and_paws_cat_game/services/app_info_service.dart';
+import 'package:mice_and_paws_cat_game/views/components/hunt_ui.dart';
+import 'package:mice_and_paws_cat_game/views/theme/paw_theme.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 /// Product story and runtime build information.

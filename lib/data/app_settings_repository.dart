@@ -1,5 +1,5 @@
-import 'package:game_for_cats_2025/models/app_settings.dart';
-import 'package:game_for_cats_2025/models/database/db_helper.dart';
+import 'package:mice_and_paws_cat_game/models/app_settings.dart';
+import 'package:mice_and_paws_cat_game/models/database/db_helper.dart';
 
 /// Repository that maps persisted settings rows to the app model.
 // ? The UI never talks to sqflite directly; it always goes through AppState -> repository -> DBHelper.

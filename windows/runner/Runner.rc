@@ -92,9 +92,9 @@ BEGIN
             VALUE "CompanyName", "Mice and Paws" "\0"
             VALUE "FileDescription", "Mice and Paws: Cat Game" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "game_for_cats_2025" "\0"
+            VALUE "InternalName", "mice_and_paws_cat_game" "\0"
             VALUE "LegalCopyright", "Mice and Paws" "\0"
-            VALUE "OriginalFilename", "game_for_cats_2025.exe" "\0"
+            VALUE "OriginalFilename", "mice_and_paws_cat_game.exe" "\0"
             VALUE "ProductName", "Mice and Paws: Cat Game" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END

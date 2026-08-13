@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
-import 'package:game_for_cats_2025/models/enums/game_enums.dart';
+import 'package:mice_and_paws_cat_game/models/enums/enum_functions.dart';
+import 'package:mice_and_paws_cat_game/models/enums/game_enums.dart';
 
 part 'app_settings.freezed.dart';
 

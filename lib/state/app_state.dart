@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/data/app_settings_repository.dart';
-import 'package:game_for_cats_2025/data/onboarding_repository.dart';
-import 'package:game_for_cats_2025/models/app_settings.dart';
-import 'package:game_for_cats_2025/services/app_analytics.dart';
-import 'package:game_for_cats_2025/services/app_logger.dart';
+import 'package:mice_and_paws_cat_game/data/app_settings_repository.dart';
+import 'package:mice_and_paws_cat_game/data/onboarding_repository.dart';
+import 'package:mice_and_paws_cat_game/models/app_settings.dart';
+import 'package:mice_and_paws_cat_game/services/app_analytics.dart';
+import 'package:mice_and_paws_cat_game/services/app_logger.dart';
 
 // * AppState is the single app-wide source of truth for:
 // * - persisted settings

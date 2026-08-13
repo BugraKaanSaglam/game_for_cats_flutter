@@ -1,8 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:game_for_cats_2025/models/app_settings.dart';
-import 'package:game_for_cats_2025/views/screens/main_screen.dart';
+import 'package:mice_and_paws_cat_game/models/app_settings.dart';
+import 'package:mice_and_paws_cat_game/views/screens/main_screen.dart';
 
 import '../helpers/test_app.dart';
 

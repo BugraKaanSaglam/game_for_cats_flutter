@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/l10n/app_localizations.dart';
-import 'package:game_for_cats_2025/routing/app_routes.dart';
-import 'package:game_for_cats_2025/services/app_analytics.dart';
-import 'package:game_for_cats_2025/state/app_state.dart';
-import 'package:game_for_cats_2025/views/components/hunt_ui.dart';
-import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
+import 'package:mice_and_paws_cat_game/l10n/app_localizations.dart';
+import 'package:mice_and_paws_cat_game/routing/app_routes.dart';
+import 'package:mice_and_paws_cat_game/services/app_analytics.dart';
+import 'package:mice_and_paws_cat_game/state/app_state.dart';
+import 'package:mice_and_paws_cat_game/views/components/hunt_ui.dart';
+import 'package:mice_and_paws_cat_game/views/theme/paw_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 

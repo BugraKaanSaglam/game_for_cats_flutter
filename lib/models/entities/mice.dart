@@ -5,8 +5,8 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:game_for_cats_2025/controllers/animation_handler.dart';
-import 'package:game_for_cats_2025/controllers/utils.dart';
+import 'package:mice_and_paws_cat_game/controllers/animation_handler.dart';
+import 'package:mice_and_paws_cat_game/controllers/utils.dart';
 
 const _collisionCooldown = Duration(milliseconds: 5000);
 

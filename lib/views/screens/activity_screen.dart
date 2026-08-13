@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:game_for_cats_2025/l10n/app_localizations.dart';
-import 'package:game_for_cats_2025/controllers/activity_controller.dart';
-import 'package:game_for_cats_2025/models/database/session_log.dart';
-import 'package:game_for_cats_2025/models/enums/enum_functions.dart';
-import 'package:game_for_cats_2025/models/enums/game_enums.dart';
-import 'package:game_for_cats_2025/services/app_analytics.dart';
-import 'package:game_for_cats_2025/views/components/hunt_ui.dart';
-import 'package:game_for_cats_2025/views/theme/paw_theme.dart';
+import 'package:mice_and_paws_cat_game/l10n/app_localizations.dart';
+import 'package:mice_and_paws_cat_game/controllers/activity_controller.dart';
+import 'package:mice_and_paws_cat_game/models/database/session_log.dart';
+import 'package:mice_and_paws_cat_game/models/enums/enum_functions.dart';
+import 'package:mice_and_paws_cat_game/models/enums/game_enums.dart';
+import 'package:mice_and_paws_cat_game/services/app_analytics.dart';
+import 'package:mice_and_paws_cat_game/views/components/hunt_ui.dart';
+import 'package:mice_and_paws_cat_game/views/theme/paw_theme.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
-import 'package:game_for_cats_2025/routing/app_routes.dart';
+import 'package:mice_and_paws_cat_game/routing/app_routes.dart';
 
 /// Local journal of completed hunts with best-score and trend summaries.
 class ActivityScreen extends StatefulWidget {

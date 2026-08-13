@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:game_for_cats_2025/data/app_settings_repository.dart';
-import 'package:game_for_cats_2025/data/onboarding_repository.dart';
-import 'package:game_for_cats_2025/models/app_settings.dart';
-import 'package:game_for_cats_2025/models/enums/game_enums.dart';
-import 'package:game_for_cats_2025/state/app_state.dart';
+import 'package:mice_and_paws_cat_game/data/app_settings_repository.dart';
+import 'package:mice_and_paws_cat_game/data/onboarding_repository.dart';
+import 'package:mice_and_paws_cat_game/models/app_settings.dart';
+import 'package:mice_and_paws_cat_game/models/enums/game_enums.dart';
+import 'package:mice_and_paws_cat_game/state/app_state.dart';
 
 void main() {
   group('AppState', () {

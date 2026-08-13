@@ -1,4 +1,4 @@
-import 'package:game_for_cats_2025/models/game/hunt_session.dart';
+import 'package:mice_and_paws_cat_game/models/game/hunt_session.dart';
 
 /// One complete local hunt record stored for the journal.
 class SessionLog {
